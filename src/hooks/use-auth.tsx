@@ -85,23 +85,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   const signupMutation = useMutation({
-      mutationFn: authApi.signup,
-      onSuccess: (data) => {
-        toast({
-          title: "Account created!",
-          description: data.message || "Your account has been created successfully",
-        });
-
-        router.push("/login");
-      },
-      onError: (error: any) => {
-        toast({
-          variant: "destructive",
-          title: "Signup failed",
-          description: error.message || "An error occurred during signup",
-        });
-      },
-    });
+    mutationFn: authApi.signup,
+    onSuccess: (data) => {
+      // data may be { message, userId } (no user) if backend doesn't return user on signup
+      if (data?.user) {
+        queryClient.setQueryData(["/auth/me"], data.user);
+        if (data.user.role === "admin") {
+          router.push("/admin");
+        } else {
+          router.push("/dashboard");
+        }
+      }
+      // If no user returned, the signup-form handles login + redirect itself
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Signup failed",
+        description: error.message || "An error occurred during signup",
+      });
+    },
+  });
 
   const logoutMutation = useMutation({
     mutationFn: authApi.logout,

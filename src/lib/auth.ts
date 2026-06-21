@@ -84,12 +84,15 @@ export const authApi = {
       const result: ApiResponse<AuthResponse> = await response.json();
       console.log('Signup response data:', result);
       
+      // Handle both wrapped { status, data } and unwrapped { message, userId } responses
+      const responseData = result.data ?? (result as any);
+      
       // Store token if present
-      if (result.data?.token) {
-        localStorage.setItem('authToken', result.data.token);
+      if (responseData?.token) {
+        localStorage.setItem('authToken', responseData.token);
       }
       
-      return result.data!;
+      return responseData;
     } catch (error: any) {
       console.error('Signup fetch error:', error);
       
