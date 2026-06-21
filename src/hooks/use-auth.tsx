@@ -85,31 +85,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   const signupMutation = useMutation({
-    mutationFn: authApi.signup,
-    onSuccess: (data) => {
-      if (data.user) {
-        queryClient.setQueryData(["/auth/me"], data.user);
-        
+      mutationFn: authApi.signup,
+      onSuccess: (data) => {
         toast({
           title: "Account created!",
           description: data.message || "Your account has been created successfully",
         });
-        
-        if (data.user.role === "admin") {
-          router.push("/admin");
-        } else {
-          router.push("/dashboard");
-        }
-      }
-    },
-    onError: (error: any) => {
-      toast({
-        variant: "destructive",
-        title: "Signup failed",
-        description: error.message || "An error occurred during signup",
-      });
-    },
-  });
+
+        router.push("/login");
+      },
+      onError: (error: any) => {
+        toast({
+          variant: "destructive",
+          title: "Signup failed",
+          description: error.message || "An error occurred during signup",
+        });
+      },
+    });
 
   const logoutMutation = useMutation({
     mutationFn: authApi.logout,
