@@ -75,9 +75,7 @@ export function NotificationPanel() {
       queryClient.invalidateQueries({ queryKey: ["notifications", "unread"] });
       toast({
         title: "All notifications marked as read",
-        description: data && typeof data.markedCount === 'number'
-          ? `${data.markedCount} notifications have been marked as read.`
-          : "All notifications have been marked as read.",
+        description: "All notifications have been marked as read.",
       });
     },
   });

@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { handleFormSubmissionResponse, extractMessage } from "@/lib/messages";
-import type { PaginatedResponse, Investment, Commission, Withdrawal } from "../../../shared/schema";
+import type { Investment, Commission, Withdrawal } from "../../../shared/schema";
 
 // Form validation schema
 const withdrawalFormSchema = z.object({
@@ -84,17 +84,17 @@ export function WithdrawalForm() {
   const watchedMethod = form.watch("method");
 
   // Get user's investments and commissions to show available balance
-  const { data: investments } = useQuery<PaginatedResponse<Investment>>({
+  const { data: investments = [] } = useQuery<Investment[]>({
     queryKey: ["investments"],
     queryFn: investmentApi.getAll,
   });
 
-  const { data: commissions } = useQuery<PaginatedResponse<Commission>>({
+  const { data: commissions = [] } = useQuery<Commission[]>({
     queryKey: ["commissions"],
     queryFn: commissionApi.getAll,
   });
 
-  const { data: withdrawals } = useQuery<PaginatedResponse<Withdrawal>>({
+  const { data: withdrawals = [] } = useQuery<Withdrawal[]>({
     queryKey: ["withdrawals"],
     queryFn: withdrawalApi.getAll,
   });

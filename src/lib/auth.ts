@@ -23,19 +23,25 @@ export const authApi = {
       }),
       credentials: 'include',
     });
-    
-    const result: ApiResponse<AuthResponse> = await response.json();
-    
+
+    const result = await response.json();
+
     if (!response.ok) {
       throw new Error(result.message || "Login failed");
     }
-    
-    // Store token if present
-    if (result.data?.token) {
-      localStorage.setItem('authToken', result.data.token);
+
+    // Handle both wrapped { data: { user, token } } and unwrapped { user, sessionId } responses
+    const responseData: AuthResponse = result.data ?? result;
+
+    // Store token or sessionId — backend returns sessionId, not a JWT token
+    const tokenToStore = responseData?.token || responseData?.sessionId;
+    if (tokenToStore) {
+      localStorage.setItem('authToken', tokenToStore);
     }
-    
-    return result.data!;
+
+    // Also set the user in query cache immediately so isAuthenticated becomes true
+    // without waiting for the /auth/me query to re-run
+    return responseData;
   },
 
   signup: async (data: InsertUser): Promise<AuthResponse> => {
@@ -141,11 +147,11 @@ export const authApi = {
   me: async (): Promise<User> => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
     const token = localStorage.getItem('authToken');
-    
+
     if (!token) {
       throw new Error('No authentication token found');
     }
-    
+
     const response = await fetch(`${baseUrl}/auth/me`, {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -153,14 +159,15 @@ export const authApi = {
       },
       credentials: 'include',
     });
-    
-    const result: ApiResponse<User> = await response.json();
-    
+
+    const result = await response.json();
+
     if (!response.ok) {
       throw new Error(result.message || "Failed to get user data");
     }
-    
-    return result.data!;
+
+    // Handle both wrapped { data: { ...user } } and unwrapped { ...user } responses
+    return (result.data ?? result) as User;
   },
 
   // Forgot password functionality

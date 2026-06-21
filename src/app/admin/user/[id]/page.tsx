@@ -314,7 +314,7 @@ export default function AdminViewUser() {
             </div>
             <div className="mt-8">
               <h3 className="font-semibold mb-2">Commission Breakdown</h3>
-              {commissionStats && commissionStats.docs && commissionStats.docs.length > 0 ? (
+              {commissionStats && commissionStats.length > 0 ? (
                 <table className="min-w-full divide-y divide-gray-200 mb-4">
                   <thead>
                     <tr>
@@ -324,7 +324,7 @@ export default function AdminViewUser() {
                   </thead>
                   <tbody>
                     {Array.from({ length: 10 }, (_, i) => i + 1).map((level) => {
-                      const total = commissionStats.docs
+                      const total = commissionStats
                         .filter((c: any) => c.level === level)
                         .reduce((sum: number, c: any) => sum + c.amount, 0);
                       return (

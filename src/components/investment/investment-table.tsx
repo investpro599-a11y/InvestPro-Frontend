@@ -23,7 +23,6 @@ import { format } from "date-fns";
 import { Eye, X, Download, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Investment } from "@shared/schema";
-import { PaginatedResponse } from "@shared/schema";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -49,13 +48,13 @@ export function InvestmentTable() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: investments, isLoading } = useQuery<PaginatedResponse<Investment>>({
+  const { data: investments = [], isLoading } = useQuery<Investment[]>({
     queryKey: ["investments"],
     queryFn: investmentApi.getAll,
   });
 
-  // Use investments.docs for the data array
-  const data = investments?.docs || [];
+  // Use investments array directly
+  const data = investments;
 
   // Cancel investment mutation
   const cancelInvestmentMutation = useMutation({
@@ -214,7 +213,7 @@ export function InvestmentTable() {
       {/* Results Summary */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">
-          Showing {filteredInvestments.length} of {investments?.totalDocs || 0} investments
+          Showing {filteredInvestments.length} of {investments.length} investments
         </div>
         {filteredInvestments.length > 0 && (
           <div className="flex space-x-2">
@@ -239,12 +238,12 @@ export function InvestmentTable() {
           {filteredInvestments.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
               <p>
-                {(investments?.docs.length || 0) === 0
+                {data.length === 0
                   ? "No investments found"
                   : "No investments match your search criteria"}
               </p>
               <p className="text-sm">
-                {(investments?.docs.length || 0) === 0
+                {data.length === 0
                   ? "Create your first investment to get started"
                   : "Try adjusting your search or filters"}
               </p>

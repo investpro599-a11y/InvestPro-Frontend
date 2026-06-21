@@ -39,11 +39,10 @@ export function WithdrawalApproval() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery<{ pendingWithdrawals: Withdrawal[]; totalPendingAmount: number; count: number }>({
+  const { data: pendingWithdrawals = [], isLoading } = useQuery<Withdrawal[]>({
     queryKey: ["admin/withdrawals/pending"],
     queryFn: adminApi.getPendingWithdrawals,
   });
-  const pendingWithdrawals = data?.pendingWithdrawals ?? [];
 
   const approveWithdrawalMutation = useMutation({
     mutationFn: async ({ id, txid, paymentProof }: { id: string; txid: string; paymentProof?: File }) => {
@@ -80,7 +79,7 @@ export function WithdrawalApproval() {
       const formData = new FormData();
       formData.append('txid', txid);
       formData.append('paymentProof', paymentProof);
-      return adminApi.approveWithdrawal(id, formData);
+      return adminApi.approveWithdrawal(id, txid);
     },
     onSuccess: (response) => {
       // Use server message if available, otherwise use default
@@ -239,7 +238,7 @@ export function WithdrawalApproval() {
       <CardHeader>
         <CardTitle>Withdrawal Approvals</CardTitle>
         <div className="text-sm text-gray-600">
-          {pendingWithdrawals.length} pending withdrawals • Total: PKR {data?.totalPendingAmount.toLocaleString()}
+          {pendingWithdrawals.length} pending withdrawals
         </div>
       </CardHeader>
       <CardContent>

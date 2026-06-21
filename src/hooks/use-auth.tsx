@@ -62,13 +62,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return result;
     },
     onSuccess: (data) => {
+      if (!data?.user) return;
       queryClient.setQueryData(["/auth/me"], data.user);
-      
       toast({
         title: "Welcome back!",
         description: data.message || "Login successful",
       });
-      
       if (data.user.role === "admin") {
         router.push("/admin");
       } else {

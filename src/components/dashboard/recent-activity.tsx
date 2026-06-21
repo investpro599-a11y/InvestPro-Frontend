@@ -33,18 +33,18 @@ const getStatusColor = (status: string) => {
 
 export function RecentActivity() {
   const { isAdmin } = useAuth();
-  const { data: investments } = useQuery<{ docs: Investment[] }>({
+  const { data: investments = [] } = useQuery<Investment[]>({
     queryKey: ["investments"],
     queryFn: investmentApi.getAll,
   });
 
-  const { data: withdrawals } = useQuery<{ docs: Withdrawal[] }>({
+  const { data: withdrawals = [] } = useQuery<Withdrawal[]>({
     queryKey: ["withdrawals"],
     queryFn: withdrawalApi.getAll,
   });
 
-  const recentInvestments = (investments?.docs || []).slice(0, 3);
-  const recentWithdrawals = (withdrawals?.docs || []).slice(0, 3);
+  const recentInvestments = investments.slice(0, 3);
+  const recentWithdrawals = withdrawals.slice(0, 3);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">

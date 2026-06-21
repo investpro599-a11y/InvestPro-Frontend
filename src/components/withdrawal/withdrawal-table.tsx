@@ -19,7 +19,7 @@ import { SearchFilter } from "@/components/ui/search-filter";
 import { pdfExporter } from "@/lib/pdf-export";
 import { format } from "date-fns";
 import { ExternalLink, Download, FileText } from "lucide-react";
-import { Withdrawal, PaginatedResponse } from "@shared/schema";
+import { Withdrawal, Investment, PaginatedResponse } from "@shared/schema";
 import { WithdrawalDetails } from "./withdrawal-details";
 
 const getStatusColor = (status: string) => {
@@ -41,21 +41,19 @@ export function WithdrawalTable() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<Record<string, string>>({});
 
-  const { data: withdrawals, isLoading } = useQuery<PaginatedResponse<Withdrawal>>({
+  const { data: withdrawals = [], isLoading } = useQuery<Withdrawal[]>({
     queryKey: ["withdrawals"],
     queryFn: withdrawalApi.getAll,
   });
 
-  // Get user's investments to check for matured principal
-  const { data: investments } = useQuery({
+  const { data: investments = [] } = useQuery<Investment[]>({
     queryKey: ["investments"],
     queryFn: investmentApi.getAll,
   });
-  const hasMaturedPrincipal = (investments?.docs ?? []).some((inv) => inv.status === 'completed');
+  const hasMaturedPrincipal = investments.some((inv) => inv.status === 'completed');
 
-  // Filter and search withdrawals
   const filteredWithdrawals = useMemo(() => {
-    let filtered = withdrawals?.docs || [];
+    let filtered = withdrawals;
 
     // Apply search
     if (searchQuery) {
@@ -199,7 +197,7 @@ export function WithdrawalTable() {
       {/* Results Summary */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">
-          Showing {filteredWithdrawals.length} of {withdrawals?.totalDocs || 0} withdrawals
+          Showing {filteredWithdrawals.length} of {withdrawals.length} withdrawals
         </div>
         {filteredWithdrawals.length > 0 && (
           <div className="flex space-x-2">
@@ -229,12 +227,12 @@ export function WithdrawalTable() {
           {filteredWithdrawals.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
               <p>
-                {(withdrawals?.docs.length || 0) === 0
+                {withdrawals.length === 0
                   ? "No withdrawals found"
                   : "No withdrawals match your search criteria"}
               </p>
               <p className="text-sm">
-                {(withdrawals?.docs.length || 0) === 0
+                {withdrawals.length === 0
                   ? "Request your first withdrawal to get started"
                   : "Try adjusting your search or filters"}
               </p>
