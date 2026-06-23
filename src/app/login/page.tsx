@@ -31,7 +31,7 @@ export default function Login() {
               <img src="/investpro.png" alt="InvestPro Logo" className="h-32 w-32 object-contain" />
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-gray-900">Welcome to InvestPro Scam</h2>
+              <h2 className="text-3xl font-bold text-gray-900">Welcome to InvestPro</h2>
               <p className="text-gray-600 mt-2">Sign in to access your investment dashboard</p>
             </div>
           </CardHeader>
