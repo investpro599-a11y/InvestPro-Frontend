@@ -27,9 +27,6 @@ export function LoginForm() {
     setLoginError('');
     try {
       await login(data);
-      // The useAuth hook will handle routing based on user role
-      // Admins go to /admin, users go to /dashboard
-      window.location.reload();
     } catch (error: any) {
       setLoginError(error.message || "Login failed");
     }
