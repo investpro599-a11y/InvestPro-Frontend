@@ -54,7 +54,10 @@ class ApiClient {
     }
 
     const result: ApiResponse<T> = await response.json();
+    console.log("API RESULT:", result);
+    console.log("API RESULT DATA:", result.data);
     return result.data!;
+
   }
 
   // Authentication
