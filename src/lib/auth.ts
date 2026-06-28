@@ -26,24 +26,23 @@ export const authApi = {
 
 
     const result = await response.json();
-    console.log("API RESULT:", result);
-    console.log("API RESULT DATA:", result.data);
 
     if (!response.ok) {
-      throw new Error(result.message || "Login failed");
+      throw new Error(result?.message || "Login failed");
     }
 
-    // Handle both wrapped { data: { user, token } } and unwrapped { user, sessionId } responses
+    // Backend returns { user, sessionId } — no data wrapper
     const responseData: AuthResponse = result.data ?? result;
 
-    // Store token or sessionId — backend returns sessionId, not a JWT token
-    const tokenToStore = responseData?.token || responseData?.sessionId;
+    if (!responseData?.user) {
+      throw new Error("Invalid response from server: missing user data");
+    }
+
+    const tokenToStore = responseData.token || responseData.sessionId;
     if (tokenToStore) {
       localStorage.setItem('authToken', tokenToStore);
     }
 
-    // Also set the user in query cache immediately so isAuthenticated becomes true
-    // without waiting for the /auth/me query to re-run
     return responseData;
   },
 

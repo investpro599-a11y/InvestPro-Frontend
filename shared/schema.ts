@@ -2,24 +2,22 @@
 // These match the backend models but are simplified for client use
 
 export interface User {
-  _id: string;
+  id: number;
   fullName: string;
   username: string;
   email: string;
-  phone?: string;
-  profilePicture?: string;
-  walletAddress?: string;
+  password?: string;
+  phone?: string | null;
+  profilePicture?: string | null;
+  walletAddress?: string | null;
   role: 'user' | 'admin';
   referralCode: string;
-  referredBy?: string;
+  referredBy?: number | null;
   isActive: boolean;
-  emailVerified: boolean;
-  phoneVerified: boolean;
-  twoFactorEnabled: boolean;
-  lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
-  securityQuestions?: SecurityQuestion[];
+  otp?: string | null;
+  otpExpiry?: Date | null;
 }
 
 export interface Investment {
@@ -138,9 +136,9 @@ export interface LoginData {
 }
 
 export interface AuthResponse {
-  user: User;
-  sessionId?: string; // ✅ add this
-  token?: string;     // optional if still used elsewhere
+  user?: User;
+  sessionId?: string;
+  token?: string;
   message?: string;
 }
 

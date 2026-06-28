@@ -62,7 +62,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return result;
     },
     onSuccess: (data) => {
-      if (!data?.user) return;
+      if (!data?.user) {
+        toast({
+          variant: "destructive",
+          title: "Login failed",
+          description: "Unexpected response from server. Please try again.",
+        });
+        return;
+      }
       queryClient.setQueryData(["/auth/me"], data.user);
       toast({
         title: "Welcome back!",
