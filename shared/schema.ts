@@ -136,9 +136,9 @@ export interface LoginData {
 }
 
 export interface AuthResponse {
-  user?: User;
-  sessionId?: string;
-  token?: string;
+  user: User;
+  sessionId?: string; // ✅ add this
+  token?: string;     // optional if still used elsewhere
   message?: string;
 }
 
