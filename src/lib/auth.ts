@@ -24,7 +24,10 @@ export const authApi = {
       credentials: 'include',
     });
 
+
     const result = await response.json();
+    console.log("API RESULT:", result);
+    console.log("API RESULT DATA:", result.data);
 
     if (!response.ok) {
       throw new Error(result.message || "Login failed");
