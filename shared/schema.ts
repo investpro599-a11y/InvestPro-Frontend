@@ -2,22 +2,24 @@
 // These match the backend models but are simplified for client use
 
 export interface User {
-  id: number;
+  _id: string;
   fullName: string;
   username: string;
   email: string;
-  password?: string;
-  phone?: string | null;
-  profilePicture?: string | null;
-  walletAddress?: string | null;
+  phone?: string;
+  profilePicture?: string;
+  walletAddress?: string;
   role: 'user' | 'admin';
   referralCode: string;
-  referredBy?: number | null;
+  referredBy?: string;
   isActive: boolean;
+  emailVerified: boolean;
+  phoneVerified: boolean;
+  twoFactorEnabled: boolean;
+  lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
-  otp?: string | null;
-  otpExpiry?: Date | null;
+  securityQuestions?: SecurityQuestion[];
 }
 
 export interface Investment {
