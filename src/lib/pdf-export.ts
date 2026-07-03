@@ -4,7 +4,8 @@ import { format } from 'date-fns';
 import type { DashboardStats } from '@shared/schema';
 
 interface InvestmentData {
-  _id: string;
+  _id?: string;
+  id?: number;
   amount: number;
   plan: string;
   createdAt: Date;
@@ -19,7 +20,8 @@ interface InvestmentData {
 }
 
 interface WithdrawalData {
-  _id: string;
+  _id?: string;
+  id?: number;
   amount: number;
   type: string;
   method: string;

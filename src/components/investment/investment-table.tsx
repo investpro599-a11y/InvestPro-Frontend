@@ -262,7 +262,7 @@ export function InvestmentTable() {
             </TableHeader>
             <TableBody>
                 {filteredInvestments.map((investment) => (
-                <TableRow key={investment._id}>
+                <TableRow key={investment.id || investment._id}>
                   <TableCell className="font-medium">
                     PKR {investment.amount.toLocaleString()}
                   </TableCell>
@@ -283,7 +283,7 @@ export function InvestmentTable() {
                               <Button 
                                 variant="destructive" 
                                 size="sm"
-                                disabled={cancellingId === investment._id}
+                                disabled={cancellingId === String(investment.id || investment._id)}
                               >
                                 <X className="h-4 w-4" />
                               </Button>
@@ -302,16 +302,16 @@ export function InvestmentTable() {
                                   Plan: {investment.plan === "6months" ? "6 Months" : 
                                          investment.plan === "12months" ? "12 Months" : "18 Months"}
                                   <br />
-                                  ID: {investment._id}
+                                  ID: {investment.id || investment._id}
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>No, keep it</AlertDialogCancel>
                                 <AlertDialogAction
-                                  onClick={() => handleCancelInvestment(investment._id)}
+                                  onClick={() => handleCancelInvestment(String(investment.id || investment._id))}
                                   className="bg-red-600 hover:bg-red-700"
                                 >
-                                  {cancellingId === investment._id ? "Cancelling..." : "Yes, cancel investment"}
+                                  {cancellingId === String(investment.id || investment._id) ? "Cancelling..." : "Yes, cancel investment"}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
