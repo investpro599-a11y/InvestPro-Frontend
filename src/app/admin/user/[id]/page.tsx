@@ -85,13 +85,13 @@ export default function AdminViewUser() {
 
   const handleToggleUserStatus = () => {
     if (user) {
-      toggleUserStatusMutation.mutate(user._id);
+      toggleUserStatusMutation.mutate(String(user.id || user._id));
     }
   };
 
   useEffect(() => {
     if (user && user.referredBy) {
-      adminApi.getUserById(user.referredBy).then(setReferrer);
+      adminApi.getUserById(String(user.referredBy)).then(setReferrer);
     }
   }, [user]);
 
@@ -245,8 +245,8 @@ export default function AdminViewUser() {
                     </tr>
                   </thead>
                   <tbody>
-                    {allInvestments.filter((inv: any) => inv.userId === user._id).map((inv: any) => (
-                      <tr key={inv._id}>
+                    {allInvestments.filter((inv: any) => inv.userId === user.id || inv.userId === user._id).map((inv: any) => (
+                      <tr key={inv.id || inv._id}>
                         <td className="px-4 py-2">PKR {inv.amount.toLocaleString()}</td>
                         <td className="px-4 py-2">{inv.plan}</td>
                         <td className="px-4 py-2">{inv.status}</td>
@@ -272,8 +272,8 @@ export default function AdminViewUser() {
                     </tr>
                   </thead>
                   <tbody>
-                    {allWithdrawals.filter((w: any) => w.userId === user._id).map((w: any) => (
-                      <tr key={w._id}>
+                    {allWithdrawals.filter((w: any) => w.userId === user.id || w.userId === user._id).map((w: any) => (
+                      <tr key={w.id || w._id}>
                         <td className="px-4 py-2">PKR {w.amount.toLocaleString()}</td>
                         <td className="px-4 py-2">{w.type}</td>
                         <td className="px-4 py-2">{w.status}</td>
@@ -299,8 +299,8 @@ export default function AdminViewUser() {
                     </tr>
                   </thead>
                   <tbody>
-                    {allLogs.filter((log: any) => log.userId === user._id).map((log: any) => (
-                      <tr key={log._id}>
+                    {allLogs.filter((log: any) => log.userId === user.id || log.userId === user._id).map((log: any) => (
+                      <tr key={log.id || log._id}>
                         <td className="px-4 py-2">{log.action}</td>
                         <td className="px-4 py-2">{log.details || '-'}</td>
                         <td className="px-4 py-2">{log.ipAddress || '-'}</td>

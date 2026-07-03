@@ -66,7 +66,7 @@ export function InvestmentApproval() {
       
       if (!userId) return null;
 
-      return adminApi.getUserById(userId);
+      return adminApi.getUserById(String(userId));
     },
     enabled: !!selectedInvestment?.userId,
   });
