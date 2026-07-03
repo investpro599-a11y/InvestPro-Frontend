@@ -61,7 +61,7 @@ export function InvestmentApproval() {
     queryKey: ["admin/users", selectedInvestment?.userId],
     queryFn: () => {
       const userId = typeof selectedInvestment?.userId === 'object' && selectedInvestment.userId 
-        ? selectedInvestment.userId._id 
+        ? (selectedInvestment.userId.id || selectedInvestment.userId._id) 
         : selectedInvestment?.userId;
       
       if (!userId) return null;
@@ -126,7 +126,7 @@ export function InvestmentApproval() {
   const confirmReject = () => {
     if (investmentToReject && rejectReason.trim()) {
       rejectInvestmentMutation.mutate({
-        id: investmentToReject._id,
+        id: String(investmentToReject.id || (investmentToReject as any)._id),
         reason: rejectReason.trim()
       });
     }
@@ -195,7 +195,7 @@ export function InvestmentApproval() {
               </TableHeader>
               <TableBody>
                 {pendingInvestments.map((investment) => (
-                  <TableRow key={investment._id}>
+                  <TableRow key={investment.id || investment._id}>
                     <TableCell>
                       <div>
                         <p className="font-medium">User ID: {typeof investment.userId === 'object' && investment.userId
@@ -237,7 +237,7 @@ export function InvestmentApproval() {
                         </Button>
                         <Button
                           size="sm"
-                          onClick={() => handleApprove(investment._id)}
+                          onClick={() => handleApprove(String(investment.id || investment._id))}
                           disabled={approveInvestmentMutation.isPending}
                           className="bg-green-600 hover:bg-green-700"
                         >

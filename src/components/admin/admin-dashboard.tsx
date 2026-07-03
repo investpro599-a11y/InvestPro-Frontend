@@ -188,7 +188,7 @@ export function AdminDashboard() {
                   <tr><td colSpan={6} className="text-center py-4 text-gray-500">No investments found</td></tr>
                 ) : (
                   allInvestments.map((inv: Investment) => (
-                    <tr key={inv._id} className="border-b">
+                    <tr key={inv.id || inv._id} className="border-b">
                       <td className="px-4 py-2">
                         {typeof inv.userId === 'object' && inv.userId ? 
                           `${inv.userId.fullName} (@${inv.userId.username})` : 
@@ -235,7 +235,7 @@ export function AdminDashboard() {
                   <tr><td colSpan={5} className="text-center py-4 text-gray-500">No withdrawals found</td></tr>
                 ) : (
                   allWithdrawals.map((withdrawal: Withdrawal) => (
-                    <tr key={withdrawal._id} className="border-b">
+                    <tr key={withdrawal.id || withdrawal._id} className="border-b">
                       <td className="px-4 py-2">
                         {typeof withdrawal.userId === 'object' && withdrawal.userId ? 
                           `${(withdrawal.userId as any).fullName} (@${(withdrawal.userId as any).username})` : 

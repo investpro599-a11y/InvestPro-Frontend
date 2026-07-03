@@ -156,7 +156,7 @@ export function WithdrawalApproval() {
       return;
     }
     approveWithdrawalMutation.mutate({ 
-      id: selectedWithdrawal._id, 
+      id: String(selectedWithdrawal.id || (selectedWithdrawal as any)._id), 
       txid,
       paymentProof: paymentProof || undefined
     });
@@ -169,7 +169,7 @@ export function WithdrawalApproval() {
 
   const handleConfirmReject = () => {
     if (!selectedWithdrawal) return;
-    rejectWithdrawalMutation.mutate({ id: selectedWithdrawal._id, reason: rejectReason });
+    rejectWithdrawalMutation.mutate({ id: String(selectedWithdrawal.id || (selectedWithdrawal as any)._id), reason: rejectReason });
   };
 
   const getStatusColor = (status: string) => {
@@ -260,7 +260,7 @@ export function WithdrawalApproval() {
             </TableHeader>
             <TableBody>
               {pendingWithdrawals.map((withdrawal) => (
-                <TableRow key={withdrawal._id}>
+                <TableRow key={withdrawal.id}>
                   <TableCell>
                     <div>
                       <div className="font-medium">

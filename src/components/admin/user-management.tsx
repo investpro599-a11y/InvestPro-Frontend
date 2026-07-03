@@ -148,7 +148,7 @@ export function UserManagement() {
           </TableHeader>
           <TableBody>
             {filteredUsers.map((user) => (
-              <TableRow key={user._id}>
+              <TableRow key={user.id || user._id}>
                 <TableCell>
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-8 w-8">
@@ -180,14 +180,14 @@ export function UserManagement() {
                 </TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => router.push(`/admin/user/${user._id}`)}>
+                    <Button variant="outline" size="sm" onClick={() => router.push(`/admin/user/${String(user.id || user._id)}`)}>
                       <Eye className="h-4 w-4" />
                     </Button>
                     <Button 
                       variant="outline" 
                       size="sm"
                       className={user.isActive ? "text-orange-600 hover:bg-orange-50" : "text-green-600 hover:bg-green-50"}
-                      onClick={() => handleToggleUserStatus(user._id)}
+                      onClick={() => handleToggleUserStatus(String(user.id || user._id))}
                       disabled={toggleUserStatusMutation.isPending}
                       title={user.isActive ? "Deactivate User" : "Activate User"}
                     >
@@ -197,7 +197,7 @@ export function UserManagement() {
                       variant="outline" 
                       size="sm"
                       className="text-red-600 hover:bg-red-50"
-                      onClick={() => handleDeleteUser(user._id)}
+                      onClick={() => handleDeleteUser(String(user.id || user._id))}
                       disabled={deleteUserMutation.isPending}
                     >
                       <Trash2 className="h-4 w-4" />
