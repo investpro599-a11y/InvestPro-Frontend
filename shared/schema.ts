@@ -2,7 +2,8 @@
 // These match the backend models but are simplified for client use
 
 export interface User {
-  _id: string;
+  _id?: string;
+  id: number;
   fullName: string;
   username: string;
   email: string;
@@ -11,7 +12,7 @@ export interface User {
   walletAddress?: string;
   role: 'user' | 'admin';
   referralCode: string;
-  referredBy?: string;
+  referredBy?: number;
   isActive: boolean;
   emailVerified: boolean;
   phoneVerified: boolean;
@@ -23,8 +24,9 @@ export interface User {
 }
 
 export interface Investment {
-  _id: string;
-  userId: string | User;
+  _id?: string;
+  id: number;
+  userId: number | User;
   amount: number;
   plan: '6months' | '12months' | '18months';
   paymentMethod: 'usdt_trc20';
@@ -40,8 +42,9 @@ export interface Investment {
 }
 
 export interface Withdrawal {
-  _id: string;
-  userId: string;
+  _id?: string;
+  id: number;
+  userId: number;
   amount: number;
   type: 'roi' | 'commission' | 'principal';
   method: 'easypaisa' | 'jazzcash' | 'bank_account' | 'trc20' | 'others';
@@ -64,10 +67,11 @@ export interface Withdrawal {
 }
 
 export interface Commission {
-  _id: string;
-  userId: string;
-  fromUserId: string;
-  investmentId: string;
+  _id?: string;
+  id: number;
+  userId: number;
+  fromUserId: number;
+  investmentId: number;
   level: number;
   amount: number;
   type: 'direct' | 'unilevel';
@@ -78,8 +82,9 @@ export interface Commission {
 }
 
 export interface Notification {
-  _id: string;
-  userId: string;
+  _id?: string;
+  id: number;
+  userId: number;
   type: 'investment' | 'withdrawal' | 'user' | 'system';
   title: string;
   message: string;
@@ -90,8 +95,9 @@ export interface Notification {
 }
 
 export interface Session {
-  _id: string;
-  userId: string;
+  _id?: string;
+  id: string;
+  userId: number;
   expiresAt: Date;
   createdAt: Date;
 }
