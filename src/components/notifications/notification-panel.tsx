@@ -82,7 +82,7 @@ export function NotificationPanel() {
 
   const handleMarkAsRead = (notification: Notification) => {
     if (notification.status === "unread") {
-      markAsReadMutation.mutate(notification._id);
+      markAsReadMutation.mutate(String(notification.id || notification._id));
     }
   };
 
@@ -163,7 +163,7 @@ export function NotificationPanel() {
                 <div className="space-y-3">
                   {filteredNotifications.map((notification) => (
                     <div
-                      key={notification._id}
+                      key={notification.id || notification._id}
                       className={`p-4 rounded-lg border transition-colors ${
                         notification.status === "unread"
                           ? "bg-blue-50 border-blue-200"
@@ -217,7 +217,7 @@ export function NotificationPanel() {
             <div className="space-y-3">
               {notifications.map((notification) => (
                 <div
-                  key={notification._id}
+                  key={notification.id || notification._id}
                   className={`p-4 rounded-lg border transition-colors ${
                     notification.status === "unread"
                       ? "bg-blue-50 border-blue-200"

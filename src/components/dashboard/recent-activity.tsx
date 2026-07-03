@@ -76,7 +76,7 @@ export function RecentActivity() {
               </div>
             ) : (
               recentInvestments.map((investment) => (
-                <div key={investment._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div key={investment.id || investment._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                       <Coins className="h-5 w-5 text-primary" />
@@ -129,7 +129,7 @@ export function RecentActivity() {
               </div>
             ) : (
               recentWithdrawals.map((withdrawal) => (
-                <div key={withdrawal._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div key={withdrawal.id || withdrawal._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
                       <ArrowUp className="h-5 w-5 text-green-600" />

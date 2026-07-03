@@ -252,7 +252,7 @@ export function WithdrawalTable() {
             </TableHeader>
             <TableBody>
                 {filteredWithdrawals.map((withdrawal) => (
-                <TableRow key={withdrawal._id}>
+                <TableRow key={withdrawal.id || withdrawal._id}>
                   <TableCell className="font-medium">
                     PKR {withdrawal.amount.toLocaleString()}
                   </TableCell>
