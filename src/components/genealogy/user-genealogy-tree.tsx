@@ -74,7 +74,7 @@ function TreeNodeComponent({ node }: { node: GenealogyNode }) {
           <div className="h-8 w-px bg-gray-300 my-2"></div>
           <div className="flex space-x-8">
             {node.children.map((child) => (
-              <TreeNodeComponent key={child._id} node={child} />
+              <TreeNodeComponent key={child.id || child._id} node={child} />
             ))}
           </div>
         </>

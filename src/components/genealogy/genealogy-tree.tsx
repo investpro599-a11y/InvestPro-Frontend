@@ -106,7 +106,7 @@ function TreeNodeComponent({ node }: { node: GenealogyNode }) {
           <div className="h-8 w-px bg-gray-300 my-2"></div>
           <div className="flex space-x-8 overflow-x-auto pb-2">
             {node.children.map((child) => (
-              <TreeNodeComponent key={child._id} node={child} />
+              <TreeNodeComponent key={child.id || child._id} node={child} />
             ))}
           </div>
         </>
@@ -205,7 +205,7 @@ export function GenealogyTree({ selectedUserId: initialSelectedUserId }: { selec
     if (selectedUserId === "myself") {
       return user?.fullName || "Myself";
     }
-    const member = teamMembers.find((m: User) => m._id === selectedUserId);
+    const member = teamMembers.find((m: User) => String(m.id || m._id) === selectedUserId);
     return member?.fullName || "Select Member";
   };
 
@@ -281,7 +281,7 @@ export function GenealogyTree({ selectedUserId: initialSelectedUserId }: { selec
                     </div>
                   </SelectItem>
                   {filteredTeamMembers.map((member: User) => (
-                    <SelectItem key={member._id} value={member._id}>
+                    <SelectItem key={member.id || member._id} value={String(member.id || member._id)}>
                       <div className="flex items-center space-x-2">
                         <Avatar className="w-4 h-4">
                           <AvatarImage src={getFileUrl(member.profilePicture)} />

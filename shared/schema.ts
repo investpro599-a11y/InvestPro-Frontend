@@ -231,7 +231,8 @@ export interface PaginatedResponse<T> {
 
 // Genealogy interfaces
 export type GenealogyNode = {
-  _id: string;
+  _id?: string;
+  id: number;
   fullName: string;
   username: string;
   email: string;

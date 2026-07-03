@@ -91,7 +91,7 @@ export function GenealogyManagement() {
           </TableHeader>
           <TableBody>
             {filteredUsers.map((user: User) => (
-              <TableRow key={user._id}>
+              <TableRow key={user.id || user._id}>
                 <TableCell>
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-8 w-8">
@@ -136,7 +136,7 @@ export function GenealogyManagement() {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      onClick={() => handleViewTree(user._id)}
+                      onClick={() => handleViewTree(String(user.id || user._id))}
                       className="flex items-center space-x-1"
                     >
                       <Network className="h-4 w-4" />
