@@ -69,7 +69,7 @@ export function StatsGrid() {
                     </span>
                   </span>
                 </p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 sm:mt-2">PKR {stats?.totalInvested?.toLocaleString() || "0"}</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 sm:mt-2">PKR {stats?.investmentAmount?.toLocaleString() || "0"}</p>
               </div>
               <div className="p-2 sm:p-3 rounded-lg bg-blue-100">
                 <Wallet className="h-6 w-6 text-blue-700" />
