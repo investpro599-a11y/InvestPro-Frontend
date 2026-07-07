@@ -18,7 +18,7 @@ import type { Investment, Commission, Withdrawal } from "../../../shared/schema"
 
 // Form validation schema
 const withdrawalFormSchema = z.object({
-  amount: z.number().min(10, "Minimum withdrawal amount is PKR 10"),
+  amount: z.number().min(10, "Minimum withdrawal amount is 10"),
   type: z.enum(["roi", "commission", "principal"], {
     required_error: "Please select a withdrawal type",
   }),
@@ -276,9 +276,9 @@ export function WithdrawalForm() {
         <div className="text-sm text-gray-600 space-y-1">
           <p><strong>Available Balances:</strong></p>
           <p>• ROI (Your investment returns): PKR {availableROI.toLocaleString()}</p>
-          <p>• Commission (Withdrawable): PKR {availableCommission.toLocaleString()} <span title="This is the amount you can withdraw right now. It is your total paid commissions minus any already withdrawn.">ⓘ</span></p>
+          <p>• Commission (Withdrawable): ${availableCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span title="This is the amount you can withdraw right now. It is your total paid commissions minus any already withdrawn.">ⓘ</span></p>
           <p>• Principal (Matured): PKR {availableMaturedPrincipal.toLocaleString()}</p>
-          <p>• <b>Total Balance:</b> PKR {totalBalance.toLocaleString()}</p>
+          <p>• <b>Total Balance:</b> PKR {(availableROI + availableMaturedPrincipal).toLocaleString()} + ${availableCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           <p className="text-xs text-gray-500 mt-2">
             Note: You can only withdraw principal after your investment matures (6, 12, or 18 months). If you have no matured investments, principal withdrawal is disabled.
           </p>
@@ -293,7 +293,11 @@ export function WithdrawalForm() {
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Withdrawal Amount (PKR)</FormLabel>
+                    <FormLabel>
+                      {form.watch("type") === "commission"
+                        ? "Withdrawal Amount (USD)"
+                        : "Withdrawal Amount (PKR)"}
+                    </FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 

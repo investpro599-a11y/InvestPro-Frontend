@@ -106,7 +106,9 @@ export function WithdrawalTable() {
     const csvContent = [
       ["Amount", "Type", "Method", "Date", "Status", "TXID"],
       ...filteredWithdrawals.map((withdrawal) => [
-        `PKR ${withdrawal.amount.toLocaleString()}`,
+        withdrawal.type === "commission"
+          ? `$${parseFloat(String(withdrawal.amount)).toFixed(2)}`
+          : `PKR ${parseFloat(String(withdrawal.amount)).toLocaleString()}`,
         withdrawal.type,
         getMethodDisplayName(withdrawal.method),
         format(new Date(withdrawal.createdAt), "MMM dd, yyyy"),
@@ -254,7 +256,9 @@ export function WithdrawalTable() {
                 {filteredWithdrawals.map((withdrawal) => (
                 <TableRow key={withdrawal.id || withdrawal._id}>
                   <TableCell className="font-medium">
-                    PKR {withdrawal.amount.toLocaleString()}
+                    {withdrawal.type === "commission"
+                      ? `$${parseFloat(String(withdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                      : `PKR ${parseFloat(String(withdrawal.amount)).toLocaleString()}`}
                   </TableCell>
                   <TableCell className="capitalize">{withdrawal.type}</TableCell>
                   <TableCell>

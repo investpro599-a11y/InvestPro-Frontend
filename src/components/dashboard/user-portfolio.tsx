@@ -49,15 +49,15 @@ export function UserPortfolio() {
           </div>
           <div>
             <p className="font-medium">Unpaid Commissions:</p>
-            <p className="text-xl text-purple-700">PKR {(stats.unpaidCommissions ?? 0).toLocaleString()}</p>
+            <p className="text-xl text-purple-700">${parseFloat(String(stats.unpaidCommissions ?? 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
           <div>
             <p className="font-medium">Direct Commissions:</p>
-            <p className="text-xl">PKR {(stats.directCommissions ?? 0).toLocaleString()}</p>
+            <p className="text-xl">${parseFloat(String(stats.directCommissions ?? 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
           <div>
             <p className="font-medium">Total Commissions:</p>
-            <p className="text-xl text-purple-700">PKR {(stats.totalCommissions ?? 0).toLocaleString()}</p>
+            <p className="text-xl text-purple-700">${parseFloat(String(stats.totalCommissions ?? 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
           <div>
             <p className="font-medium">Total Referrals:</p>
@@ -108,7 +108,7 @@ export function UserPortfolio() {
                   return (
                     <tr key={level}>
                       <td className="px-4 py-2">{level === 1 ? 'Direct' : `Level ${level}`}</td>
-                      <td className="px-4 py-2">PKR {total.toLocaleString()}</td>
+                      <td className="px-4 py-2">${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     </tr>
                   );
                 })}

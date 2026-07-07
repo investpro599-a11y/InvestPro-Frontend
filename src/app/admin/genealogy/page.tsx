@@ -98,16 +98,16 @@ export default function AdminGenealogy() {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-1 sm:space-y-2">
-                    <li className="flex justify-between text-xs sm:text-sm"><span>Direct (Level 1)</span><span className="font-semibold">7%</span></li>
+                    <li className="flex justify-between text-xs sm:text-sm"><span>Direct (Level 1)</span><span className="font-semibold">5%</span></li>
                     <li className="flex justify-between text-xs sm:text-sm"><span>Level 2</span><span className="font-semibold">1%</span></li>
-                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 3</span><span className="font-semibold">1%</span></li>
-                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 4</span><span className="font-semibold">1%</span></li>
-                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 5</span><span className="font-semibold">0.5%</span></li>
-                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 6</span><span className="font-semibold">0.5%</span></li>
-                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 7</span><span className="font-semibold">0.25%</span></li>
-                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 8</span><span className="font-semibold">0.25%</span></li>
-                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 9</span><span className="font-semibold">0.25%</span></li>
-                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 10</span><span className="font-semibold">0.25%</span></li>
+                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 3</span><span className="font-semibold">0.5%</span></li>
+                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 4</span><span className="font-semibold">0.5%</span></li>
+                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 5</span><span className="font-semibold">0.2%</span></li>
+                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 6</span><span className="font-semibold">0.2%</span></li>
+                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 7</span><span className="font-semibold">0.1%</span></li>
+                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 8</span><span className="font-semibold">0.1%</span></li>
+                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 9</span><span className="font-semibold">0.1%</span></li>
+                    <li className="flex justify-between text-xs sm:text-sm"><span>Level 10</span><span className="font-semibold">0.1%</span></li>
                   </ul>
                 </CardContent>
               </Card>

@@ -107,7 +107,7 @@ export function AdminDashboard() {
           </div>
           <div className="bg-purple-50 rounded-lg p-4 text-center">
             <p className="text-2xl font-bold text-purple-600">
-              PKR {statsLoading ? "..." : (adminStats?.commissions?.total || 0).toLocaleString()}
+              ${statsLoading ? "..." : (adminStats?.commissions?.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
             <p className="text-sm text-purple-700">Total Commissions</p>
             <p className="text-xs text-purple-600 mt-1">
@@ -147,7 +147,7 @@ export function AdminDashboard() {
               <div className="flex justify-between">
                 <span className="text-sm text-emerald-600">Total Commissions:</span>
                 <span className="text-sm font-medium text-emerald-700">
-                  PKR {(adminStats?.commissions?.total || 0).toLocaleString()}
+                  ${(adminStats?.commissions?.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between">

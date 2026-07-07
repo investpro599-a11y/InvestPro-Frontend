@@ -91,7 +91,9 @@ export function StatsGrid() {
                     </span>
                   </span>
                 </p>
-                <p className="text-lg sm:text-2xl font-bold text-purple-900 mt-1 sm:mt-2">PKR {stats?.totalCommissions?.toLocaleString() || "0"}</p>
+                <p className="text-lg sm:text-2xl font-bold text-purple-900 mt-1 sm:mt-2">
+                  ${parseFloat(String(stats?.totalCommissions || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
               </div>
               <div className="p-2 sm:p-3 rounded-lg bg-purple-100">
                 <ArrowUp className="h-6 w-6 text-purple-700" />
