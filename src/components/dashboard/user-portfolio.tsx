@@ -41,11 +41,11 @@ export function UserPortfolio() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
             <p className="font-medium">Total Invested (Active):</p>
-            <p className="text-2xl font-bold text-green-700">PKR {(stats.investmentAmount ?? 0).toLocaleString()}</p>
+            <p className="text-2xl font-bold text-green-700">${(stats.investmentAmount ?? 0).toLocaleString()}</p>
           </div>
           <div>
             <p className="font-medium">Unpaid ROI:</p>
-            <p className="text-2xl font-bold text-blue-700">PKR {(stats.unpaidROI ?? 0).toLocaleString()}</p>
+            <p className="text-2xl font-bold text-blue-700">${(stats.unpaidROI ?? 0).toLocaleString()}</p>
           </div>
           <div>
             <p className="font-medium">Unpaid Commissions:</p>
@@ -78,7 +78,7 @@ export function UserPortfolio() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-green-50 rounded-lg p-4 flex flex-col items-center">
               <span className="text-xs text-gray-500 mb-1">Unpaid ROI</span>
-              <span className="text-2xl font-bold text-green-700">PKR {(stats.unpaidROI ?? 0).toLocaleString()}</span>
+              <span className="text-2xl font-bold text-green-700">${(stats.unpaidROI ?? 0).toLocaleString()}</span>
             </div>
             <div className="bg-blue-50 rounded-lg p-4 flex flex-col items-center">
               <span className="text-xs text-gray-500 mb-1">ROI %</span>
@@ -104,7 +104,7 @@ export function UserPortfolio() {
                 {Array.from({ length: 9 }, (_, i) => i + 1).map((level) => {
                   const total = commissionStats
                     .filter((c: any) => c.level === level)
-                    .reduce((sum: number, c: any) => sum + c.amount, 0);
+                    .reduce((sum: number, c: any) => sum + parseFloat(String(c.amount || 0)), 0);
                   return (
                     <tr key={level}>
                       <td className="px-4 py-2">{level === 1 ? 'Direct' : `Level ${level}`}</td>

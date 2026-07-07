@@ -155,7 +155,7 @@ export function InvestmentTable() {
     const csvContent = [
       ["Amount", "Plan", "Date", "ROI Rate", "Status", "Payment Method"],
       ...filteredInvestments.map((investment) => [
-        `PKR ${investment.amount.toLocaleString()}`,
+        `$${investment.amount.toLocaleString()}`,
         investment.plan,
         format(new Date(investment.createdAt), "MMM dd, yyyy"),
         `${investment.roiRate}%`,
@@ -264,7 +264,7 @@ export function InvestmentTable() {
                 {filteredInvestments.map((investment) => (
                 <TableRow key={investment.id || investment._id}>
                   <TableCell className="font-medium">
-                    PKR {investment.amount.toLocaleString()}
+                    ${investment.amount.toLocaleString()}
                   </TableCell>
                   <TableCell>{investment.plan}</TableCell>
                   <TableCell>{format(new Date(investment.createdAt), "MMM dd, yyyy")}</TableCell>
@@ -297,7 +297,7 @@ export function InvestmentTable() {
                                   <br />
                                   <strong>Investment Details:</strong>
                                   <br />
-                                  Amount: PKR {investment.amount.toLocaleString()}
+                                  Amount: ${investment.amount.toLocaleString()}
                                   <br />
                                   Plan: {investment.plan === "6months" ? "6 Months" : 
                                          investment.plan === "12months" ? "12 Months" : "18 Months"}

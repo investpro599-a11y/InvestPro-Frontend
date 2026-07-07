@@ -73,15 +73,15 @@ function TreeNodeComponent({ node }: { node: GenealogyNode }) {
         <div className="mt-2 space-y-1 text-left">
           <div className="flex justify-between text-xs">
             <span className="font-medium">Balance:</span>
-            <span className="truncate max-w-[90px]" title={`PKR ${node.balance?.toLocaleString()}`}>PKR {node.balance?.toLocaleString()}</span>
+            <span className="truncate max-w-[90px]" title={`$${node.balance?.toLocaleString()}`}>${node.balance?.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-xs">
             <span className="font-medium">Investment:</span>
-            <span className="truncate max-w-[90px]" title={`PKR ${node.investmentAmount?.toLocaleString()}`}>PKR {node.investmentAmount?.toLocaleString()}</span>
+            <span className="truncate max-w-[90px]" title={`$${node.investmentAmount?.toLocaleString()}`}>${node.investmentAmount?.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-xs">
             <span className="font-medium">Commission:</span>
-            <span className="truncate max-w-[90px]" title={`PKR ${node.commissionAmount?.toLocaleString()}`}>PKR {node.commissionAmount?.toLocaleString()}</span>
+            <span className="truncate max-w-[90px]" title={`$${node.commissionAmount?.toLocaleString()}`}>${node.commissionAmount?.toLocaleString()}</span>
           </div>
         </div>
         {node.commissionForRoot > 0 && (
@@ -90,13 +90,13 @@ function TreeNodeComponent({ node }: { node: GenealogyNode }) {
             <ul className="text-xs ml-2 max-h-20 overflow-y-auto pr-1">
               {node.commissionForRootDetails.map((detail, idx) => (
                 <li key={idx} className="mb-1">
-                  <span>• Investment: PKR {detail.investmentAmount.toLocaleString()} on {new Date(detail.date).toLocaleDateString()}<br /></span>
-                  <span>  Rate: {detail.rate}% → <span className="font-bold">PKR {detail.commissionAmount.toLocaleString()}</span></span>
+                  <span>• Investment: ${detail.investmentAmount.toLocaleString()} on {new Date(detail.date).toLocaleDateString()}<br /></span>
+                  <span>  Rate: {detail.rate}% → <span className="font-bold">${detail.commissionAmount.toLocaleString()}</span></span>
                   <span className="ml-2 inline-block px-2 py-0.5 rounded bg-green-100 text-green-800 text-[10px] font-bold align-middle">One-time commission paid</span>
                 </li>
               ))}
             </ul>
-            <p className="text-xs font-bold text-green-800 mt-1">Total from this member: PKR {node.commissionForRoot.toLocaleString()}</p>
+            <p className="text-xs font-bold text-green-800 mt-1">Total from this member: ${node.commissionForRoot.toLocaleString()}</p>
           </div>
         )}
       </div>

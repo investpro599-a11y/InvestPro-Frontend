@@ -127,7 +127,11 @@ export function WithdrawalDetails({ withdrawal }: WithdrawalDetailsProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="font-medium text-gray-600">Amount:</p>
-              <p className="text-lg font-semibold">PKR {withdrawal.amount.toLocaleString()}</p>
+              <p className="text-lg font-semibold">
+                {withdrawal.type === "commission"
+                  ? `$${parseFloat(String(withdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                  : `$${withdrawal.amount.toLocaleString()}`}
+              </p>
             </div>
             <div>
               <p className="font-medium text-gray-600">Type:</p>

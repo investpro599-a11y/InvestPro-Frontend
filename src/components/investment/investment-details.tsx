@@ -119,7 +119,7 @@ export function InvestmentDetails({ investment, trigger }: InvestmentDetailsProp
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-gray-600">Investment Amount</p>
                   <p className="text-2xl font-bold text-green-600">
-                    PKR {investment.amount.toLocaleString()}
+                    ${investment.amount.toLocaleString()}
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -131,7 +131,7 @@ export function InvestmentDetails({ investment, trigger }: InvestmentDetailsProp
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-gray-600">Expected ROI</p>
                   <p className="text-xl font-semibold text-purple-600">
-                    PKR {calculateROI().toLocaleString()}
+                    ${calculateROI().toLocaleString()}
                   </p>
                 </div>
                 <div className="space-y-2">

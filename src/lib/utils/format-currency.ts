@@ -5,9 +5,9 @@
  * @returns Formatted currency string (e.g., "$1,234.56")
  */
 export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('en-PK', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'PKR',
+    currency: 'USD',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value);

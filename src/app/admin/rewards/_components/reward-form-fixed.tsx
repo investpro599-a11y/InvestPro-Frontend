@@ -353,18 +353,18 @@ export function RewardForm({ reward, onSuccess }: RewardFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="block text-sm font-medium text-gray-700">
-                      Value (PKR)
+                      Value ($)
                     </FormLabel>
                     <FormControl>
                       <div className="relative mt-1 rounded-md shadow-sm">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                          <span className="text-gray-500 sm:text-sm">PKR</span>
+                          <span className="text-gray-500 sm:text-sm">$</span>
                         </div>
                         <Input
                           type="number"
                           step="0.01"
                           min="0"
-                          className="pl-14"
+                          className="pl-8"
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
@@ -438,18 +438,18 @@ export function RewardForm({ reward, onSuccess }: RewardFormProps) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="block text-sm font-medium text-gray-700">
-                          Left Leg Volume (PKR)
+                          Left Leg Volume ($)
                         </FormLabel>
                         <FormControl>
                           <div className="relative mt-1 rounded-md shadow-sm">
                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                              <span className="text-gray-500 sm:text-sm">PKR</span>
+                              <span className="text-gray-500 sm:text-sm">$</span>
                             </div>
                             <Input
                               type="number"
                               min="0"
                               step="1"
-                              className="pl-14"
+                              className="pl-8"
                               {...field}
                               onChange={(e) => field.onChange(Number(e.target.value))}
                             />
@@ -469,18 +469,18 @@ export function RewardForm({ reward, onSuccess }: RewardFormProps) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="block text-sm font-medium text-gray-700">
-                          Right Leg Volume (PKR)
+                          Right Leg Volume ($)
                         </FormLabel>
                         <FormControl>
                           <div className="relative mt-1 rounded-md shadow-sm">
                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                              <span className="text-gray-500 sm:text-sm">PKR</span>
+                              <span className="text-gray-500 sm:text-sm">$</span>
                             </div>
                             <Input
                               type="number"
                               min="0"
                               step="1"
-                              className="pl-14"
+                              className="pl-8"
                               {...field}
                               onChange={(e) => field.onChange(Number(e.target.value))}
                             />

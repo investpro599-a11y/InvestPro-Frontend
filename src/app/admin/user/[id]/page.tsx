@@ -247,7 +247,7 @@ export default function AdminViewUser() {
                   <tbody>
                     {allInvestments.filter((inv: any) => inv.userId === user.id || inv.userId === user._id).map((inv: any) => (
                       <tr key={inv.id || inv._id}>
-                        <td className="px-4 py-2">PKR {inv.amount.toLocaleString()}</td>
+                        <td className="px-4 py-2">${parseFloat(inv.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({inv.amountPkr?.toLocaleString()} PKR)</td>
                         <td className="px-4 py-2">{inv.plan}</td>
                         <td className="px-4 py-2">{inv.status}</td>
                         <td className="px-4 py-2">{inv.roiRate}%</td>
@@ -274,7 +274,7 @@ export default function AdminViewUser() {
                   <tbody>
                     {allWithdrawals.filter((w: any) => w.userId === user.id || w.userId === user._id).map((w: any) => (
                       <tr key={w.id || w._id}>
-                        <td className="px-4 py-2">PKR {w.amount.toLocaleString()}</td>
+                        <td className="px-4 py-2">${parseFloat(w.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({w.amountPkr?.toLocaleString()} PKR)</td>
                         <td className="px-4 py-2">{w.type}</td>
                         <td className="px-4 py-2">{w.status}</td>
                         <td className="px-4 py-2">{w.walletAddress}</td>
@@ -326,11 +326,11 @@ export default function AdminViewUser() {
                     {Array.from({ length: 10 }, (_, i) => i + 1).map((level) => {
                       const total = commissionStats
                         .filter((c: any) => c.level === level)
-                        .reduce((sum: number, c: any) => sum + c.amount, 0);
+                        .reduce((sum: number, c: any) => sum + parseFloat(String(c.amount || 0)), 0);
                       return (
                         <tr key={level}>
                           <td className="px-4 py-2">{level === 1 ? 'Direct' : `Level ${level}`}</td>
-                          <td className="px-4 py-2">PKR {total.toLocaleString()}</td>
+                          <td className="px-4 py-2">${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         </tr>
                       );
                     })}

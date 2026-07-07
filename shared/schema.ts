@@ -168,6 +168,7 @@ export interface DashboardStats {
   unpaidCommissions: number;
   directCommissions: number;
   totalCommissions: number;
+  exchangeRate?: number;
   paidCommissions: number;
   totalReferrals: number;
   activeReferrals: number;

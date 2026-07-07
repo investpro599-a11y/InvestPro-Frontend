@@ -204,7 +204,7 @@ export function InvestmentApproval() {
                       </div>
                     </TableCell>
                     <TableCell className="font-medium">
-                      PKR {investment.amount.toLocaleString()}
+                      ${parseFloat(String(investment.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({(investment as any).amountPkr?.toLocaleString()} PKR)
                     </TableCell>
                     <TableCell>{investment.plan}</TableCell>
                     <TableCell className="capitalize">{investment.status}</TableCell>
@@ -276,7 +276,7 @@ export function InvestmentApproval() {
                 <div>
                   <Label className="text-sm font-medium">Amount</Label>
                   <p className="text-lg font-semibold">
-                    PKR {selectedInvestment.amount.toLocaleString()}
+                    ${parseFloat(String(selectedInvestment.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({(selectedInvestment as any).amountPkr?.toLocaleString()} PKR)
                   </p>
                 </div>
                 <div>

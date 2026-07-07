@@ -88,8 +88,8 @@ export function InvestmentChart() {
                   <LineChart data={chartData?.byDay || []}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="date" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `PKR ${value.toLocaleString()}`} />
-                    <Tooltip formatter={(value) => [`PKR ${value.toLocaleString()}`, "Investment Amount"]} labelStyle={{ color: "#374151" }} contentStyle={{ backgroundColor: "white", border: "1px solid #e5e7eb", borderRadius: "8px", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }} />
+                    <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value.toLocaleString()}`} />
+                    <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, "Investment Amount"]} labelStyle={{ color: "#374151" }} contentStyle={{ backgroundColor: "white", border: "1px solid #e5e7eb", borderRadius: "8px", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }} />
                     <Line type="monotone" dataKey="amount" stroke="hsl(207, 90%, 54%)" strokeWidth={3} dot={{ fill: "hsl(207, 90%, 54%)", strokeWidth: 2, r: 6 }} activeDot={{ r: 8, stroke: "hsl(207, 90%, 54%)", strokeWidth: 2 }} />
                   </LineChart>
                 </ResponsiveContainer>
@@ -107,8 +107,8 @@ export function InvestmentChart() {
                   <BarChart data={chartData?.byPlan || []}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="plan" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `PKR ${value.toLocaleString()}`} />
-                    <Tooltip formatter={(value) => [`PKR ${value.toLocaleString()}`, "Investment Amount"]} />
+                    <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value.toLocaleString()}`} />
+                    <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, "Investment Amount"]} />
                     <Bar dataKey="amount" fill="#2563eb" />
                   </BarChart>
                 </ResponsiveContainer>
@@ -130,7 +130,7 @@ export function InvestmentChart() {
                       ))}
                     </Pie>
                     <Legend />
-                    <Tooltip formatter={(value) => [`PKR ${value.toLocaleString()}`, "Investment Amount"]} />
+                    <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, "Investment Amount"]} />
                   </PieChart>
                 </ResponsiveContainer>
               )}

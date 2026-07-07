@@ -42,12 +42,12 @@ function TreeNodeComponent({ node }: { node: GenealogyNode }) {
         <p className="font-semibold">{node.fullName}</p>
         <p className="text-sm opacity-80">@{node.username}</p>
         <p className="text-xs opacity-60">Level {node.level}</p>
-        <p className="text-xs mt-1">Balance: PKR {node.balance?.toLocaleString()}</p>
-        <p className="text-xs mt-1">Total Investment: PKR {node.investmentAmount?.toLocaleString()}</p>
-        <p className="text-xs mt-1">Total Commission Earned: PKR {node.commissionAmount?.toLocaleString()}</p>
+        <p className="text-xs mt-1">Balance: ${node.balance?.toLocaleString()}</p>
+        <p className="text-xs mt-1">Total Investment: ${node.investmentAmount?.toLocaleString()}</p>
+        <p className="text-xs mt-1">Total Commission Earned: ${node.commissionAmount?.toLocaleString()}</p>
         { (node.investmentAmount ?? 0) > 0 && (
           <p className="text-xs mt-1" title="This is your fixed monthly return (15%) on your own investment. Not a commission.">
-            Monthly ROI: PKR {((node.investmentAmount ?? 0) * 0.15).toLocaleString()}
+            Monthly ROI: ${((node.investmentAmount ?? 0) * 0.15).toLocaleString()}
             <span className="ml-1 text-gray-400" title="This is your fixed monthly return (15%) on your own investment. Not a commission.">ⓘ</span>
           </p>
         )}
@@ -58,13 +58,13 @@ function TreeNodeComponent({ node }: { node: GenealogyNode }) {
             <ul className="text-xs ml-2">
               {node.commissionForRootDetails.map((detail, idx) => (
                 <li key={idx} className="mb-1">
-                  <span>• Investment: PKR {detail.investmentAmount.toLocaleString()} on {new Date(detail.date).toLocaleDateString()}<br/></span>
-                  <span>  Rate: {detail.rate}% → <span className="font-bold">PKR {detail.commissionAmount.toLocaleString()}</span></span>
+                  <span>• Investment: ${detail.investmentAmount.toLocaleString()} on {new Date(detail.date).toLocaleDateString()}<br/></span>
+                  <span>  Rate: {detail.rate}% → <span className="font-bold">${detail.commissionAmount.toLocaleString()}</span></span>
                   <span className="ml-2 inline-block px-2 py-0.5 rounded bg-green-100 text-green-800 text-[10px] font-bold align-middle">One-time commission paid</span>
                 </li>
               ))}
             </ul>
-            <p className="text-xs font-bold text-green-800 mt-1">Total from this member: PKR {node.commissionForRoot.toLocaleString()}</p>
+            <p className="text-xs font-bold text-green-800 mt-1">Total from this member: ${node.commissionForRoot.toLocaleString()}</p>
           </div>
         )}
       </div>

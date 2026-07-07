@@ -111,7 +111,7 @@ export function AdminDashboard() {
             </p>
             <p className="text-sm text-purple-700">Total Commissions</p>
             <p className="text-xs text-purple-600 mt-1">
-              PKR {(adminStats?.revenue?.total || 0).toLocaleString()} revenue
+              $${(adminStats?.revenue?.total || 0).toLocaleString()} revenue
             </p>
           </div>
         </div>
@@ -153,7 +153,7 @@ export function AdminDashboard() {
               <div className="flex justify-between">
                 <span className="text-sm text-emerald-600">System Revenue:</span>
                 <span className="text-sm font-medium text-emerald-700">
-                  PKR {(adminStats?.revenue?.total || 0).toLocaleString()}
+                  $${(adminStats?.revenue?.total || 0).toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -195,7 +195,7 @@ export function AdminDashboard() {
                           inv.userId || 'Unknown User'
                         }
                       </td>
-                      <td className="px-4 py-2">PKR {parseFloat(String(inv.amount)).toLocaleString()}</td>
+                      <td className="px-4 py-2">${parseFloat(String(inv.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({(inv as any).amountPkr?.toLocaleString()} PKR)</td>
                       <td className="px-4 py-2">{inv.plan}</td>
                       <td className="px-4 py-2">
                         <span className="capitalize px-2 py-1 rounded text-xs font-medium bg-gray-100">
@@ -242,7 +242,7 @@ export function AdminDashboard() {
                           withdrawal.userId || 'Unknown User'
                         }
                       </td>
-                      <td className="px-4 py-2">PKR {parseFloat(String(withdrawal.amount)).toLocaleString()}</td>
+                      <td className="px-4 py-2">${parseFloat(String(withdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({(withdrawal as any).amountPkr?.toLocaleString()} PKR)</td>
                       <td className="px-4 py-2">
                         <span className="capitalize px-2 py-1 rounded text-xs font-medium bg-gray-100">
                           {withdrawal.status}

@@ -45,12 +45,12 @@ export const columns: ColumnDef<Reward>[] = [
   },
   {
     accessorKey: "value",
-    header: "Value (PKR)",
+    header: "Value ($)",
     cell: ({ row }: { row: { getValue: (key: string) => unknown } }) => {
       const value = Number(row.getValue("value"));
-      const formatted = new Intl.NumberFormat("en-PK", {
+      const formatted = new Intl.NumberFormat("en-US", {
         style: "currency",
-        currency: "PKR",
+        currency: "USD",
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
       }).format(value);

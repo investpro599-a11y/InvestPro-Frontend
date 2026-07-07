@@ -182,12 +182,12 @@ export default function RewardsPage() {
   };
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-PK', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'PKR',
+      currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(value).replace('PKR', 'PKR ');
+    }).format(value);
   };
 
   // Sort rewards by level and orderInLevel

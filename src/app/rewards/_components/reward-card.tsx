@@ -98,28 +98,26 @@ export function RewardCard({
   // Determine if the reward can be claimed
   const canClaim = isRewardUnlocked && !rewardIsCompleted && !isLocked;
   
-  // Format numbers with proper PKR formatting and spacing
+  // Format numbers with USD formatting
   const formatNumber = (num: number): string => {
-    // Format with commas for thousands and add PKR symbol
-    const formatter = new Intl.NumberFormat('en-PK', {
+    const formatter = new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'PKR',
+      currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
       currencyDisplay: 'symbol',
     });
     
-    // For very large numbers, use K/M/B with proper spacing
     if (num >= 1000000000) {
-      return `PKR ${(num / 1000000000).toFixed(1)}B`;  // 1.5B
+      return `$${(num / 1000000000).toFixed(1)}B`;  // $1.5B
     }
     if (num >= 1000000) {
-      return `PKR ${(num / 1000000).toFixed(1)}M`;     // 1.2M
+      return `$${(num / 1000000).toFixed(1)}M`;     // $1.2M
     }
     if (num >= 1000) {
-      return `PKR ${(num / 1000).toFixed(1)}K`;        // 1.5K
+      return `$${(num / 1000).toFixed(1)}K`;        // $1.5K
     }
-    return formatter.format(num);  // PKR 500
+    return formatter.format(num);  // $500
   };
 
   // Handle claim button click

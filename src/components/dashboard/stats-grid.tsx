@@ -69,7 +69,12 @@ export function StatsGrid() {
                     </span>
                   </span>
                 </p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 sm:mt-2">PKR {stats?.investmentAmount?.toLocaleString() || "0"}</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 sm:mt-2">
+                  ${(stats?.investmentAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className="text-xs sm:text-sm font-normal text-gray-500 block">
+                    ({((stats?.investmentAmount || 0) * (stats?.exchangeRate || 278)).toLocaleString(undefined, { maximumFractionDigits: 0 })} PKR)
+                  </span>
+                </p>
               </div>
               <div className="p-2 sm:p-3 rounded-lg bg-blue-100">
                 <Wallet className="h-6 w-6 text-blue-700" />
@@ -93,6 +98,9 @@ export function StatsGrid() {
                 </p>
                 <p className="text-lg sm:text-2xl font-bold text-purple-900 mt-1 sm:mt-2">
                   ${parseFloat(String(stats?.totalCommissions || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className="text-xs sm:text-sm font-normal text-purple-500 block">
+                    ({(parseFloat(String(stats?.totalCommissions || 0)) * (stats?.exchangeRate || 278)).toLocaleString(undefined, { maximumFractionDigits: 0 })} PKR)
+                  </span>
                 </p>
               </div>
               <div className="p-2 sm:p-3 rounded-lg bg-purple-100">
@@ -115,7 +123,12 @@ export function StatsGrid() {
                     </span>
                   </span>
                 </p>
-                <p className="text-lg sm:text-2xl font-bold text-green-900 mt-1 sm:mt-2">PKR {stats?.dailyROI?.toLocaleString() || "0"}</p>
+                <p className="text-lg sm:text-2xl font-bold text-green-900 mt-1 sm:mt-2">
+                  ${(stats?.dailyROI || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className="text-xs sm:text-sm font-normal text-green-600 block">
+                    ({((stats?.dailyROI || 0) * (stats?.exchangeRate || 278)).toLocaleString(undefined, { maximumFractionDigits: 0 })} PKR)
+                  </span>
+                </p>
               </div>
               <div className="p-2 sm:p-3 rounded-lg bg-green-100">
                 <TrendingUp className="h-6 w-6 text-green-700" />
@@ -137,7 +150,12 @@ export function StatsGrid() {
                     </span>
                   </span>
                 </p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 sm:mt-2">PKR {stats?.currentBalance?.toLocaleString() || "0"}</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 sm:mt-2">
+                  ${(stats?.currentBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className="text-xs sm:text-sm font-normal text-gray-500 block">
+                    ({((stats?.currentBalance || 0) * (stats?.exchangeRate || 278)).toLocaleString(undefined, { maximumFractionDigits: 0 })} PKR)
+                  </span>
+                </p>
               </div>
               <div className="p-2 sm:p-3 rounded-lg bg-yellow-100">
                 <HandCoins className="h-6 w-6 text-yellow-700" />
@@ -164,15 +182,30 @@ export function StatsGrid() {
               <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                 <div className="bg-green-50 rounded-lg p-3 flex flex-col items-center w-full min-w-[120px]">
                   <span className="text-xs text-gray-500 mb-1">Total Earned</span>
-                  <span className="text-lg font-bold text-green-700">PKR {stats?.totalCreditedROI?.toLocaleString() ?? '0'}</span>
+                  <span className="text-lg font-bold text-green-700">
+                    ${(stats?.totalCreditedROI || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <span className="text-[10px] font-normal text-green-600 block">
+                      ({((stats?.totalCreditedROI || 0) * (stats?.exchangeRate || 278)).toLocaleString(undefined, { maximumFractionDigits: 0 })} PKR)
+                    </span>
+                  </span>
                 </div>
                 <div className="bg-red-50 rounded-lg p-3 flex flex-col items-center w-full min-w-[120px]">
                   <span className="text-xs text-gray-500 mb-1">Withdrawn</span>
-                  <span className="text-lg font-bold text-red-700">PKR {stats?.roiWithdrawn?.toLocaleString() ?? '0'}</span>
+                  <span className="text-lg font-bold text-red-700">
+                    ${(stats?.roiWithdrawn || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <span className="text-[10px] font-normal text-red-600 block">
+                      ({((stats?.roiWithdrawn || 0) * (stats?.exchangeRate || 278)).toLocaleString(undefined, { maximumFractionDigits: 0 })} PKR)
+                    </span>
+                  </span>
                 </div>
                 <div className="bg-blue-50 rounded-lg p-3 flex flex-col items-center w-full min-w-[120px]">
                   <span className="text-xs text-gray-500 mb-1">Withdrawable</span>
-                  <span className="text-lg font-bold text-blue-700">PKR {stats?.availableROI?.toLocaleString() ?? '0'}</span>
+                  <span className="text-lg font-bold text-blue-700">
+                    ${(stats?.availableROI || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <span className="text-[10px] font-normal text-blue-600 block">
+                      ({((stats?.availableROI || 0) * (stats?.exchangeRate || 278)).toLocaleString(undefined, { maximumFractionDigits: 0 })} PKR)
+                    </span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -194,7 +227,12 @@ export function StatsGrid() {
                     </span>
                   </span>
                 </p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 sm:mt-2">PKR {totalProfits.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 sm:mt-2">
+                  ${totalProfits.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className="text-xs sm:text-sm font-normal text-gray-500 block">
+                    ({(totalProfits * (stats?.exchangeRate || 278)).toLocaleString(undefined, { maximumFractionDigits: 0 })} PKR)
+                  </span>
+                </p>
               </div>
               <div className="p-2 sm:p-3 rounded-lg bg-green-100">
                 <TrendingUp className="h-6 w-6 text-green-700" />

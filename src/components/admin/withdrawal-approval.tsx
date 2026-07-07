@@ -272,7 +272,7 @@ export function WithdrawalApproval() {
                     </div>
                   </TableCell>
                   <TableCell className="font-medium">
-                    PKR {withdrawal.amount.toLocaleString()}
+                    ${parseFloat(String(withdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({(withdrawal as any).amountPkr?.toLocaleString()} PKR)
                   </TableCell>
                   <TableCell className="capitalize">{withdrawal.type}</TableCell>
                   <TableCell>
@@ -320,7 +320,7 @@ export function WithdrawalApproval() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="font-medium">Amount:</p>
-                    <p>PKR {selectedWithdrawal.amount.toLocaleString()}</p>
+                    <p>${parseFloat(String(selectedWithdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({(selectedWithdrawal as any).amountPkr?.toLocaleString()} PKR)</p>
                   </div>
                   <div>
                     <p className="font-medium">Type:</p>
@@ -395,7 +395,7 @@ export function WithdrawalApproval() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="font-medium">Amount:</p>
-                    <p>PKR {selectedWithdrawal.amount.toLocaleString()}</p>
+                    <p>${parseFloat(String(selectedWithdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({(selectedWithdrawal as any).amountPkr?.toLocaleString()} PKR)</p>
                   </div>
                   <div>
                     <p className="font-medium">Type:</p>

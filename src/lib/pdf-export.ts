@@ -86,7 +86,7 @@ export class PDFExporter {
     this.doc.setFontSize(10);
     this.doc.setFont('helvetica', 'normal');
     this.doc.text(`Total ${type}s: ${totalCount}`, 20, 90);
-    this.doc.text(`Total Amount: PKR ${totalAmount.toLocaleString()}`, 20, 100);
+    this.doc.text(`Total Amount: $${totalAmount.toLocaleString()}`, 20, 100);
 
     // Add status breakdown
     const statusCounts = data.reduce((acc, item) => {
@@ -115,7 +115,7 @@ export class PDFExporter {
       startY: yPos,
       head: [['Amount', 'Plan', 'Date', 'ROI Rate', 'Status', 'Payment Method']],
       body: investments.map(inv => [
-        `PKR ${inv.amount.toLocaleString()}`,
+        `$${inv.amount.toLocaleString()}`,
         inv.plan,
         format(new Date(inv.createdAt), 'MMM dd, yyyy'),
         `${inv.roiRate}%`,
@@ -153,7 +153,7 @@ export class PDFExporter {
       startY: yPos,
       head: [['Amount', 'Type', 'Method', 'Date', 'Status', 'TXID']],
       body: withdrawals.map(w => [
-        `PKR ${w.amount.toLocaleString()}`,
+        `$${w.amount.toLocaleString()}`,
         w.type,
         w.method,
         format(new Date(w.createdAt), 'MMM dd, yyyy'),
@@ -194,11 +194,11 @@ export class PDFExporter {
     
     let yPos = 90;
     const statsData = [
-      { label: 'Total Investment Amount', value: `PKR ${stats.investmentAmount?.toLocaleString() || '0'}` },
-      { label: 'Unpaid ROI', value: `PKR ${stats.unpaidROI?.toLocaleString() || '0'}` },
-      { label: 'Unpaid Commissions', value: `PKR ${stats.unpaidCommissions?.toLocaleString() || '0'}` },
-      { label: 'Direct Commissions', value: `PKR ${stats.directCommissions?.toLocaleString() || '0'}` },
-      { label: 'Total Commissions', value: `PKR ${stats.totalCommissions?.toLocaleString() || '0'}` },
+      { label: 'Total Investment Amount', value: `$${stats.investmentAmount?.toLocaleString() || '0'}` },
+      { label: 'Unpaid ROI', value: `$${stats.unpaidROI?.toLocaleString() || '0'}` },
+      { label: 'Unpaid Commissions', value: `$${stats.unpaidCommissions?.toLocaleString() || '0'}` },
+      { label: 'Direct Commissions', value: `$${stats.directCommissions?.toLocaleString() || '0'}` },
+      { label: 'Total Commissions', value: `$${stats.totalCommissions?.toLocaleString() || '0'}` },
       { label: 'Total Referrals', value: String(stats.totalReferrals || '0') },
       { label: 'Active Referrals', value: String(stats.activeReferrals || '0') },
     ];

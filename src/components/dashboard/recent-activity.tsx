@@ -82,7 +82,7 @@ export function RecentActivity() {
                       <Coins className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">PKR {investment.amount.toLocaleString()}</p>
+                      <p className="font-medium text-gray-900">${investment.amount.toLocaleString()}</p>
                       <p className="text-sm text-gray-500">{investment.plan} plan</p>
                     </div>
                   </div>
@@ -135,7 +135,7 @@ export function RecentActivity() {
                       <ArrowUp className="h-5 w-5 text-green-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">PKR {withdrawal.amount.toLocaleString()}</p>
+                      <p className="font-medium text-gray-900">${withdrawal.amount.toLocaleString()}</p>
                       <p className="text-sm text-gray-500">{withdrawal.type} Withdrawal</p>
                     </div>
                   </div>
