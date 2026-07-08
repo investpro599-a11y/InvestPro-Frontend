@@ -268,23 +268,16 @@ export function WithdrawalForm() {
         return null;
     }
   };
-
-  const exchangeRate = stats?.exchangeRate || 278;
-  const availableROIPkr = availableROI * exchangeRate;
-  const availableCommissionPkr = availableCommission * exchangeRate;
-  const availableMaturedPrincipalPkr = availableMaturedPrincipal * exchangeRate;
-  const totalBalancePkr = totalBalance * exchangeRate;
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Request Withdrawal</CardTitle>
         <div className="text-sm text-gray-600 space-y-1">
-          <p><strong>Available Balances (USD & PKR):</strong></p>
-          <p>• ROI (Your investment returns): ${availableROI.toLocaleString()} (approx. {availableROIPkr.toLocaleString()} PKR)</p>
-          <p>• Commission (Withdrawable): ${availableCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (approx. {availableCommissionPkr.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} PKR) <span title="This is the amount you can withdraw right now. It is your total paid commissions minus any already withdrawn.">ⓘ</span></p>
-          <p>• Principal (Matured): ${availableMaturedPrincipal.toLocaleString()} (approx. {availableMaturedPrincipalPkr.toLocaleString()} PKR)</p>
-          <p>• <b>Total Balance:</b> ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (approx. {totalBalancePkr.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} PKR)</p>
+          <p><strong>Available Balances:</strong></p>
+          <p>• ROI (Your investment returns): ${availableROI.toLocaleString()}</p>
+          <p>• Commission (Withdrawable): ${availableCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span title="This is the amount you can withdraw right now. It is your total paid commissions minus any already withdrawn.">ⓘ</span></p>
+          <p>• Principal (Matured): ${availableMaturedPrincipal.toLocaleString()}</p>
+          <p>• <b>Total Balance:</b> ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           <p className="text-xs text-gray-500 mt-2">
             Note: You can only withdraw principal after your investment matures (6, 12, or 18 months). If you have no matured investments, principal withdrawal is disabled.
           </p>
@@ -328,10 +321,10 @@ export function WithdrawalForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="roi">ROI Withdrawal (Available: ${availableROI.toLocaleString()} / {availableROIPkr.toLocaleString()} PKR)</SelectItem>
-                        <SelectItem value="commission">Commission Withdrawal (Available: ${availableCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / {availableCommissionPkr.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} PKR)</SelectItem>
+                        <SelectItem value="roi">ROI Withdrawal (Available: ${availableROI.toLocaleString()})</SelectItem>
+                        <SelectItem value="commission">Commission Withdrawal (Available: ${availableCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</SelectItem>
                         <SelectItem value="principal" disabled={availableMaturedPrincipal === 0}>
-                          Principal Withdrawal (Available: ${availableMaturedPrincipal.toLocaleString()} / {availableMaturedPrincipalPkr.toLocaleString()} PKR)
+                          Principal Withdrawal (Available: ${availableMaturedPrincipal.toLocaleString()})
                         </SelectItem>
                       </SelectContent>
                     </Select>
