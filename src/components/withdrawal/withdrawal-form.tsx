@@ -293,12 +293,12 @@ export function WithdrawalForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Withdrawal Amount (PKR)
+                      Withdrawal Amount (USD)
                     </FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
-                        placeholder="Enter amount in PKR" 
+                        placeholder="Enter amount in USD" 
                         {...field}
                         onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                       />

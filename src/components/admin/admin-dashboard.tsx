@@ -195,7 +195,7 @@ export function AdminDashboard() {
                           inv.userId || 'Unknown User'
                         }
                       </td>
-                      <td className="px-4 py-2">${parseFloat(String(inv.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({(inv as any).amountPkr?.toLocaleString()} PKR)</td>
+                      <td className="px-4 py-2">${parseFloat(String(inv.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       <td className="px-4 py-2">{inv.plan}</td>
                       <td className="px-4 py-2">
                         <span className="capitalize px-2 py-1 rounded text-xs font-medium bg-gray-100">
@@ -242,7 +242,7 @@ export function AdminDashboard() {
                           withdrawal.userId || 'Unknown User'
                         }
                       </td>
-                      <td className="px-4 py-2">${parseFloat(String(withdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({(withdrawal as any).amountPkr?.toLocaleString()} PKR)</td>
+                      <td className="px-4 py-2">${parseFloat(String(withdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       <td className="px-4 py-2">
                         <span className="capitalize px-2 py-1 rounded text-xs font-medium bg-gray-100">
                           {withdrawal.status}

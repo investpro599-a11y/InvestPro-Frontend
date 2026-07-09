@@ -63,7 +63,7 @@ export const columns: ColumnDef<Reward>[] = [
     header: "Requirements",
     cell: ({ row }: { row: { original: Reward } }) => (
       <div className="text-sm">
-        Left: {row.original.requirements.leftLegRequired} | Right: {row.original.requirements.rightLegRequired}
+        Left: {row.original.requirements?.leftLegRequired ?? 0} | Right: {row.original.requirements?.rightLegRequired ?? 0}
       </div>
     ),
   },

@@ -115,7 +115,7 @@ export function InvestmentForm() {
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Investment Amount (PKR)</FormLabel>
+                    <FormLabel>Investment Amount (USD)</FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="Enter amount" {...field} />
                     </FormControl>
