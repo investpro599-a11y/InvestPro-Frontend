@@ -145,7 +145,25 @@ export function WithdrawalForm() {
 
   const onSubmit = (data: WithdrawalFormData) => {
     console.log('Submitting withdrawal data:', data);
-    createWithdrawalMutation.mutate(data);
+    
+    // Map specific method fields to walletAddress for the backend
+    let walletAddress = data.walletAddress || "";
+    
+    if (data.method === "easypaisa" || data.method === "jazzcash") {
+      walletAddress = data.phoneNumber || "";
+    } else if (data.method === "bank_account") {
+      walletAddress = `${data.bankName} - ${data.accountNumber}`;
+    } else if (data.method === "trc20") {
+      walletAddress = data.trcId || "";
+    } else if (data.method === "others") {
+      walletAddress = `${data.platform} - ${data.accountName} - ${data.accountNumber}`;
+    }
+
+    createWithdrawalMutation.mutate({
+      ...data,
+      amount: data.amount.toString(),
+      walletAddress
+    } as any);
   };
 
   const renderMethodFields = () => {
