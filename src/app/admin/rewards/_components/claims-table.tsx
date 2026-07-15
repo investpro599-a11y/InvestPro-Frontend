@@ -21,14 +21,14 @@ export function ClaimsTable() {
   const { data: claims = [], isLoading, error } = useQuery({
     queryKey: ['admin/rewards-pending'],
     queryFn: async () => {
-      const res = await apiRequest('GET', '/api/admin/rewards/pending');
+      const res = await apiRequest('GET', '/admin/rewards/pending');
       return await res.json();
     }
   });
 
   const approveMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await apiRequest('PUT', `/api/admin/rewards/${id}/approve`);
+      const res = await apiRequest('PUT', `/admin/rewards/${id}/approve`);
       return await res.json();
     },
     onSuccess: () => {
