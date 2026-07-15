@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { rewardApi } from '@/lib/api/reward';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import {
   Table,
   TableBody,
@@ -11,25 +11,34 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { Check } from 'lucide-react';
 
 export function ClaimsTable() {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['admin/rewards-with-claims'],
+  const queryClient = useQueryClient();
+
+  const { data: claims = [], isLoading, error } = useQuery({
+    queryKey: ['admin/rewards-pending'],
     queryFn: async () => {
-      const result = await rewardApi.admin.getRewardsWithClaims();
-      return result.rewards || [];
+      const res = await apiRequest('GET', '/api/admin/rewards/pending');
+      return await res.json();
     }
   });
 
-  // Flatten all claims from all rewards
-  const allClaims = data?.flatMap(reward => 
-    (reward.claims || []).map(claim => ({
-      ...claim,
-      rewardName: reward.name,
-      rewardLevel: reward.level,
-      rewardValue: reward.value,
-    }))
-  ) || [];
+  const approveMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await apiRequest('PUT', `/api/admin/rewards/${id}/approve`);
+      return await res.json();
+    },
+    onSuccess: () => {
+      toast.success("Reward claim approved successfully!");
+      queryClient.invalidateQueries({ queryKey: ['admin/rewards-pending'] });
+    },
+    onError: (err: any) => {
+      toast.error(err.message || "Failed to approve reward claim");
+    }
+  });
 
   if (isLoading) {
     return (
@@ -50,43 +59,55 @@ export function ClaimsTable() {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-        <div className="text-red-600 font-medium mb-2">Failed to load claims</div>
-        <p className="text-red-500 text-sm">{error.message}</p>
+        <div className="text-red-600 font-medium mb-2">Failed to load pending claims</div>
+        <p className="text-red-500 text-sm">{(error as any).message}</p>
       </div>
     );
   }
 
-  if (allClaims.length === 0) {
+  if (claims.length === 0) {
     return (
       <div className="text-center p-6 border rounded-lg bg-gray-50">
-        <div className="text-gray-500">No reward claims found</div>
+        <div className="text-gray-500">No pending reward claims found</div>
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden border rounded-lg">
+    <div className="overflow-x-auto border rounded-lg">
       <Table>
         <TableHeader className="bg-gray-50">
           <TableRow>
-            <TableHead className="w-[200px]">User</TableHead>
+            <TableHead>User</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Reward</TableHead>
-            <TableHead>Level</TableHead>
-            <TableHead>Value</TableHead>
-            <TableHead>Claimed On</TableHead>
+            <TableHead>Req Volume</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {allClaims.map((claim, index) => (
-            <TableRow key={index}>
-              <TableCell className="font-medium">{claim.username}</TableCell>
-              <TableCell>{claim.email}</TableCell>
-              <TableCell>{claim.rewardName}</TableCell>
-              <TableCell>Level {claim.rewardLevel}</TableCell>
-              <TableCell>${claim.rewardValue?.toLocaleString()}</TableCell>
+          {claims.map((claim: any) => (
+            <TableRow key={claim.id}>
+              <TableCell className="font-medium">{claim.user?.fullName || 'Unknown'}</TableCell>
+              <TableCell>{claim.user?.email || 'N/A'}</TableCell>
+              <TableCell className="font-semibold text-primary">{claim.reward?.name || 'Unknown'}</TableCell>
+              <TableCell>${claim.reward?.requiredVolumeUsd?.toLocaleString() || 0} USD</TableCell>
               <TableCell>
-                {claim.claimedAt ? new Date(claim.claimedAt).toLocaleDateString() : 'N/A'}
+                <span className="px-2 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                  {claim.status}
+                </span>
+              </TableCell>
+              <TableCell className="text-right">
+                <Button 
+                  size="sm" 
+                  onClick={() => approveMutation.mutate(claim.id)}
+                  disabled={approveMutation.isPending}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Check className="w-4 h-4 mr-1" />
+                  Approve
+                </Button>
               </TableCell>
             </TableRow>
           ))}

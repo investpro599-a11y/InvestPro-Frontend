@@ -151,6 +151,67 @@ export function StatsGrid() {
             </div>
           </CardContent>
         </Card>
+        {/* Binary Tree Volumes - NEW */}
+        <Card className="hover:shadow-lg transition-shadow border-blue-200 bg-blue-50">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-blue-900 flex items-center gap-1">
+                  Left Leg Volume
+                </p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-700 mt-1 sm:mt-2">
+                  ${(stats?.leftVolume || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                </p>
+              </div>
+              <div className="p-2 sm:p-3 rounded-lg bg-blue-200">
+                <Users className="h-6 w-6 text-blue-800" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow border-purple-200 bg-purple-50">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-purple-900 flex items-center gap-1">
+                  Right Leg Volume
+                </p>
+                <p className="text-lg sm:text-2xl font-bold text-purple-700 mt-1 sm:mt-2">
+                  ${(stats?.rightVolume || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                </p>
+              </div>
+              <div className="p-2 sm:p-3 rounded-lg bg-purple-200">
+                <Users className="h-6 w-6 text-purple-800" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow border-green-200 bg-green-50 col-span-1 md:col-span-2 lg:col-span-2">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-green-900 flex items-center gap-1">
+                  Total Matched Volume
+                  <span className="relative group">
+                    <Info className="h-4 w-4 text-gray-400" />
+                    <span className="absolute left-6 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
+                      The lower volume of your two legs. Matches trigger rewards!
+                    </span>
+                  </span>
+                </p>
+                <p className="text-lg sm:text-2xl font-bold text-green-700 mt-1 sm:mt-2">
+                  ${(stats?.matchedVolume || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                </p>
+              </div>
+              <div className="p-2 sm:p-3 rounded-lg bg-green-200">
+                <TrendingUp className="h-6 w-6 text-green-800" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Daily ROI Summary Block - NEW */}
         <Card className="hover:shadow-lg transition-shadow col-span-1 md:col-span-2 lg:col-span-4">
           <CardContent className="p-4 sm:p-6">

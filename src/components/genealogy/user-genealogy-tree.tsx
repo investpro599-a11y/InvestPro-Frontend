@@ -30,6 +30,9 @@ function TreeNodeComponent({ node }: { node: GenealogyNode }) {
 
   const colorClass = levelColors[node.level - 1] || "bg-gray-900 border-gray-900 text-white";
 
+  const leftChild = node.children?.find(c => c.placementPosition === 'left');
+  const rightChild = node.children?.find(c => c.placementPosition === 'right');
+
   return (
     <div className="flex flex-col items-center">
       <div className={`rounded-xl border-2 p-4 text-center min-w-[200px] ${colorClass}`}>
@@ -45,9 +48,11 @@ function TreeNodeComponent({ node }: { node: GenealogyNode }) {
         <p className="text-xs mt-1">Balance: ${node.balance?.toLocaleString()}</p>
         <p className="text-xs mt-1">Total Investment: ${node.investmentAmount?.toLocaleString()}</p>
         <p className="text-xs mt-1">Total Commission Earned: ${node.commissionAmount?.toLocaleString()}</p>
+        <p className="text-xs mt-1">Left Volume: ${(node.leftVolume ?? 0).toLocaleString()} USD</p>
+        <p className="text-xs mt-1">Right Volume: ${(node.rightVolume ?? 0).toLocaleString()} USD</p>
         { (node.investmentAmount ?? 0) > 0 && (
           <p className="text-xs mt-1" title="This is your fixed monthly return (15%) on your own investment. Not a commission.">
-            Monthly ROI: ${((node.investmentAmount ?? 0) * 0.15).toLocaleString()}
+            Monthly ROI: ${((node.investmentAmount ?? 0) * 0.15).toLocaleString()} USD
             <span className="ml-1 text-gray-400" title="This is your fixed monthly return (15%) on your own investment. Not a commission.">ⓘ</span>
           </p>
         )}
@@ -69,16 +74,29 @@ function TreeNodeComponent({ node }: { node: GenealogyNode }) {
         )}
       </div>
 
-      {node.children && node.children.length > 0 && (
-        <>
-          <div className="h-8 w-px bg-gray-300 my-2"></div>
-          <div className="flex space-x-8">
-            {node.children.map((child) => (
-              <TreeNodeComponent key={child.id || child._id} node={child} />
-            ))}
-          </div>
-        </>
-      )}
+      <div className="h-8 w-px bg-gray-300 my-2"></div>
+      <div className="flex space-x-8">
+        <div className="flex flex-col items-center">
+          <Badge variant="outline" className="mb-2 bg-gray-100">Left</Badge>
+          {leftChild ? (
+            <TreeNodeComponent node={leftChild} />
+          ) : (
+            <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center min-w-[200px] text-gray-400 flex items-center justify-center min-h-[100px]">
+              Empty Spot
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col items-center">
+          <Badge variant="outline" className="mb-2 bg-gray-100">Right</Badge>
+          {rightChild ? (
+            <TreeNodeComponent node={rightChild} />
+          ) : (
+            <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center min-w-[200px] text-gray-400 flex items-center justify-center min-h-[100px]">
+              Empty Spot
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

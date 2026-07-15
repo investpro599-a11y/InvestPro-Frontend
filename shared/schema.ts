@@ -245,6 +245,9 @@ export type GenealogyNode = {
   commissionAmount: number;
   roiAmount?: number;
   balance: number;
+  leftVolume?: number;
+  rightVolume?: number;
+  placementPosition?: 'left' | 'right' | null;
   commissionForRoot: number;
   commissionForRootDetails: Array<{
     investmentAmount: number;
