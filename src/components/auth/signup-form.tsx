@@ -7,6 +7,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { authApi } from "@/lib/auth";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -55,6 +56,11 @@ export function SignupForm({ initialReferralCode }: SignupFormProps) {
   const [usernameError, setUsernameError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<string[]>([]);
+  const [step, setStep] = useState<'form' | 'otp'>('form');
+  const [pendingEmail, setPendingEmail] = useState('');
+  const [otpValue, setOtpValue] = useState('');
+  const { verifyEmail } = useAuth();
+
   
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -136,7 +142,15 @@ export function SignupForm({ initialReferralCode }: SignupFormProps) {
       console.error('Signup error:', error);
       
       let handled = false;
-      if (error.message === 'Email already exists') {
+      if (error.requiresVerification) {
+        toast({
+          title: "Verification required",
+          description: "Please check your email for the verification code.",
+        });
+        setPendingEmail(data.email);
+        setStep('otp');
+        handled = true;
+      } else if (error.message === 'Email already exists') {
         setEmailError('Email already exists');
         handled = true;
       } else if (error.message === 'Username already exists') {

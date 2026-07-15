@@ -15,6 +15,11 @@ export function LoginForm() {
   const { login } = useAuth();
   const router = useRouter();
   const [loginError, setLoginError] = useState('');
+  const [step, setStep] = useState<'form' | 'otp'>('form');
+  const [pendingEmail, setPendingEmail] = useState('');
+  const [otpValue, setOtpValue] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const { verifyEmail } = useAuth();
   const form = useForm<LoginData>({
     defaultValues: {
       emailOrUsername: '',
@@ -28,7 +33,12 @@ export function LoginForm() {
     try {
       await login(data);
     } catch (error: any) {
-      setLoginError(error.message || "Login failed");
+      if (error.requiresVerification) {
+        setPendingEmail(error.email || data.emailOrUsername);
+        setStep('otp');
+      } else {
+        setLoginError(error.message || "Login failed");
+      }
     }
   };
 

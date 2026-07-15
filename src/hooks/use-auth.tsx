@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
 interface AuthContextType {
+  verifyEmail: (data: { email: string; otp: string }) => Promise<void>;
   user: User | null;
   isLoading: boolean;
   login: (data: LoginData) => Promise<void>;
@@ -83,6 +84,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
   });
 
+  
+  const verifyMutation = useMutation({
+    mutationFn: async (data: { email: string; otp: string }) => {
+      return await authApi.verifyEmail(data);
+    },
+    onSuccess: (data) => {
+      if (data?.user) {
+        queryClient.setQueryData(["/auth/me"], data.user);
+        toast({ title: "Verification successful" });
+        if (data.user.role === "admin") {
+          router.push("/admin");
+        } else {
+          router.push("/dashboard");
+        }
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Verification failed",
+        description: error.message || "Invalid or expired OTP",
+      });
+    },
+  });
+
   const signupMutation = useMutation({
     mutationFn: authApi.signup,
     onSuccess: (data) => {
@@ -120,6 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   const value: AuthContextType = {
+    verifyEmail: verifyMutation.mutateAsync,
     user: user || null,
     isLoading,
     login: async (data: LoginData) => {

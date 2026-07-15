@@ -30,7 +30,12 @@ export const authApi = {
     console.log("API RESULT DATA:", result.data);
 
     if (!response.ok) {
-      throw new Error(result.message || "Login failed");
+      const err = new Error(result.message || "Login failed");
+      if (result.requiresVerification) {
+        (err as any).requiresVerification = true;
+        (err as any).email = result.email;
+      }
+      throw err;
     }
 
     // Handle both wrapped { data: { user, token } } and unwrapped { user, sessionId } responses
@@ -125,6 +130,60 @@ export const authApi = {
     }
   },
 
+  
+  verifyEmail: async (data: { email: string; otp: string }) => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+    const response = await fetch(`${baseUrl}/auth/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Verification failed");
+    if (result.sessionId) localStorage.setItem('authToken', result.sessionId);
+    return result;
+  },
+
+  resendOtp: async (email: string) => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+    const response = await fetch(`${baseUrl}/auth/resend-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to resend code");
+    return result;
+  },
+
+  forgotPassword: async (email: string) => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+    const response = await fetch(`${baseUrl}/auth/forgot-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to send reset link");
+    return result;
+  },
+
+  resetPassword: async (data: { email: string; otp: string; newPassword: string }) => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+    const response = await fetch(`${baseUrl}/auth/reset-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to reset password");
+    return result;
+  },
+
   logout: async (): Promise<void> => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
     const token = localStorage.getItem('authToken');
@@ -174,185 +233,4 @@ export const authApi = {
   },
 
   // Forgot password functionality
-  requestPasswordReset: async (data: ForgotPasswordData & { method: 'email' | 'security' }): Promise<{ message: string; userId?: string }> => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    const response = await fetch(`${baseUrl}/auth/forgot-password`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-      credentials: 'include',
-    });
-    const result: ApiResponse<{ message: string; userId?: string }> = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || "Failed to request password reset");
-    }
-    return result.data!;
-  },
-
-  getUserIdByEmail: async (email: string): Promise<string> => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    const response = await fetch(`${baseUrl}/auth/user-id-by-email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-    const result: ApiResponse<{ userId: string }> = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || 'User not found');
-    }
-    return result.data!.userId;
-  },
-
-  getSecurityQuestions: async (userId: string): Promise<SecurityQuestion[]> => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    const response = await fetch(`${baseUrl}/auth/security-questions/${userId}`);
-    const result: ApiResponse<SecurityQuestion[]> = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || 'Failed to fetch security questions');
-    }
-    return result.data!;
-  },
-
-  verifySecurityAnswers: async (userId: string, answers: string[]): Promise<void> => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    const response = await fetch(`${baseUrl}/auth/verify-security-answers/${userId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ answers }),
-    });
-    const result: ApiResponse = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || 'Security answers verification failed');
-    }
-  },
-
-  resetPassword: async (data: ResetPasswordData): Promise<{ message: string }> => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    const response = await fetch(`${baseUrl}/auth/reset-password/${data.userId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        otp: data.otp,
-        newPassword: data.newPassword,
-        confirmPassword: data.confirmPassword
-      }),
-      credentials: 'include',
-    });
-    
-    const result: ApiResponse<{ message: string }> = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(result.message || "Failed to reset password");
-    }
-    
-    return result.data!;
-  },
-
-  resendPasswordResetOtp: async (userId: string): Promise<{ message: string }> => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    const response = await fetch(`${baseUrl}/auth/resend-password-reset-otp`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId }),
-      credentials: 'include',
-    });
-    
-    const result: ApiResponse<{ message: string }> = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(result.message || "Failed to resend OTP");
-    }
-    
-    return result.data!;
-  },
-
-  // Email verification
-  verifyEmail: async (token: string): Promise<{ message: string }> => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    const response = await fetch(`${baseUrl}/auth/verify-email/${token}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      credentials: 'include',
-    });
-    
-    const result: ApiResponse<{ message: string }> = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(result.message || "Failed to verify email");
-    }
-    
-    return result.data!;
-  },
-
-  resendEmailVerification: async (): Promise<{ message: string }> => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    const token = localStorage.getItem('authToken');
-    
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
-    
-    const response = await fetch(`${baseUrl}/auth/resend-verification`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      credentials: 'include',
-    });
-    
-    const result: ApiResponse<{ message: string }> = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(result.message || "Failed to resend verification email");
-    }
-    
-    return result.data!;
-  },
-
-  // Update password
-  updatePassword: async (currentPassword: string, newPassword: string): Promise<{ message: string }> => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    const token = localStorage.getItem('authToken');
-    
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
-    
-    const response = await fetch(`${baseUrl}/auth/update-password`, {
-      method: "PATCH",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        currentPassword,
-        newPassword
-      }),
-      credentials: 'include',
-    });
-    
-    const result: ApiResponse<{ message: string }> = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(result.message || "Failed to update password");
-    }
-    
-    return result.data!;
-  },
-
-  resetPasswordWithToken: async (token: string, newPassword: string, confirmPassword: string): Promise<{ message: string }> => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    const response = await fetch(`${baseUrl}/auth/reset-password/${token}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ newPassword, confirmPassword }),
-      credentials: 'include',
-    });
-    const result: ApiResponse<{ message: string }> = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || "Failed to reset password");
-    }
-    return result.data!;
-  },
 };

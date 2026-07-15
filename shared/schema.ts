@@ -17,6 +17,10 @@ export interface User {
   emailVerified: boolean;
   phoneVerified: boolean;
   twoFactorEnabled: boolean;
+  leftVolume?: string;
+  rightVolume?: string;
+  placementId?: number;
+  placementPosition?: string;
   lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -206,6 +210,9 @@ export interface DashboardStats {
   dailyROI: number;
   totalCreditedROI: number; // Total daily ROI earned
   roiWithdrawn: number; // Total ROI withdrawn
+  leftVolume?: number;
+  rightVolume?: number;
+  matchedVolume?: number;
 }
 
 // API Response wrapper

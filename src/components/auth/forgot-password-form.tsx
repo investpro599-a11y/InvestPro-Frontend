@@ -6,32 +6,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Mail, Lock, Key } from "lucide-react";
+import { ArrowLeft, Key, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { authApi } from "@/lib/auth";
-import { SecurityQuestion } from "../../../shared/schema";
 
-type Step = 'choice' | 'email' | 'security' | 'reset' | 'success';
-
-const isClient = typeof window !== 'undefined';
+type Step = 'email' | 'otp' | 'password' | 'success';
 
 export function ForgotPasswordForm() {
   const router = useRouter();
-  const [step, setStep] = useState<Step>('choice');
-  const [method, setMethod] = useState<'email' | 'security' | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
-  const [securityQuestions, setSecurityQuestions] = useState<SecurityQuestion[]>([]);
-  const [securityAnswers, setSecurityAnswers] = useState<string[]>(['', '', '']);
-  const [securityError, setSecurityError] = useState('');
+  const [enteredOtp, setEnteredOtp] = useState("");
 
   const emailForm = useForm();
-
   const resetForm = useForm();
+
+  const otpForm = useForm();
+  const handleVerifyOtp = async (data: any) => {
+    if (!data.otp || data.otp.length < 6) {
+      setError('Please enter a valid 6-digit OTP');
+      return;
+    }
+    setEnteredOtp(data.otp);
+    setStep('password');
+    setError('');
+    setSuccess('');
+  };
 
   // Countdown timer for resend button
   useEffect(() => {
@@ -45,15 +49,10 @@ export function ForgotPasswordForm() {
     setError('');
     setSuccess('');
     try {
-      const result = await authApi.requestPasswordReset(data);
-      setUserId(result.userId ?? null);
+      await authApi.forgotPassword(data.email);
       setEmail(data.email);
-      if (result.userId) {
-        const questions = await authApi.getSecurityQuestions(result.userId);
-        setSecurityQuestions(questions);
-      }
-      setStep('security');
-      setResendCountdown(60); // Start 60 second countdown
+      setStep('otp');
+      setResendCountdown(60);
       setSuccess('Password reset OTP sent to your email.');
     } catch (error: any) {
       setError(error.message || "Failed to send reset OTP");
@@ -64,9 +63,13 @@ export function ForgotPasswordForm() {
     setError('');
     setSuccess('');
     try {
+      if (data.newPassword !== data.confirmPassword) {
+        throw new Error("Passwords do not match");
+      }
       await authApi.resetPassword({
-        ...data,
-        userId: userId!,
+        email,
+        otp: enteredOtp,
+        newPassword: data.newPassword,
       });
       setStep('success');
       setSuccess('Password reset successfully! You can now login with your new password.');
@@ -80,8 +83,7 @@ export function ForgotPasswordForm() {
     setError('');
     setSuccess('');
     try {
-      if (!userId) return;
-      await authApi.resendPasswordResetOtp(userId);
+      await authApi.forgotPassword(email);
       setSuccess("OTP resent to your email.");
       setResendCountdown(60); // Reset countdown
     } catch (error: any) {
@@ -116,55 +118,25 @@ export function ForgotPasswordForm() {
     );
   }
 
-  if (step === 'choice') {
+  
+  if (step === 'otp') {
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Forgot Password?</CardTitle>
-          <p className="text-sm text-gray-600">How would you like to reset your password?</p>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button className="w-full" onClick={() => { setMethod('email'); setStep('email'); }}>Send Reset Link to Email</Button>
-          <Button className="w-full" variant="outline" onClick={() => { setMethod('security'); setStep('security'); }}>Answer Security Questions</Button>
-          <div className="text-center mt-2">
-            <Button variant="link" onClick={handleBackToLogin} className="text-sm flex items-center space-x-1 mx-auto">
-              <ArrowLeft className="h-4 w-4" />
-              <span>Back to Login</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (step === 'email') {
-    return (
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Reset via Email</CardTitle>
-          <p className="text-sm text-gray-600">Enter your email address to receive a reset link.</p>
+          <CardTitle className="text-xl">Enter OTP</CardTitle>
+          <p className="text-sm text-gray-600">Enter the OTP sent to {email}.</p>
         </CardHeader>
         <CardContent>
-          <Form {...emailForm}>
-            <form onSubmit={emailForm.handleSubmit(async (data: any) => {
-              setError('');
-              setSuccess('');
-              try {
-                await authApi.requestPasswordReset({ ...data, method: 'email' });
-                setSuccess('If your email is registered, a reset link has been sent.');
-                setStep('success');
-              } catch (error: any) {
-                setError(error.message || 'Failed to send reset link');
-              }
-            })} className="space-y-4">
+          <Form {...otpForm}>
+            <form onSubmit={otpForm.handleSubmit(handleVerifyOtp)} className="space-y-4">
               <FormField
-                control={emailForm.control}
-                name="email"
+                control={otpForm.control}
+                name="otp"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email Address</FormLabel>
+                    <FormLabel>OTP Code</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="Enter your email address" {...field} />
+                      <Input type="text" placeholder="6-digit code" maxLength={6} autoComplete="one-time-code" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -172,11 +144,25 @@ export function ForgotPasswordForm() {
               />
               {error && <div className="text-red-600 text-sm text-center">{error}</div>}
               {success && <div className="text-green-600 text-sm text-center">{success}</div>}
-              <Button type="submit" className="w-full" disabled={emailForm.formState.isSubmitting}>
-                {emailForm.formState.isSubmitting ? 'Sending...' : 'Send Reset Link'}
+              
+              <Button type="submit" className="w-full">
+                Verify OTP
               </Button>
+
+              <div className="text-center">
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={handleResendOtp}
+                  disabled={resendLoading || resendCountdown > 0}
+                  className="text-sm"
+                >
+                  {resendCountdown > 0 ? `Resend OTP in ${resendCountdown}s` : "Resend OTP"}
+                </Button>
+              </div>
+
               <div className="text-center mt-2">
-                <Button variant="link" onClick={() => setStep('choice')} className="text-sm flex items-center space-x-1 mx-auto">
+                <Button variant="link" onClick={() => setStep('email')} className="text-sm flex items-center space-x-1 mx-auto">
                   <ArrowLeft className="h-4 w-4" />
                   <span>Back</span>
                 </Button>
@@ -188,115 +174,16 @@ export function ForgotPasswordForm() {
     );
   }
 
-  if (step === 'security') {
-    return (
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Reset via Security Questions</CardTitle>
-          <p className="text-sm text-gray-600">Enter your email to answer your security questions.</p>
-        </CardHeader>
-        <CardContent>
-          {!securityQuestions.length ? (
-            <Form {...emailForm}>
-              <form onSubmit={emailForm.handleSubmit(async (data: any) => {
-                setError('');
-                setSuccess('');
-                try {
-                  // Find user by email, get userId (API to be implemented)
-                  const userId = await authApi.getUserIdByEmail(data.email);
-                  setUserId(userId);
-                  const questions = await authApi.getSecurityQuestions(userId);
-                  setSecurityQuestions(questions);
-                } catch (error: any) {
-                  setError(error.message || 'Failed to find user or questions');
-                }
-              })} className="space-y-4">
-                <FormField
-                  control={emailForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email Address</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="Enter your email address" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {error && <div className="text-red-600 text-sm text-center">{error}</div>}
-                <Button type="submit" className="w-full" disabled={emailForm.formState.isSubmitting}>
-                  {emailForm.formState.isSubmitting ? 'Finding...' : 'Continue'}
-                </Button>
-                <div className="text-center mt-2">
-                  <Button variant="link" onClick={() => setStep('choice')} className="text-sm flex items-center space-x-1 mx-auto">
-                    <ArrowLeft className="h-4 w-4" />
-                    <span>Back</span>
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          ) : (
-            <form onSubmit={async e => {
-              e.preventDefault();
-              setSecurityError('');
-              try {
-                await authApi.verifySecurityAnswers(userId!, securityAnswers);
-                setStep('reset');
-              } catch (err: any) {
-                setSecurityError(err.message || 'Incorrect answers.');
-              }
-            }} className="space-y-4">
-              {securityQuestions.map((q, idx) => (
-                <div key={idx} className="mb-2">
-                  <label className="block font-semibold mb-1">{q.question}</label>
-                  <Input
-                    type="text"
-                    value={securityAnswers[idx]}
-                    onChange={e => {
-                      const updated = [...securityAnswers];
-                      updated[idx] = e.target.value;
-                      setSecurityAnswers(updated);
-                    }}
-                    required
-                    autoComplete="off"
-                  />
-                </div>
-              ))}
-              {securityError && <div className="text-red-600 text-sm text-center">{securityError}</div>}
-              <Button type="submit" className="w-full">Continue</Button>
-              <div className="text-center mt-2">
-                <Button variant="link" onClick={() => { setSecurityQuestions([]); setStep('security'); }} className="text-sm flex items-center space-x-1 mx-auto">
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Back</span>
-                </Button>
-              </div>
-            </form>
-          )}
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (step === 'reset') {
+  if (step === 'password') {
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Reset Password</CardTitle>
+          <p className="text-sm text-gray-600">Enter the OTP sent to {email} and your new password.</p>
         </CardHeader>
         <CardContent>
           <Form {...resetForm}>
-            <form onSubmit={resetForm.handleSubmit(async (data: any) => {
-              setError('');
-              setSuccess('');
-              try {
-                await authApi.resetPassword({ ...data, userId });
-                setStep('success');
-                setSuccess('Password reset successfully! You can now login with your new password.');
-              } catch (error: any) {
-                setError(error.message || 'Failed to reset password');
-              }
-            })} className="space-y-4">
+            <form onSubmit={resetForm.handleSubmit(handleResetPassword)} className="space-y-4">
               <FormField
                 control={resetForm.control}
                 name="newPassword"
@@ -325,9 +212,29 @@ export function ForgotPasswordForm() {
               />
               {error && <div className="text-red-600 text-sm text-center">{error}</div>}
               {success && <div className="text-green-600 text-sm text-center">{success}</div>}
+              
               <Button type="submit" className="w-full" disabled={resetForm.formState.isSubmitting}>
                 {resetForm.formState.isSubmitting ? 'Resetting...' : 'Reset Password'}
               </Button>
+
+              <div className="text-center">
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={handleResendOtp}
+                  disabled={resendLoading || resendCountdown > 0}
+                  className="text-sm"
+                >
+                  {resendCountdown > 0 ? `Resend OTP in ${resendCountdown}s` : "Resend OTP"}
+                </Button>
+              </div>
+
+              <div className="text-center mt-2">
+                <Button variant="link" onClick={() => setStep('email')} className="text-sm flex items-center space-x-1 mx-auto">
+                  <ArrowLeft className="h-4 w-4" />
+                  <span>Back</span>
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>
@@ -343,7 +250,7 @@ export function ForgotPasswordForm() {
         </div>
         <CardTitle className="text-xl">Forgot Password?</CardTitle>
         <p className="text-sm text-gray-600">
-          Enter your email address and we&apos;ll send you a code to reset your password.
+          Enter your email address and we'll send you an OTP to reset your password.
         </p>
       </CardHeader>
       <CardContent>
@@ -389,4 +296,4 @@ export function ForgotPasswordForm() {
       </CardContent>
     </Card>
   );
-} 
+}
