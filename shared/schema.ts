@@ -107,6 +107,22 @@ export interface Session {
 }
 
 // Form data interfaces for API requests
+export interface Reward {
+  id: number;
+  name: string;
+  requiredVolumePkr: string;
+  rewardAmountPkr: string;
+  description: string | null;
+  createdAt: string;
+}
+
+export interface InsertReward {
+  name: string;
+  requiredVolumePkr: string;
+  rewardAmountPkr: string;
+  description?: string;
+}
+
 export interface InsertUser {
   fullName: string;
   username: string;

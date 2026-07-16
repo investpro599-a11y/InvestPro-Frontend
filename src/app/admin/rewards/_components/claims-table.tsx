@@ -26,6 +26,20 @@ export function ClaimsTable() {
     }
   });
 
+  const { data: settings } = useQuery({
+    queryKey: ['publicSettings'],
+    queryFn: async () => {
+      const res = await apiRequest('GET', '/settings/public');
+      return await res.json();
+    },
+  });
+
+  const exchangeRate = settings?.exchangeRate || 278;
+
+  const formatUSD = (val: number) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+  };
+
   const approveMutation = useMutation({
     mutationFn: async (id: number) => {
       const res = await apiRequest('PUT', `/admin/rewards/${id}/approve`);
@@ -92,7 +106,12 @@ export function ClaimsTable() {
               <TableCell className="font-medium">{claim.user?.fullName || 'Unknown'}</TableCell>
               <TableCell>{claim.user?.email || 'N/A'}</TableCell>
               <TableCell className="font-semibold text-primary">{claim.reward?.name || 'Unknown'}</TableCell>
-              <TableCell>${claim.reward?.requiredVolumeUsd?.toLocaleString() || 0} USD</TableCell>
+              <TableCell>
+                Rs {Number(claim.reward?.requiredVolumePkr || 0).toLocaleString()} 
+                <span className="text-gray-500 text-xs ml-1">
+                  ({formatUSD(Number(claim.reward?.requiredVolumePkr || 0) / exchangeRate)})
+                </span>
+              </TableCell>
               <TableCell>
                 <span className="px-2 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
                   {claim.status}
