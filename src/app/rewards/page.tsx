@@ -10,7 +10,7 @@ import { CheckCircle, Clock, Gift, Users, Trophy, ArrowRight } from 'lucide-reac
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Reward } from '@/shared/schema';
+import { Reward } from '@shared/schema';
 
 // Helper to format PKR
 const formatPKR = (val: string | number) => {
