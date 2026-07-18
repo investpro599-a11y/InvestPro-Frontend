@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Key, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -27,14 +28,22 @@ export function ForgotPasswordForm() {
 
   const otpForm = useForm();
   const handleVerifyOtp = async (data: any) => {
-    if (!data.otp || data.otp.length < 6) {
-      setError('Please enter a valid 6-digit OTP');
+    const otpValue = String(data.verificationCode || "").trim();
+    if (!otpValue || !/^\d{6}$/.test(otpValue)) {
+      setError('Please enter a valid 6-digit numeric OTP');
       return;
     }
-    setEnteredOtp(data.otp);
-    setStep('password');
+    
     setError('');
     setSuccess('');
+    
+    try {
+      await authApi.verifyResetOtp({ email, otp: otpValue });
+      setEnteredOtp(otpValue);
+      setStep('password');
+    } catch (error: any) {
+      setError(error.message || "Invalid OTP. Please try again.");
+    }
   };
 
   // Countdown timer for resend button
@@ -129,16 +138,34 @@ export function ForgotPasswordForm() {
         <CardContent>
           <Form {...otpForm}>
             <form onSubmit={otpForm.handleSubmit(handleVerifyOtp)} className="space-y-4">
+              {/* Dummy fields to absorb aggressive browser autofill */}
+              <input type="text" name="dummy_email" style={{ display: 'none' }} aria-hidden="true" tabIndex={-1} />
+              <input type="password" name="dummy_password" style={{ display: 'none' }} aria-hidden="true" tabIndex={-1} />
+              
               <FormField
                 control={otpForm.control}
-                name="otp"
+                name="verificationCode"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>OTP Code</FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="6-digit code" maxLength={6} autoComplete="one-time-code" {...field} />
+                      <InputOTP maxLength={6} {...field}>
+                        <InputOTPGroup className="mx-auto w-full flex justify-center">
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                          <InputOTPSlot index={3} />
+                          <InputOTPSlot index={4} />
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
                     </FormControl>
                     <FormMessage />
+                    <div className="flex justify-center mt-2">
+                      <Button type="button" variant="ghost" size="sm" onClick={() => otpForm.setValue('verificationCode', '')} className="text-xs text-gray-500 h-6">
+                        Clear Input
+                      </Button>
+                    </div>
                   </FormItem>
                 )}
               />
