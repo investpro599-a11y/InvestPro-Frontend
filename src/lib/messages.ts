@@ -21,7 +21,9 @@ export const MESSAGE_TYPES = {
 } as const;
 
 // Helper function to extract message from API response
-export function extractMessage(response: any): string {
+export function extractMessage(response: any): string | undefined {
+  if (!response) return undefined;
+
   if (typeof response === 'string') {
     return response;
   }
@@ -41,7 +43,13 @@ export function extractMessage(response: any): string {
     return response.error.message;
   }
   
-  return 'An unexpected error occurred. Please try again.';
+  // If this appears to be an error response, provide a fallback error message
+  if (response?.error || (response?.status && response?.status >= 400) || response instanceof Error) {
+    return 'An unexpected error occurred. Please try again.';
+  }
+  
+  // For successful responses that just return an object, we don't need a description
+  return undefined;
 }
 
 // Helper function to determine if response contains a success message
@@ -162,8 +170,7 @@ export function handleNetworkError(error: any): string {
   if (error?.message?.includes('timeout')) {
     return 'The request took too long to complete. Please try again.';
   }
-  
-  return extractMessage(error);
+  return extractMessage(error) || 'An unexpected error occurred. Please try again.';
 }
 
 // Helper for handling validation errors
@@ -171,8 +178,7 @@ export function handleValidationError(error: any): string {
   if (error?.message?.includes('validation')) {
     return 'Please check your input and ensure all required fields are filled correctly.';
   }
-  
-  return extractMessage(error);
+  return extractMessage(error) || 'Please check your input and ensure all required fields are filled correctly.';
 }
 
 // Helper for handling authentication errors
@@ -184,6 +190,5 @@ export function handleAuthError(error: any): string {
   if (error?.status === 403) {
     return 'You do not have permission to perform this action.';
   }
-  
-  return extractMessage(error);
-} 
+  return extractMessage(error) || 'Authentication failed. Please log in again.';
+}
