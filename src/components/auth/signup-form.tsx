@@ -7,6 +7,8 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { authApi } from "@/lib/auth";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
@@ -191,6 +193,95 @@ export function SignupForm({ initialReferralCode }: SignupFormProps) {
     // Trigger form validation
     form.handleSubmit(onSubmit)(e);
   };
+
+  const handleVerifyOtp = async (data: any) => {
+    const code = String(data.verificationCode || "").trim();
+    if (!code || !/^\d{6}$/.test(code)) {
+      setSignupError('Please enter a valid 6-digit numeric OTP');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setSignupError('');
+    
+    try {
+      await authApi.verifySignupOtp({ email: pendingEmail, otp: code });
+      toast({
+        title: "Verification successful!",
+        description: "Your account is now active. Logging you in...",
+      });
+      // Verification successful, redirect to login page or just let them click Back to Login
+      router.push("/login");
+    } catch (error: any) {
+      setSignupError(error.message || "Invalid OTP. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const otpForm = useForm();
+
+  if (step === 'otp') {
+    return (
+      <Card className="w-full max-w-md mx-auto shadow-sm border-0">
+        <CardHeader className="text-center pb-2">
+          <CardTitle className="text-xl font-bold">Verify Your Email</CardTitle>
+          <p className="text-sm text-gray-500 mt-2">
+            We sent a verification code to <strong>{pendingEmail}</strong>.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <Form {...otpForm}>
+            <form onSubmit={otpForm.handleSubmit(handleVerifyOtp)} className="space-y-4">
+              {/* Dummy fields to absorb aggressive browser autofill */}
+              <input type="text" name="dummy_email" style={{ display: 'none' }} aria-hidden="true" tabIndex={-1} />
+              <input type="password" name="dummy_password" style={{ display: 'none' }} aria-hidden="true" tabIndex={-1} />
+              
+              <FormField
+                control={otpForm.control}
+                name="verificationCode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="sr-only">Verification Code</FormLabel>
+                    <FormControl>
+                      <InputOTP maxLength={6} {...field}>
+                        <InputOTPGroup className="mx-auto w-full flex justify-center">
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                          <InputOTPSlot index={3} />
+                          <InputOTPSlot index={4} />
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </FormControl>
+                    <FormMessage />
+                    <div className="flex justify-center mt-2">
+                      <Button type="button" variant="ghost" size="sm" onClick={() => otpForm.setValue('verificationCode', '')} className="text-xs text-gray-500 h-6">
+                        Clear Input
+                      </Button>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              
+              {signupError && <div className="text-red-600 text-sm text-center bg-red-50 p-2 rounded">{signupError}</div>}
+              
+              <Button type="submit" className="w-full mt-4" disabled={isSubmitting}>
+                {isSubmitting ? "Verifying..." : "Verify Account"}
+              </Button>
+              
+              <div className="text-center mt-4">
+                <Button variant="link" onClick={() => router.push("/login")} className="text-sm">
+                  Back to Login
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Form {...form}>
