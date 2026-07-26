@@ -53,23 +53,24 @@ function TreeNodeComponent({ node }: { node: GenealogyNode }) {
         { (node.investmentAmount ?? 0) > 0 && (
           <p className="text-xs mt-1" title="This is your fixed monthly return (15%) on your own investment. Not a commission.">
             Monthly ROI: ${((node.investmentAmount ?? 0) * 0.15).toLocaleString()} USD
-            <span className="ml-1 text-gray-400" title="This is your fixed monthly return (15%) on your own investment. Not a commission.">ⓘ</span>
+            <span className="ml-1 opacity-70" title="This is your fixed monthly return (15%) on your own investment. Not a commission.">ⓘ</span>
           </p>
         )}
-        <p className="text-[10px] text-gray-400 mt-1">Commission is from your downline's investments. ROI is your own investment return.</p>
+        <p className="text-[10px] opacity-75 mt-1">Commission is from your downline's investments. ROI is your own investment return.</p>
         {node.commissionForRoot > 0 && (
-          <div className="mt-2 text-left">
-            <p className="text-xs font-semibold text-green-700">You earn from this member:</p>
-            <ul className="text-xs ml-2">
+          <div className="mt-3 p-2.5 rounded-lg bg-black/30 border border-white/20 text-left shadow-inner">
+            <p className="text-xs font-bold text-emerald-300">You earn from this member:</p>
+            <ul className="text-xs mt-1 space-y-1.5">
               {node.commissionForRootDetails.map((detail, idx) => (
-                <li key={idx} className="mb-1">
-                  <span>• Investment: ${detail.investmentAmount.toLocaleString()} on {new Date(detail.date).toLocaleDateString()}<br/></span>
-                  <span>  Rate: {detail.rate}% → <span className="font-bold">${detail.commissionAmount.toLocaleString()}</span></span>
-                  <span className="ml-2 inline-block px-2 py-0.5 rounded bg-green-100 text-green-800 text-[10px] font-bold align-middle">One-time commission paid</span>
+                <li key={idx} className="leading-relaxed border-b border-white/10 pb-1 last:border-b-0">
+                  <span className="text-white/90">• Investment: ${detail.investmentAmount.toLocaleString()} on {new Date(detail.date).toLocaleDateString()}<br/></span>
+                  <span className="text-white/80">  Rate: {detail.rate}% → </span>
+                  <span className="font-bold text-emerald-300">${detail.commissionAmount.toLocaleString()}</span>
+                  <span className="ml-2 inline-block px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-200 border border-emerald-500/40 text-[10px] font-semibold align-middle">One-time commission paid</span>
                 </li>
               ))}
             </ul>
-            <p className="text-xs font-bold text-green-800 mt-1">Total from this member: ${node.commissionForRoot.toLocaleString()}</p>
+            <p className="text-xs font-bold text-emerald-300 mt-2 pt-1 border-t border-white/10">Total from this member: ${node.commissionForRoot.toLocaleString()}</p>
           </div>
         )}
       </div>
