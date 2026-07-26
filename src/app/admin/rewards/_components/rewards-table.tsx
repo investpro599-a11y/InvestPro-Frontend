@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { columns } from './columns';
 
@@ -121,10 +121,8 @@ export function RewardsTable() {
   if (rewards.length === 0) {
     return (
       <div className="text-center p-12">
-        <div className="mx-auto h-16 w-16 text-gray-400 mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-16 h-16">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v1.5c0 1.24-1.01 2.25-2.25 2.25H5.25c-1.24 0-2.25-1.01-2.25-2.25v-1.5m12.5-7.5l-3.75-3.75L12 4.5l-3.75 3.75M12 4.5v12m0 0l3.75-3.75M12 18.75l-3.75-3.75" />
-          </svg>
+        <div className="mx-auto h-16 w-16 mb-4 flex items-center justify-center">
+          <Trophy className="w-14 h-14 text-yellow-500" />
         </div>
         <h3 className="mt-2 text-lg font-medium text-gray-900">No rewards</h3>
         <p className="mt-1 text-gray-500">Get started by creating a new reward.</p>
