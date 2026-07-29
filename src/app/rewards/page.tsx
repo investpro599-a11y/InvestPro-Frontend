@@ -6,11 +6,13 @@ import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import { apiRequest } from '@/lib/queryClient';
-import { CheckCircle, Clock, Gift, Users, Trophy, ArrowRight } from 'lucide-react';
+import { CheckCircle, Clock, Gift, Users, Trophy, ArrowRight, User } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Reward } from '@shared/schema';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getFileUrl } from "@/lib/utils";
 
 // Helper to format PKR
 const formatPKR = (val: string | number) => {
@@ -277,7 +279,18 @@ export default function RewardsPage() {
             </div>
             
             <div className="bg-gray-100 pt-16 pb-8 px-6 text-center relative">
-              <h3 className="text-green-700 font-black text-2xl tracking-wide uppercase mb-6 drop-shadow-sm">Congratulations</h3>
+              <div className="absolute left-1/2 -top-12 -translate-x-1/2 z-30">
+                <Avatar className="w-24 h-24 border-4 border-white shadow-xl bg-gray-100">
+                  <AvatarImage 
+                    src={getFileUrl(user?.profilePicture)} 
+                    crossOrigin="anonymous"
+                  />
+                  <AvatarFallback className="text-gray-400">
+                    <User className="w-12 h-12" />
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+              <h3 className="text-green-700 font-black text-2xl tracking-wide uppercase mb-6 drop-shadow-sm mt-4">Congratulations</h3>
               
               <Button 
                 onClick={() => {
