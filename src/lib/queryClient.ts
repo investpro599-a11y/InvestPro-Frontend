@@ -34,10 +34,10 @@ export async function apiRequest(
   
   // If no explicit API URL is set, use appropriate default based on environment
   if (!baseUrl) {
-    if (typeof window !== 'undefined' && window.location.hostname === 'www.investpro.website') {
-      baseUrl = 'https://www.investpro.website';
+    if (typeof window !== 'undefined' && window.location.hostname.includes('investpro.website')) {
+      baseUrl = 'https://www.investpro.website/api';
     } else {
-      baseUrl = 'http://localhost:8000';
+      baseUrl = 'http://localhost:8000/api';
     }
   }
   
