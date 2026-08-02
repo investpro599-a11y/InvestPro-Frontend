@@ -224,13 +224,17 @@ export const rewardApi = {
       }
       try {
         console.log(`Fetching reward with ID: ${id}`);
-        const response = await handleApiRequest<{ data: { reward: Reward } }>('GET', `admin/rewards/${id}`);
+        const response = await handleApiRequest<any>('GET', `admin/rewards/${id}`);
         console.log('Raw API response for reward:', response);
         
-        // Check if the response has the expected nested structure
         if (response?.data?.reward) {
-          console.log('Extracted reward data:', response.data.reward);
           return response.data.reward;
+        }
+        if (response?.reward) {
+          return response.reward;
+        }
+        if (response?._id || response?.id) {
+          return response;
         }
         
         console.warn('Unexpected response format:', response);
@@ -242,17 +246,26 @@ export const rewardApi = {
     },
 
     createReward: async (data: RewardBase): Promise<Reward> => {
-      // Use a relative URL without the /api prefix to be consistent with other endpoints
-      return await handleApiRequest<Reward>('POST', 'admin/rewards', data);
+      console.log('Creating reward with data:', data);
+      const response = await handleApiRequest<any>('POST', 'admin/rewards', data);
+      if (response?.data?.reward) return response.data.reward;
+      if (response?.reward) return response.reward;
+      return response;
     },
 
     updateReward: async (id: string, data: Partial<RewardBase>): Promise<Reward> => {
       console.log('Updating reward with ID:', id, 'Data:', data);
       try {
-        const response = await handleApiRequest<{ data: { reward: Reward } }>('PATCH', `admin/rewards/${id}`, data);
+        const response = await handleApiRequest<any>('PUT', `admin/rewards/${id}`, data);
         console.log('Update response:', response);
         if (response?.data?.reward) {
           return response.data.reward;
+        }
+        if (response?.reward) {
+          return response.reward;
+        }
+        if (response?._id || response?.id) {
+          return response;
         }
         throw new Error('Invalid response format from server');
       } catch (error) {
@@ -263,14 +276,13 @@ export const rewardApi = {
 
     deleteReward: async (id: string): Promise<void> => {
       try {
-        await handleApiRequest('DELETE', `/admin/rewards/${id}`);
+        await handleApiRequest('DELETE', `admin/rewards/${id}`);
       } catch (error: any) {
-        // If the error is 404 (Not Found), it means the reward was already deleted
-        if (error?.response?.status === 404) {
+        if (error?.response?.status === 404 || error?.status === 404) {
           console.log('Reward not found, assuming it was already deleted');
-          return; // Resolve the promise since the reward is already deleted
+          return;
         }
-        throw error; // Re-throw other errors
+        throw error;
       }
     },
   },
