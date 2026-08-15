@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { usePathname, useRouter } from "next/navigation";
-import { Navigation } from "@/components/navigation";
+import { Layout } from "@/components/layout";
 import { WithdrawalApproval } from "@/components/admin/withdrawal-approval";
 
 export default function AdminWithdrawalApprovals() {
@@ -24,17 +24,17 @@ export default function AdminWithdrawalApprovals() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Withdrawal Approvals</h1>
-          <p className="text-gray-600 mt-1">Review and process pending withdrawal requests.</p>
-        </div>
+    <Layout>
+      <div className="py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-white">Withdrawal <span className="gradient-text-primary">Approvals</span></h1>
+            <p className="text-slate-300 mt-1 font-medium">Review and process pending withdrawal requests.</p>
+          </div>
 
-        <WithdrawalApproval />
+          <WithdrawalApproval />
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 }

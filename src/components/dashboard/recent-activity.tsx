@@ -11,23 +11,20 @@ import { Coins, ArrowUp } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/hooks/use-auth";
 
-const getStatusColor = (status: string) => {
+const getStatusBadgeVariant = (status: string) => {
   switch (status) {
     case "pending":
-      return "bg-yellow-100 text-yellow-800";
-    case "active":
-      return "bg-green-100 text-green-800";
-    case "completed":
-      return "bg-green-100 text-green-800";
     case "processing":
-      return "bg-blue-100 text-blue-800";
     case "maturing":
-      return "bg-blue-100 text-blue-800";
+      return "warning";
+    case "active":
+    case "completed":
+      return "success";
     case "cancelled":
     case "rejected":
-      return "bg-red-100 text-red-800";
+      return "destructive";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "secondary";
   }
 };
 
@@ -47,50 +44,50 @@ export function RecentActivity() {
   const recentWithdrawals = withdrawals.slice(0, 3);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Recent Investments */}
-      <Card>
-        <CardHeader>
+      <Card className="glass-card border-sky-500/25 bg-[#0e2238]/90">
+        <CardHeader className="border-b border-sky-500/20 pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle>Recent Investments</CardTitle>
+            <CardTitle className="text-xl font-extrabold font-display text-white">Recent Investments</CardTitle>
             {!isAdmin && (
               <Link href="/investments">
-                <Button variant="link" className="text-primary hover:text-primary/80">
-                  View All
+                <Button variant="link" className="text-sky-400 hover:text-sky-300 font-bold">
+                  View All →
                 </Button>
               </Link>
             )}
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        <CardContent className="pt-6">
+          <div className="space-y-3.5">
             {recentInvestments.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Coins className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No investments yet</p>
+              <div className="text-center py-10 text-slate-300">
+                <Coins className="h-12 w-12 mx-auto mb-3 opacity-60 text-sky-400" />
+                <p className="text-sm font-bold">No recent investments recorded</p>
                 {!isAdmin && (
                   <Link href="/investments">
-                    <Button className="mt-2">Create First Investment</Button>
+                    <Button variant="glass" size="sm" className="mt-3 bg-sky-500/20 text-sky-300 border-sky-400/30">Create First Investment</Button>
                   </Link>
                 )}
               </div>
             ) : (
               recentInvestments.map((investment) => (
-                <div key={investment.id || investment._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                      <Coins className="h-5 w-5 text-primary" />
+                <div key={investment.id || investment._id} className="flex items-center justify-between p-4 bg-[#07172b] border border-sky-500/25 rounded-2xl hover:border-sky-400/40 transition-all">
+                  <div className="flex items-center space-x-3.5">
+                    <div className="w-11 h-11 bg-sky-500/20 border border-sky-400/30 rounded-xl flex items-center justify-center text-sky-300">
+                      <Coins className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">${investment.amount.toLocaleString()}</p>
-                      <p className="text-sm text-gray-500">{investment.plan} plan</p>
+                      <p className="font-extrabold font-display text-white">${investment.amount.toLocaleString()}</p>
+                      <p className="text-xs text-slate-300 font-medium capitalize">{investment.plan} Plan</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <Badge className={getStatusColor(investment.status)}>
+                  <div className="text-right space-y-1">
+                    <Badge variant={getStatusBadgeVariant(investment.status)}>
                       {investment.status}
                     </Badge>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-xs text-slate-400 font-medium">
                       {formatDistanceToNow(new Date(investment.createdAt), { addSuffix: true })}
                     </p>
                   </div>
@@ -102,48 +99,48 @@ export function RecentActivity() {
       </Card>
 
       {/* Recent Withdrawals */}
-      <Card>
-        <CardHeader>
+      <Card className="glass-card border-sky-500/25 bg-[#0e2238]/90">
+        <CardHeader className="border-b border-sky-500/20 pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle>Recent Withdrawals</CardTitle>
+            <CardTitle className="text-xl font-extrabold font-display text-white">Recent Withdrawals</CardTitle>
             {!isAdmin && (
               <Link href="/withdrawals">
-                <Button variant="link" className="text-primary hover:text-primary/80">
-                  View All
+                <Button variant="link" className="text-sky-400 hover:text-sky-300 font-bold">
+                  View All →
                 </Button>
               </Link>
             )}
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        <CardContent className="pt-6">
+          <div className="space-y-3.5">
             {recentWithdrawals.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <ArrowUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No withdrawals yet</p>
+              <div className="text-center py-10 text-slate-300">
+                <ArrowUp className="h-12 w-12 mx-auto mb-3 opacity-60 text-emerald-400" />
+                <p className="text-sm font-bold">No recent payouts requested</p>
                 {!isAdmin && (
                   <Link href="/withdrawals">
-                    <Button className="mt-2">Request Withdrawal</Button>
+                    <Button variant="glass" size="sm" className="mt-3 bg-emerald-500/20 text-emerald-300 border-emerald-400/30">Request Withdrawal</Button>
                   </Link>
                 )}
               </div>
             ) : (
               recentWithdrawals.map((withdrawal) => (
-                <div key={withdrawal.id || withdrawal._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-                      <ArrowUp className="h-5 w-5 text-green-600" />
+                <div key={withdrawal.id || withdrawal._id} className="flex items-center justify-between p-4 bg-[#07172b] border border-sky-500/25 rounded-2xl hover:border-sky-400/40 transition-all">
+                  <div className="flex items-center space-x-3.5">
+                    <div className="w-11 h-11 bg-emerald-500/20 border border-emerald-400/30 rounded-xl flex items-center justify-center text-emerald-400">
+                      <ArrowUp className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">${withdrawal.amount.toLocaleString()}</p>
-                      <p className="text-sm text-gray-500">{withdrawal.type} Withdrawal</p>
+                      <p className="font-extrabold font-display text-white">${withdrawal.amount.toLocaleString()}</p>
+                      <p className="text-xs text-slate-300 font-medium capitalize">{withdrawal.type} Payout</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <Badge className={getStatusColor(withdrawal.status)}>
+                  <div className="text-right space-y-1">
+                    <Badge variant={getStatusBadgeVariant(withdrawal.status)}>
                       {withdrawal.status}
                     </Badge>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-xs text-slate-400 font-medium">
                       {formatDistanceToNow(new Date(withdrawal.createdAt), { addSuffix: true })}
                     </p>
                   </div>

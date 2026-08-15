@@ -139,15 +139,15 @@ export function RewardsTable() {
   }
 
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-x-auto w-full">
       <Table>
-        <TableHeader className="bg-gray-50">
+        <TableHeader className="bg-slate-100/90 dark:bg-[#07172b] border-b border-sky-500/20">
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
+            <TableRow key={headerGroup.id} className="border-sky-500/20 hover:bg-transparent">
               {headerGroup.headers.map((header) => (
                 <TableHead 
                   key={header.id}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3.5 text-left text-xs font-bold text-slate-800 dark:text-slate-300 uppercase tracking-wider"
                 >
                   {header.isPlaceholder
                     ? null
@@ -160,16 +160,16 @@ export function RewardsTable() {
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody className="bg-white divide-y divide-gray-200">
+        <TableBody className="bg-white/95 dark:bg-[#091b30] divide-y divide-slate-200 dark:divide-sky-500/15">
           {table.getRowModel().rows.map((row) => (
             <TableRow
               key={row.id}
-              className="hover:bg-gray-50 transition-colors"
+              className="hover:bg-slate-100/80 dark:hover:bg-sky-500/10 border-slate-200 dark:border-sky-500/15 transition-colors"
             >
               {row.getVisibleCells().map((cell) => (
                 <TableCell 
                   key={cell.id}
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                  className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900 dark:text-white"
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>

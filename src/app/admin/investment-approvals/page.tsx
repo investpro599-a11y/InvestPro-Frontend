@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { usePathname, useRouter } from "next/navigation";
-import { Navigation } from "@/components/navigation";
+import { Layout } from "@/components/layout";
 import { InvestmentApproval } from "@/components/admin/investment-approval";
 
 export default function AdminInvestmentApprovals() {
@@ -24,17 +24,17 @@ export default function AdminInvestmentApprovals() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Investment Approvals</h1>
-          <p className="text-gray-600 mt-1">Review and approve pending investment requests.</p>
-        </div>
+    <Layout>
+      <div className="py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-white">Investment <span className="gradient-text-primary">Approvals</span></h1>
+            <p className="text-slate-300 mt-1 font-medium">Review and approve pending investment requests.</p>
+          </div>
 
-        <InvestmentApproval />
+          <InvestmentApproval />
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 }

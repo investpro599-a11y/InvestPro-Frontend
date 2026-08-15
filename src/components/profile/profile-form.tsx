@@ -146,49 +146,46 @@ export function ProfileForm() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Profile Picture Section */}
         <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <User className="h-5 w-5" />
+          <Card className="glass-card border-sky-500/25 bg-white/90 dark:bg-[#0e2238]/90 shadow-xl">
+            <CardHeader className="border-b border-sky-500/20 px-6 py-4 bg-slate-50/80 dark:bg-[#07172b]">
+              <CardTitle className="flex items-center space-x-2 text-slate-900 dark:text-white font-extrabold font-display">
+                <User className="h-5 w-5 text-sky-500" />
                 <span>Profile Picture</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-center space-y-4">
+            <CardContent className="text-center space-y-4 p-6">
               <div className="relative inline-block">
-                <Avatar className="w-24 h-24 mx-auto">
+                <Avatar className="w-24 h-24 mx-auto border-2 border-sky-400/40 shadow-lg">
                   <AvatarImage 
                     src={getFileUrl(user.profilePicture)} 
                     crossOrigin="anonymous"
                   />
-                  <AvatarFallback className="text-2xl">
+                  <AvatarFallback className="bg-sky-950 text-sky-200 text-2xl font-bold">
                     {user.fullName.split(" ").map((n: string) => n[0]).join("").toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                {isEditing && (
-                  <>
-                    <Button
-                      size="sm"
-                      className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0"
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      <Camera className="h-4 w-4" />
-                    </Button>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      ref={fileInputRef}
-                      style={{ display: "none" }}
-                      tabIndex={-1}
-                      aria-hidden="true"
-                      onChange={handleProfileImageChange}
-                    />
-                  </>
-                )}
+                <Button
+                  size="sm"
+                  className="absolute -bottom-1 -right-1 rounded-full w-8 h-8 p-0 bg-sky-600 hover:bg-sky-500 text-white shadow-md"
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  title="Upload picture"
+                >
+                  <Camera className="h-4 w-4" />
+                </Button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  style={{ display: "none" }}
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  onChange={handleProfileImageChange}
+                />
               </div>
               <div>
-                <p className="font-medium text-gray-900">{user.fullName}</p>
-                <p className="text-sm text-gray-500">@{user.username}</p>
+                <p className="font-bold text-lg text-slate-900 dark:text-white">{user.fullName}</p>
+                <p className="text-sm font-semibold text-sky-600 dark:text-sky-300">@{user.username}</p>
               </div>
             </CardContent>
           </Card>
@@ -196,21 +193,25 @@ export function ProfileForm() {
 
         {/* Profile Form Section */}
         <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
+          <Card className="glass-card border-sky-500/25 bg-white/90 dark:bg-[#0e2238]/90 shadow-xl">
+            <CardHeader className="border-b border-sky-500/20 px-6 py-4 bg-slate-50/80 dark:bg-[#07172b]">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center space-x-2">
-                  <Settings className="h-5 w-5" />
+                <CardTitle className="flex items-center space-x-2 text-slate-900 dark:text-white font-extrabold font-display">
+                  <Settings className="h-5 w-5 text-sky-500" />
                   <span>Profile Information</span>
                 </CardTitle>
-                {!isEditing && (
-                  <Button onClick={() => setIsEditing(true)} variant="outline">
+                {!isEditing ? (
+                  <Button onClick={() => setIsEditing(true)} variant="outline" className="bg-sky-500/10 border-sky-400/30 text-sky-600 dark:text-sky-300 font-bold hover:bg-sky-500/20">
                     Edit Profile
+                  </Button>
+                ) : (
+                  <Button onClick={handleCancel} variant="ghost" size="sm" className="text-slate-600 dark:text-slate-300 font-bold">
+                    Cancel
                   </Button>
                 )}
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -219,9 +220,9 @@ export function ProfileForm() {
                       name="fullName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Full Name</FormLabel>
+                          <FormLabel className="text-slate-800 dark:text-slate-200 font-bold text-xs uppercase tracking-wider">Full Name</FormLabel>
                           <FormControl>
-                            <Input {...field} disabled={!isEditing} />
+                            <Input {...field} disabled={!isEditing} className="bg-white/80 dark:bg-[#07172b] border-sky-500/20 text-slate-900 dark:text-white font-semibold" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -229,9 +230,9 @@ export function ProfileForm() {
                     />
 
                     <div>
-                      <FormLabel>Username</FormLabel>
-                      <Input value={user.username} disabled className="bg-gray-50 text-gray-500" />
-                      <p className="text-xs text-gray-500 mt-1">Username cannot be changed</p>
+                      <FormLabel className="text-slate-800 dark:text-slate-200 font-bold text-xs uppercase tracking-wider">Username</FormLabel>
+                      <Input value={user.username} disabled className="bg-slate-100 dark:bg-[#051120] border-sky-500/20 text-slate-500 dark:text-slate-400 font-semibold" />
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Username cannot be changed</p>
                     </div>
                   </div>
 
@@ -241,9 +242,9 @@ export function ProfileForm() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email Address</FormLabel>
+                          <FormLabel className="text-slate-800 dark:text-slate-200 font-bold text-xs uppercase tracking-wider">Email Address</FormLabel>
                           <FormControl>
-                            <Input type="email" {...field} disabled={!isEditing} />
+                            <Input type="email" {...field} disabled={!isEditing} className="bg-white/80 dark:bg-[#07172b] border-sky-500/20 text-slate-900 dark:text-white font-semibold" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -255,9 +256,9 @@ export function ProfileForm() {
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phone Number</FormLabel>
+                          <FormLabel className="text-slate-800 dark:text-slate-200 font-bold text-xs uppercase tracking-wider">Phone Number</FormLabel>
                           <FormControl>
-                            <Input type="tel" {...field} disabled={!isEditing} />
+                            <Input type="tel" {...field} disabled={!isEditing} className="bg-white/80 dark:bg-[#07172b] border-sky-500/20 text-slate-900 dark:text-white font-semibold" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -270,11 +271,11 @@ export function ProfileForm() {
                     name="walletAddress"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>TRC20 USDT Wallet Address</FormLabel>
+                        <FormLabel className="text-slate-800 dark:text-slate-200 font-bold text-xs uppercase tracking-wider">TRC20 USDT Wallet Address</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your TRC20 USDT wallet address for withdrawals" {...field} disabled={!isEditing} />
+                          <Input placeholder="Enter your TRC20 USDT wallet address for withdrawals" {...field} disabled={!isEditing} className="bg-white/80 dark:bg-[#07172b] border-sky-500/20 text-slate-900 dark:text-white font-semibold" />
                         </FormControl>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
                           This address will be used for all withdrawal transactions. Make sure it&apos;s correct.
                         </p>
                         <FormMessage />
@@ -283,11 +284,11 @@ export function ProfileForm() {
                   />
 
                   {isEditing && (
-                    <div className="flex justify-end space-x-4">
+                    <div className="flex justify-end space-x-4 pt-2">
                       <Button type="button" variant="outline" onClick={handleCancel}>
                         Cancel
                       </Button>
-                      <Button type="submit" disabled={updateProfileMutation.isPending}>
+                      <Button type="submit" disabled={updateProfileMutation.isPending} className="bg-gradient-to-r from-blue-600 to-sky-500 text-white font-bold shadow-lg shadow-sky-500/25">
                         {updateProfileMutation.isPending ? (
                           "Saving..."
                         ) : (
@@ -308,16 +309,16 @@ export function ProfileForm() {
 
       {/* Password Change Section */}
       <div className="mt-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Settings className="h-5 w-5" />
+        <Card className="glass-card border-sky-500/25 bg-white/90 dark:bg-[#0e2238]/90 shadow-xl">
+          <CardHeader className="border-b border-sky-500/20 px-6 py-4 bg-slate-50/80 dark:bg-[#07172b]">
+            <CardTitle className="flex items-center space-x-2 text-slate-900 dark:text-white font-extrabold font-display">
+              <Settings className="h-5 w-5 text-sky-500" />
               <span>Change Password</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-600 mb-4">
-              Use the form below to change your password. You'll need to provide your current password for security.
+          <CardContent className="p-6">
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-6 font-medium">
+              Use the form below to change your password. You&apos;ll need to provide your current password for security.
             </p>
             <PasswordChangeForm />
           </CardContent>

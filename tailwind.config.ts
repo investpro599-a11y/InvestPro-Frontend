@@ -11,7 +11,21 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-inter)", "sans-serif"],
+        display: ["var(--font-plus-jakarta)", "sans-serif"],
+      },
+      boxShadow: {
+        glass: "0 8px 32px 0 rgba(0, 0, 0, 0.08)",
+        "glass-lg": "0 12px 40px 0 rgba(0, 0, 0, 0.15)",
+        "glass-glow": "0 0 25px -5px rgba(59, 130, 246, 0.3)",
+        "glow-emerald": "0 0 25px -5px rgba(16, 185, 129, 0.3)",
+        "glow-purple": "0 0 25px -5px rgba(168, 85, 247, 0.3)",
+        "glow-amber": "0 0 25px -5px rgba(245, 158, 11, 0.3)",
+      },
       borderRadius: {
+        "3xl": "1.5rem",
+        "4xl": "2rem",
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
@@ -70,25 +84,31 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "float-slow": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { opacity: "0.6", transform: "scale(1)" },
+          "50%": { opacity: "0.9", transform: "scale(1.05)" },
+        },
+        shimmer: {
+          "100%": { transform: "translateX(100%)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "float": "float-slow 6s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 4s ease-in-out infinite",
+        "shimmer": "shimmer 2.5s infinite",
       },
     },
   },

@@ -26,11 +26,11 @@ export default function Investments() {
 
   return (
     <Layout>
-      <div className="bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Investments</h1>
-            <p className="text-gray-600 mt-1">Manage your investment portfolio and create new investments.</p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-white">Portfolio <span className="gradient-text-primary">Investments</span></h1>
+            <p className="text-slate-300 mt-1 font-medium">Manage your investment portfolio and create new investments.</p>
           </div>
 
           <div className="space-y-8">

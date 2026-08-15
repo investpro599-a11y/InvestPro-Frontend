@@ -81,39 +81,39 @@ export function ClaimsTable() {
 
   if (claims.length === 0) {
     return (
-      <div className="text-center p-6 border rounded-lg bg-gray-50">
-        <div className="text-gray-500">No pending reward claims found</div>
+      <div className="text-center p-8 bg-white/90 dark:bg-[#091b30] border border-sky-500/20 text-slate-700 dark:text-slate-300 font-medium">
+        No pending reward claims found
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto border rounded-lg">
+    <div className="overflow-x-auto w-full">
       <Table>
-        <TableHeader className="bg-gray-50">
-          <TableRow>
-            <TableHead>User</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Reward</TableHead>
-            <TableHead>Req Volume</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Action</TableHead>
+        <TableHeader className="bg-slate-100/90 dark:bg-[#07172b] border-b border-sky-500/20">
+          <TableRow className="border-sky-500/20 hover:bg-transparent">
+            <TableHead className="text-slate-800 dark:text-slate-300 font-bold text-xs">User</TableHead>
+            <TableHead className="text-slate-800 dark:text-slate-300 font-bold text-xs">Email</TableHead>
+            <TableHead className="text-slate-800 dark:text-slate-300 font-bold text-xs">Reward</TableHead>
+            <TableHead className="text-slate-800 dark:text-slate-300 font-bold text-xs">Req Volume</TableHead>
+            <TableHead className="text-slate-800 dark:text-slate-300 font-bold text-xs">Status</TableHead>
+            <TableHead className="text-right text-slate-800 dark:text-slate-300 font-bold text-xs">Action</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className="bg-white/95 dark:bg-[#091b30] divide-y divide-slate-200 dark:divide-sky-500/15">
           {claims.map((claim: any) => (
-            <TableRow key={claim.id}>
-              <TableCell className="font-medium">{claim.user?.fullName || 'Unknown'}</TableCell>
-              <TableCell>{claim.user?.email || 'N/A'}</TableCell>
-              <TableCell className="font-semibold text-primary">{claim.reward?.name || 'Unknown'}</TableCell>
-              <TableCell>
+            <TableRow key={claim.id} className="hover:bg-sky-500/10 border-slate-200 dark:border-sky-500/15">
+              <TableCell className="font-bold text-slate-900 dark:text-white">{claim.user?.fullName || 'Unknown'}</TableCell>
+              <TableCell className="text-slate-700 dark:text-slate-300 font-medium">{claim.user?.email || 'N/A'}</TableCell>
+              <TableCell className="font-extrabold text-sky-600 dark:text-sky-300">{claim.reward?.name || 'Unknown'}</TableCell>
+              <TableCell className="text-slate-900 dark:text-white font-bold">
                 Rs {Number(claim.reward?.requiredVolumePkr || 0).toLocaleString()} 
-                <span className="text-gray-500 text-xs ml-1">
+                <span className="text-slate-600 dark:text-slate-300 text-xs ml-1 font-normal">
                   ({formatUSD(Number(claim.reward?.requiredVolumePkr || 0) / exchangeRate)})
                 </span>
               </TableCell>
               <TableCell>
-                <span className="px-2 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-400/30">
                   {claim.status}
                 </span>
               </TableCell>
@@ -122,7 +122,7 @@ export function ClaimsTable() {
                   size="sm" 
                   onClick={() => approveMutation.mutate(claim.id)}
                   disabled={approveMutation.isPending}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-md"
                 >
                   <Check className="w-4 h-4 mr-1" />
                   Approve

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { genealogyApi } from "@/lib";
 import { useAuth } from "@/hooks/use-auth";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PrinterCheck, Users, RefreshCw, Loader2, Search, X } from "lucide-react";
+import { PrinterCheck, Users, RefreshCw, Loader2, Search, X, ZoomIn, ZoomOut } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import type { GenealogyNode, User } from "@/../shared/schema";
@@ -23,88 +23,62 @@ const getInitials = (fullName: string | null | undefined) => {
 };
 
 function TreeNodeComponent({ node }: { node: GenealogyNode }) {
-  // Safety check for null/undefined node
-  if (!node) {
-    return null;
-  }
+  if (!node) return null;
 
-  const levelColors = [
-    "bg-primary/10 border-primary/30 text-primary",
-    "bg-green-50 border-green-200 text-green-700",
-    "bg-blue-50 border-blue-200 text-blue-700",
-    "bg-purple-50 border-purple-200 text-purple-700",
-    "bg-orange-50 border-orange-700 text-orange-700",
-  ];
-
-  const colorClass = levelColors[node.level] || "bg-gray-50 border-gray-200 text-gray-700";
   const isNonInvested = !node.investmentAmount || node.investmentAmount <= 0;
 
   return (
     <div className="flex flex-col items-center">
       <div
-        className={`rounded-xl border-2 p-4 text-center min-w-[220px] max-w-xs shadow-md transition-all duration-200 ${colorClass} ${isNonInvested ? 'opacity-70 grayscale' : ''}`}
+        className={`rounded-xl border border-sky-500/30 bg-[#0c1e34]/95 backdrop-blur-xl p-3 text-center w-48 sm:w-52 text-white shadow-xl transition-all duration-300 hover:border-sky-400/60 hover:bg-[#0f243f] ${isNonInvested ? 'opacity-70' : ''}`}
         tabIndex={0}
         aria-label={`Genealogy card for ${node.fullName || 'Unknown User'}`}
       >
-        <Avatar className="w-14 h-14 mx-auto mb-2">
+        <Avatar className="w-10 h-10 mx-auto mb-1.5 border-2 border-sky-400/40 shadow-md">
           <AvatarImage src={getFileUrl(node.profilePicture)} />
-          <AvatarFallback>
+          <AvatarFallback className="bg-sky-950 text-sky-200 font-bold text-xs">
             {getInitials(node.fullName)}
           </AvatarFallback>
         </Avatar>
         <div className="flex flex-col items-center space-y-0.5">
-          <span
-            className="font-semibold truncate max-w-[140px] block"
-            title={node.fullName || 'Unknown User'}
-          >
+          <span className="font-extrabold font-display text-white text-sm truncate max-w-[150px] block" title={node.fullName || 'Unknown User'}>
             {node.fullName || "Unknown User"}
           </span>
-          <span
-            className="text-sm opacity-80 truncate max-w-[120px] block"
-            title={node.username || 'unknown'}
-          >
+          <span className="text-[11px] text-sky-300 font-semibold truncate max-w-[130px] block" title={node.username || 'unknown'}>
             @{node.username || "unknown"}
           </span>
-          <span className="text-xs opacity-60">Level {node.level}</span>
+          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sky-500/15 border border-sky-400/30 text-[10px] font-bold text-sky-200 my-1">
+            <span className="node-dot" /> Level {node.level}
+          </div>
           {isNonInvested && (
-            <Badge variant="outline" className="text-xs mt-1" title="This user has not invested yet">Not Invested</Badge>
+            <Badge variant="outline" className="text-[10px] py-0 border-amber-400/40 bg-amber-500/10 text-amber-300">Not Invested</Badge>
           )}
         </div>
-        <div className="mt-2 space-y-1 text-left">
-          <div className="flex justify-between text-xs">
-            <span className="font-medium">Balance:</span>
-            <span className="truncate max-w-[90px]" title={`$${node.balance?.toLocaleString()}`}>${node.balance?.toLocaleString()}</span>
+        <div className="mt-1.5 space-y-0.5 text-left bg-[#07172b] p-2 rounded-lg border border-sky-500/20 text-[10px]">
+          <div className="flex justify-between">
+            <span className="text-slate-300 font-medium">Balance:</span>
+            <span className="font-bold text-white">${node.balance?.toLocaleString()}</span>
           </div>
-          <div className="flex justify-between text-xs">
-            <span className="font-medium">Investment:</span>
-            <span className="truncate max-w-[90px]" title={`$${node.investmentAmount?.toLocaleString()}`}>${node.investmentAmount?.toLocaleString()}</span>
+          <div className="flex justify-between">
+            <span className="text-slate-300 font-medium">Investment:</span>
+            <span className="font-bold text-sky-300">${node.investmentAmount?.toLocaleString()}</span>
           </div>
-          <div className="flex justify-between text-xs">
-            <span className="font-medium">Commission:</span>
-            <span className="truncate max-w-[90px]" title={`$${node.commissionAmount?.toLocaleString()}`}>${node.commissionAmount?.toLocaleString()}</span>
+          <div className="flex justify-between">
+            <span className="text-slate-300 font-medium">Commission:</span>
+            <span className="font-bold text-indigo-300">${node.commissionAmount?.toLocaleString()}</span>
           </div>
         </div>
         {node.commissionForRoot > 0 && (
-          <div className="mt-2 text-left border-t pt-2">
-            <p className="text-xs font-semibold text-green-700 mb-1">You earn from this member:</p>
-            <ul className="text-xs ml-2 max-h-20 overflow-y-auto pr-1">
-              {node.commissionForRootDetails.map((detail, idx) => (
-                <li key={idx} className="mb-1">
-                  <span>• Investment: ${detail.investmentAmount.toLocaleString()} on {new Date(detail.date).toLocaleDateString()}<br /></span>
-                  <span>  Rate: {detail.rate}% → <span className="font-bold">${detail.commissionAmount.toLocaleString()}</span></span>
-                  <span className="ml-2 inline-block px-2 py-0.5 rounded bg-green-100 text-green-800 text-[10px] font-bold align-middle">One-time commission paid</span>
-                </li>
-              ))}
-            </ul>
-            <p className="text-xs font-bold text-green-800 mt-1">Total from this member: ${node.commissionForRoot.toLocaleString()}</p>
+          <div className="mt-1.5 p-2 rounded-lg bg-[#051120] border border-emerald-500/30 text-left">
+            <p className="text-[10px] font-bold text-emerald-400">Total from member: ${node.commissionForRoot.toLocaleString()}</p>
           </div>
         )}
       </div>
 
       {node.children && node.children.length > 0 && (
         <>
-          <div className="h-8 w-px bg-gray-300 my-2"></div>
-          <div className="flex space-x-8 overflow-x-auto pb-2">
+          <div className="h-4 w-px bg-sky-400/40 my-0.5"></div>
+          <div className="flex space-x-4 sm:space-x-6 overflow-x-auto pb-1">
             {node.children.map((child) => (
               <TreeNodeComponent key={child.id || child._id} node={child} />
             ))}
@@ -121,16 +95,14 @@ export function GenealogyTree({ selectedUserId: initialSelectedUserId }: { selec
   const [selectedUserId, setSelectedUserId] = useState<string>(initialSelectedUserId || "myself");
   const [isLoadingTree, setIsLoadingTree] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [zoomScale, setZoomScale] = useState(0.8);
 
-  // Helper to check for valid userId (MongoDB ObjectId or 'myself')
   const isValidUserId = (id: string | undefined) => {
     if (!id) return false;
     if (id === 'myself') return true;
-    // MongoDB ObjectId is 24 hex chars
     return /^[a-fA-F0-9]{24}$/.test(id);
   };
 
-  // Update selectedUserId when prop changes
   useEffect(() => {
     if (initialSelectedUserId && isValidUserId(initialSelectedUserId)) {
       setSelectedUserId(initialSelectedUserId);
@@ -139,7 +111,6 @@ export function GenealogyTree({ selectedUserId: initialSelectedUserId }: { selec
     }
   }, [initialSelectedUserId]);
 
-  // Sanitize setSelectedUserId to never set 'NaN' or invalid
   const handleSelectUser = (id: string) => {
     if (isValidUserId(id)) {
       setSelectedUserId(id);
@@ -161,7 +132,6 @@ export function GenealogyTree({ selectedUserId: initialSelectedUserId }: { selec
     retry: 1,
   });
 
-  // Filter team members based on search query
   const filteredTeamMembers = teamMembers.filter((member: User) =>
     member.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     member.username.toLowerCase().includes(searchQuery.toLowerCase())
@@ -184,15 +154,6 @@ export function GenealogyTree({ selectedUserId: initialSelectedUserId }: { selec
     }
   };
 
-  const handleRefreshTeamMembers = async () => {
-    try {
-      await refetchTeamMembers();
-      toast.success("Team members refreshed");
-    } catch (error) {
-      toast.error("Failed to refresh team members");
-    }
-  };
-
   const handlePrint = () => {
     window.print();
   };
@@ -200,6 +161,10 @@ export function GenealogyTree({ selectedUserId: initialSelectedUserId }: { selec
   const handleSearchClear = () => {
     setSearchQuery("");
   };
+
+  const handleZoomIn = () => setZoomScale(prev => Math.min(prev + 0.1, 1.3));
+  const handleZoomOut = () => setZoomScale(prev => Math.max(prev - 0.1, 0.4));
+  const handleFitScreen = () => setZoomScale(0.75);
 
   const getSelectedMemberName = () => {
     if (selectedUserId === "myself") {
@@ -209,19 +174,28 @@ export function GenealogyTree({ selectedUserId: initialSelectedUserId }: { selec
     return member?.fullName || "Select Member";
   };
 
-  // If a specific user is selected and we're not in admin mode, hide the selection controls
   const showSelectionControls = !initialSelectedUserId || isAdmin;
 
-  // Handle error state
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (treeData && scrollContainerRef.current) {
+      const el = scrollContainerRef.current;
+      setTimeout(() => {
+        el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) / 2);
+      }, 100);
+    }
+  }, [treeData, zoomScale]);
+
   if (error) {
     return (
-      <Card>
+      <Card className="glass-card border-rose-500/30 bg-[#0e2238]/90 text-white">
         <CardContent className="text-center py-8">
-          <div className="text-red-600 mb-4">
+          <div className="text-rose-400 mb-4 font-bold">
             <p>Failed to load genealogy data</p>
-            <p className="text-sm text-gray-500">Please try again later</p>
+            <p className="text-xs text-slate-400">Please try again later</p>
           </div>
-          <Button onClick={() => refetch()} variant="outline">
+          <Button onClick={() => refetch()} variant="outline" className="border-rose-400/30 text-rose-300">
             Retry
           </Button>
         </CardContent>
@@ -230,34 +204,34 @@ export function GenealogyTree({ selectedUserId: initialSelectedUserId }: { selec
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
+    <Card className="glass-card border-sky-500/25 bg-[#0e2238]/90 text-white overflow-hidden shadow-2xl">
+      <CardHeader className="border-b border-sky-500/20 pb-4">
+        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
           <div className="flex items-center space-x-3">
-            <CardTitle>Genealogy Tree</CardTitle>
+            <CardTitle className="text-xl font-extrabold font-display text-white">Genealogy Tree</CardTitle>
             {isAdmin && (
-              <Badge variant="secondary" className="text-xs">
-                Admin View - All Users
+              <Badge variant="secondary" className="bg-sky-500/20 text-sky-300 border border-sky-400/30 font-bold text-xs">
+                Admin View
               </Badge>
             )}
           </div>
           {showSelectionControls && (
-            <div className="flex space-x-3">
+            <div className="flex flex-wrap items-center gap-2">
               {isAdmin && (
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
                   <Input
-                    placeholder="Search users by name..."
+                    placeholder="Search users..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-8 w-64"
+                    className="pl-9 pr-8 w-44 sm:w-56 h-8 text-xs bg-[#07172b] border-sky-500/20 text-white"
                   />
                   {searchQuery && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={handleSearchClear}
-                      className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                      className="absolute right-1 top-1/2 transform -translate-y-1/2 h-5 w-5 p-0 text-slate-400"
                     >
                       <X className="h-3 w-3" />
                     </Button>
@@ -265,10 +239,10 @@ export function GenealogyTree({ selectedUserId: initialSelectedUserId }: { selec
                 </div>
               )}
               <Select value={selectedUserId} onValueChange={handleSelectUser}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-44 h-8 text-xs bg-[#07172b] border-sky-500/20 text-white">
                   <SelectValue placeholder="Select Member" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-[#0c1e34] border-sky-500/30 text-white">
                   <SelectItem value="myself">
                     <div className="flex items-center space-x-2">
                       <Avatar className="w-4 h-4">
@@ -295,90 +269,69 @@ export function GenealogyTree({ selectedUserId: initialSelectedUserId }: { selec
                   ))}
                 </SelectContent>
               </Select>
-              
+
+              {/* Zoom Controls */}
+              <div className="flex items-center bg-[#07172b] p-1 rounded-xl border border-sky-500/20 space-x-1">
+                <Button onClick={handleZoomOut} variant="ghost" size="icon" className="h-7 w-7 text-sky-300 hover:bg-sky-500/20" title="Zoom Out">
+                  <ZoomOut className="h-3.5 w-3.5" />
+                </Button>
+                <span className="text-xs font-bold text-sky-300 px-1">{Math.round(zoomScale * 100)}%</span>
+                <Button onClick={handleZoomIn} variant="ghost" size="icon" className="h-7 w-7 text-sky-300 hover:bg-sky-500/20" title="Zoom In">
+                  <ZoomIn className="h-3.5 w-3.5" />
+                </Button>
+                <Button onClick={handleFitScreen} variant="ghost" size="sm" className="h-7 px-2 text-xs font-bold text-sky-300 hover:bg-sky-500/20">
+                  Fit
+                </Button>
+              </div>
+
               <Button 
                 onClick={handleLoadTree} 
                 disabled={isLoadingTree || !selectedUserId}
-                variant="default"
+                size="sm"
+                className="bg-gradient-to-r from-blue-600 to-sky-500 text-white font-bold h-8 text-xs shadow-md"
               >
                 {isLoadingTree ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
                 ) : (
-                  <RefreshCw className="h-4 w-4 mr-2" />
+                  <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
                 )}
-                Load Tree
-              </Button>
-              
-              <Button onClick={handleRefreshTeamMembers} variant="outline" disabled={loadingTeamMembers}>
-                <RefreshCw className={`h-4 w-4 mr-2 ${loadingTeamMembers ? 'animate-spin' : ''}`} />
-                Refresh Members
-              </Button>
-              
-              <Button onClick={handlePrint} variant="outline">
-                <PrinterCheck className="h-4 w-4 mr-2" />
-                Print Tree
+                Load
               </Button>
             </div>
           )}
         </div>
         
         {selectedUserId && (
-          <div className="text-sm text-muted-foreground">
-            Currently viewing: <span className="font-medium">{getSelectedMemberName()}</span>
-            {isAdmin && selectedUserId !== "myself" && (
-              <span className="ml-2 text-blue-600">
-                (Admin access to all user genealogy trees)
-              </span>
-            )}
-            {isAdmin && searchQuery && (
-              <span className="ml-2 text-gray-500">
-                • Showing {filteredTeamMembers.length} of {teamMembers.length} users
-              </span>
-            )}
+          <div className="text-xs text-slate-300 mt-2 font-medium">
+            Currently viewing: <span className="font-bold text-white">{getSelectedMemberName()}</span>
           </div>
         )}
       </CardHeader>
-      <CardContent>
+
+      <CardContent className="p-0 bg-[#061424] relative min-h-[500px]">
         {isLoading || isLoadingTree ? (
-          <div className="flex justify-center py-8">
+          <div className="flex justify-center py-16">
             <div className="flex flex-col items-center space-y-4">
-            <Skeleton className="h-32 w-48" />
-              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-32 w-48 bg-sky-900/30" />
+              <Skeleton className="h-4 w-32 bg-sky-900/30" />
             </div>
           </div>
         ) : treeData ? (
-          <div className="overflow-x-auto">
-            <div className="min-w-full p-8">
+          <div 
+            ref={scrollContainerRef}
+            className="overflow-auto max-h-[calc(100vh-220px)] p-8 text-center"
+          >
+            <div 
+              className="inline-block transition-transform duration-200 origin-top min-w-max p-4 text-left"
+              style={{ transform: `scale(${zoomScale})` }}
+            >
               <TreeNodeComponent node={treeData.user} />
             </div>
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
-            <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            {isAdmin && searchQuery && filteredTeamMembers.length === 0 ? (
-              <>
-                <p>No users found matching "{searchQuery}"</p>
-                <p className="text-sm">Try a different search term or clear the search</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleSearchClear}
-                  className="mt-2"
-                >
-                  Clear Search
-                </Button>
-              </>
-            ) : (
-              <>
-                <p>No genealogy data available</p>
-                <p className="text-sm">Select a team member and click "Load Tree" to view their genealogy tree</p>
-                {isAdmin && (
-                  <p className="text-xs text-blue-600 mt-2">
-                    As an admin, you can view the genealogy tree of any user in the system
-                  </p>
-                )}
-              </>
-            )}
+          <div className="text-center py-16 text-slate-400">
+            <Users className="h-12 w-12 mx-auto mb-4 opacity-50 text-sky-400" />
+            <p className="text-base font-bold text-white">No genealogy data available</p>
           </div>
         )}
       </CardContent>

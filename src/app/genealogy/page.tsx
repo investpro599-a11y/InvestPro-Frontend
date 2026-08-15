@@ -27,61 +27,56 @@ export default function Genealogy() {
 
   return (
     <Layout>
-      <div className="bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">My Genealogy Tree</h1>
-                <p className="text-gray-600 mt-1">View your personal referral network and team structure.</p>
-              </div>
-              {isAdmin && (
-                <div className="flex items-center space-x-3">
-                  <Badge variant="secondary" className="flex items-center space-x-1">
-                    <Shield className="h-3 w-3" />
-                    <span>Admin Access</span>
-                  </Badge>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => router.push("/admin/genealogy")}
-                    className="flex items-center space-x-2"
-                  >
-                    <span>Admin Genealogy</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-            </div>
+      <div className="py-6 px-2 sm:px-4 lg:px-8 w-full max-w-[98%] xl:max-w-[1700px] mx-auto space-y-6">
+        {/* Header Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 glass-panel p-6 rounded-3xl border border-sky-500/25">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-white">Genealogy <span className="gradient-text-primary">Tree</span></h1>
+            <p className="text-slate-300 mt-1 font-medium text-sm sm:text-base">View your personal referral network and team structure in a responsive view.</p>
           </div>
+          {isAdmin && (
+            <div className="flex items-center space-x-3">
+              <Badge variant="secondary" className="bg-sky-500/20 text-sky-300 border border-sky-400/30 font-bold px-3 py-1">
+                <Shield className="h-3.5 w-3.5 mr-1" />
+                Admin Access
+              </Badge>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => router.push("/admin/genealogy")}
+                className="bg-sky-500/10 border-sky-400/30 text-sky-200 hover:bg-sky-500/30 font-bold flex items-center space-x-2"
+              >
+                <span>Admin Genealogy</span>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
 
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* Commission Levels Card */}
-            <div className="md:w-1/4 w-full">
-              <Card className="sticky top-8">
-                <CardHeader>
-                  <CardTitle className="text-lg">Referral Commission Levels</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    <li className="flex justify-between text-sm"><span>Direct (Level 1)</span><span className="font-semibold">5%</span></li>
-                    <li className="flex justify-between text-sm"><span>Level 2</span><span className="font-semibold">1%</span></li>
-                    <li className="flex justify-between text-sm"><span>Level 3</span><span className="font-semibold">0.5%</span></li>
-                    <li className="flex justify-between text-sm"><span>Level 4</span><span className="font-semibold">0.5%</span></li>
-                    <li className="flex justify-between text-sm"><span>Level 5</span><span className="font-semibold">0.2%</span></li>
-                    <li className="flex justify-between text-sm"><span>Level 6</span><span className="font-semibold">0.2%</span></li>
-                    <li className="flex justify-between text-sm"><span>Level 7</span><span className="font-semibold">0.1%</span></li>
-                    <li className="flex justify-between text-sm"><span>Level 8</span><span className="font-semibold">0.1%</span></li>
-                    <li className="flex justify-between text-sm"><span>Level 9</span><span className="font-semibold">0.1%</span></li>
-                    <li className="flex justify-between text-sm"><span>Level 10</span><span className="font-semibold">0.1%</span></li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="flex-1">
-          <UserGenealogyTree />
-            </div>
+        {/* Commission Levels Quick Reference Bar */}
+        <div className="glass-panel p-4 rounded-2xl border border-sky-500/20 bg-[#08182b]/80">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs uppercase tracking-wider font-extrabold text-sky-300 flex items-center gap-2">
+              <span className="node-dot" /> Referral Commission Levels Rate Card
+            </h3>
           </div>
+          <div className="grid grid-cols-2 sm:grid-cols-5 md:grid-cols-10 gap-2 text-center text-xs font-semibold">
+            <div className="bg-[#0c1e34] p-2 rounded-xl border border-sky-500/20"><span className="text-slate-400 block text-[10px]">Level 1 (Direct)</span><span className="text-emerald-400 font-bold text-sm">5%</span></div>
+            <div className="bg-[#0c1e34] p-2 rounded-xl border border-sky-500/20"><span className="text-slate-400 block text-[10px]">Level 2</span><span className="text-sky-300 font-bold text-sm">1%</span></div>
+            <div className="bg-[#0c1e34] p-2 rounded-xl border border-sky-500/20"><span className="text-slate-400 block text-[10px]">Level 3</span><span className="text-sky-300 font-bold text-sm">0.5%</span></div>
+            <div className="bg-[#0c1e34] p-2 rounded-xl border border-sky-500/20"><span className="text-slate-400 block text-[10px]">Level 4</span><span className="text-sky-300 font-bold text-sm">0.5%</span></div>
+            <div className="bg-[#0c1e34] p-2 rounded-xl border border-sky-500/20"><span className="text-slate-400 block text-[10px]">Level 5</span><span className="text-sky-300 font-bold text-sm">0.2%</span></div>
+            <div className="bg-[#0c1e34] p-2 rounded-xl border border-sky-500/20"><span className="text-slate-400 block text-[10px]">Level 6</span><span className="text-sky-300 font-bold text-sm">0.2%</span></div>
+            <div className="bg-[#0c1e34] p-2 rounded-xl border border-sky-500/20"><span className="text-slate-400 block text-[10px]">Level 7</span><span className="text-sky-300 font-bold text-sm">0.1%</span></div>
+            <div className="bg-[#0c1e34] p-2 rounded-xl border border-sky-500/20"><span className="text-slate-400 block text-[10px]">Level 8</span><span className="text-slate-300 font-bold text-sm">0.1%</span></div>
+            <div className="bg-[#0c1e34] p-2 rounded-xl border border-sky-500/20"><span className="text-slate-400 block text-[10px]">Level 9</span><span className="text-slate-300 font-bold text-sm">0.1%</span></div>
+            <div className="bg-[#0c1e34] p-2 rounded-xl border border-sky-500/20"><span className="text-slate-400 block text-[10px]">Level 10</span><span className="text-slate-300 font-bold text-sm">0.1%</span></div>
+          </div>
+        </div>
+
+        {/* Full-Width Tree Container */}
+        <div className="w-full">
+          <UserGenealogyTree />
         </div>
       </div>
     </Layout>

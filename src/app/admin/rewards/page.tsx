@@ -12,13 +12,13 @@ export default function RewardsPage() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Rewards Management</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-3xl font-extrabold font-display text-slate-900 dark:text-white">Rewards <span className="gradient-text-primary">Management</span></h1>
+            <p className="text-slate-600 dark:text-slate-300 mt-1 font-medium">
               Manage rewards that users can earn and claim
             </p>
           </div>
           <Link href="/admin/rewards/new">
-            <Button>
+            <Button className="bg-gradient-to-r from-blue-600 to-sky-500 text-white font-bold shadow-lg shadow-sky-500/25">
               <Plus className="mr-2 h-4 w-4" />
               Add Reward
             </Button>
@@ -26,13 +26,13 @@ export default function RewardsPage() {
         </div>
       </div>
       
-<div className="space-y-6">
-        <Card className="bg-white shadow-sm rounded-lg overflow-hidden">
-          <CardHeader className="border-b border-gray-200 px-6 py-4 bg-gray-50">
+      <div className="space-y-6">
+        <Card className="glass-card border-sky-500/25 bg-white/90 dark:bg-[#0e2238]/90 overflow-hidden shadow-xl">
+          <CardHeader className="border-b border-sky-500/20 px-6 py-4 bg-slate-50/80 dark:bg-[#07172b]">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-semibold text-gray-900">Reward Claims</CardTitle>
+              <CardTitle className="text-lg font-extrabold font-display text-slate-900 dark:text-white">Reward Claims</CardTitle>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-slate-600 dark:text-slate-300 font-medium mt-1">
               View all reward claims by users
             </p>
           </CardHeader>
@@ -41,12 +41,12 @@ export default function RewardsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white shadow-sm rounded-lg overflow-hidden">
-          <CardHeader className="border-b border-gray-200 px-6 py-4 bg-gray-50">
+        <Card className="glass-card border-sky-500/25 bg-white/90 dark:bg-[#0e2238]/90 overflow-hidden shadow-xl">
+          <CardHeader className="border-b border-sky-500/20 px-6 py-4 bg-slate-50/80 dark:bg-[#07172b]">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-semibold text-gray-900">All Rewards</CardTitle>
+              <CardTitle className="text-lg font-extrabold font-display text-slate-900 dark:text-white">All Rewards</CardTitle>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-slate-600 dark:text-slate-300 font-medium mt-1">
               Manage available rewards and their details
             </p>
           </CardHeader>

@@ -25,35 +25,37 @@ function SignupInner() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-4 px-4 sm:py-8 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-6">
-        <Card className="shadow-xl border-0">
-          <CardHeader className="text-center space-y-4 pb-6 px-6 pt-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-full mx-auto">
-              <img src="/investpro.png" alt="InvestPro Logo" className="h-20 w-20 sm:h-24 sm:w-24 object-contain" />
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Ambient Lighting Spheres */}
+      <div className="fixed top-1/4 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-glow" />
+      <div className="fixed bottom-1/4 left-1/4 w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none -z-10 animate-float" />
+
+      <div className="w-full max-w-md space-y-6 relative z-10">
+        <Card className="glass-panel border-white/15 p-2 shadow-2xl rounded-3xl">
+          <CardHeader className="text-center space-y-4 pt-6">
+            <div className="relative inline-flex items-center justify-center mx-auto">
+              <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-full blur-lg opacity-75 animate-pulse" />
+              <img src="/investpro.png" alt="InvestPro Logo" className="relative h-20 w-20 object-contain" />
             </div>
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Join InvestPro</h2>
-              <p className="text-sm sm:text-base text-gray-600 mt-2">Create your account to start investing</p>
+            <div className="space-y-1.5">
+              <h2 className="text-3xl font-extrabold font-display tracking-tight text-white">
+                Join <span className="gradient-text-primary">InvestPro</span>
+              </h2>
+              <p className="text-slate-400 text-sm font-medium">Create your secure account to start investing</p>
             </div>
           </CardHeader>
-          <CardContent className="px-4 sm:px-6 pb-8">
+          <CardContent className="pb-8">
             <SignupForm initialReferralCode={referralCode} />
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-400">
                 Already have an account?{' '}
-                <Link href="/login" className="text-blue-600 hover:underline font-medium">
+                <Link href="/login" className="text-blue-400 font-semibold hover:text-blue-300 hover:underline transition-colors">
                   Log in
                 </Link>
               </p>
             </div>
           </CardContent>
         </Card>
-        
-        {/* Mobile-specific instructions */}
-        <div className="text-center text-xs text-gray-500 px-4">
-          <p>Having trouble? Make sure you have a stable internet connection and try again.</p>
-        </div>
       </div>
     </div>
   );

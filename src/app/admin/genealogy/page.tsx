@@ -28,17 +28,17 @@ export default function AdminGenealogy() {
 
   return (
     <Layout>
-      <div className="bg-gray-50">
+      <div>
         <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8">
-          <div className="mb-6 sm:mb-8">
+          <div className="mb-6 sm:mb-8 glass-panel p-6 rounded-3xl border border-sky-500/25">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:space-x-3 mb-2">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-rose-500/20 border border-rose-400/30 rounded-lg flex items-center justify-center">
+                <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-rose-400" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Admin Genealogy Management</h1>
-              <Badge variant="destructive" className="text-xs sm:text-sm">Admin Access</Badge>
+              <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-white">Admin Genealogy <span className="gradient-text-primary">Management</span></h1>
+              <Badge variant="destructive" className="text-xs sm:text-sm bg-rose-500 text-white font-bold">Admin Access</Badge>
             </div>
-            <p className="text-gray-600 mt-1 text-xs sm:text-base">
+            <p className="text-slate-300 mt-1 text-xs sm:text-base font-medium">
               View and manage genealogy trees for all users in the system. 
               Search through users and view their complete referral networks.
             </p>

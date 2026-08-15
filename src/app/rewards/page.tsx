@@ -105,16 +105,16 @@ export default function RewardsPage() {
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8">
         
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex items-center justify-between glass-panel p-6 rounded-3xl border border-sky-500/25">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Trophy className="text-yellow-500 w-6 h-6" /> 
-              My Rewards
+            <h1 className="text-3xl font-extrabold font-display text-white flex items-center gap-3">
+              <Trophy className="text-amber-400 w-8 h-8" /> 
+              My <span className="gradient-text-primary">Rewards</span>
             </h1>
-            <p className="text-gray-600 mt-1 text-sm">
-              Current Dollar Rate: {exchangeRate} PKR
+            <p className="text-slate-300 mt-1 text-sm font-medium">
+              Current Dollar Rate: <span className="text-sky-300 font-bold">{exchangeRate} PKR</span>
             </p>
           </div>
         </div>
@@ -135,113 +135,113 @@ export default function RewardsPage() {
             
             let statusText = "In Progress";
             let StatusIcon = Clock;
-            let statusColor = "text-gray-500";
+            let statusColor = "text-slate-300";
             let btnText = `Claim ${reward.name} Reward`;
             let btnDisabled = !isEligible;
-            let btnColor = "bg-blue-500 hover:bg-blue-600";
+            let btnColor = "bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-bold shadow-lg shadow-sky-500/25";
 
             if (reward.userStatus === 'approved') {
               statusText = "Claimed & Approved";
               StatusIcon = CheckCircle;
-              statusColor = "text-green-600";
+              statusColor = "text-emerald-400";
               btnText = "Reward Delivered";
               btnDisabled = true;
-              btnColor = "bg-green-500";
+              btnColor = "bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-bold";
             } else if (reward.userStatus === 'pending') {
               statusText = "Pending Admin Approval";
               StatusIcon = Clock;
-              statusColor = "text-amber-600";
+              statusColor = "text-amber-400";
               btnText = "Pending Approval";
               btnDisabled = true;
-              btnColor = "bg-amber-500";
+              btnColor = "bg-amber-500/20 border border-amber-400/40 text-amber-300 font-bold";
             } else if (isEligible) {
               statusText = "Ready to Claim";
               StatusIcon = Gift;
-              statusColor = "text-blue-600";
+              statusColor = "text-sky-300 font-bold";
               btnDisabled = false;
             }
 
             return (
-              <Card key={reward.id} className="border-2 border-gray-100 overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-                <div className="p-5 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+              <Card key={reward.id} className="glass-card border-sky-500/25 bg-[#0e2238]/90 overflow-hidden shadow-xl">
+                <div className="p-5 border-b border-sky-500/20 bg-[#07172b] flex justify-between items-center">
                   <div>
-                    <h3 className="font-bold text-lg text-gray-900 uppercase">{reward.name}</h3>
-                    <p className="text-gray-500 text-sm">{formatPKR(totalRequired)} ({pkrToUsdStr(totalRequired)}) Total Required</p>
+                    <h3 className="font-extrabold font-display text-xl text-white uppercase tracking-wide">{reward.name}</h3>
+                    <p className="text-slate-300 text-sm font-medium">{formatPKR(totalRequired)} ({pkrToUsdStr(totalRequired)}) Total Required</p>
                   </div>
                   {reward.userStatus === 'approved' && (
-                    <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 border border-green-200">
-                      <CheckCircle className="w-3 h-3" /> Approved
+                    <div className="bg-emerald-500/20 text-emerald-300 px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 border border-emerald-400/30">
+                      <CheckCircle className="w-4 h-4" /> Approved
                     </div>
                   )}
                   {reward.userStatus === 'pending' && (
-                    <div className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 border border-amber-200">
-                      <Clock className="w-3 h-3" /> Pending
+                    <div className="bg-amber-500/20 text-amber-300 px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 border border-amber-400/30">
+                      <Clock className="w-4 h-4" /> Pending
                     </div>
                   )}
                 </div>
 
-                <div className="p-5">
-                  <div className="bg-blue-50/50 rounded-xl p-5 border border-blue-100/50 mb-6 relative overflow-hidden">
-                    <p className="text-gray-500 text-sm font-medium mb-1">Reward Value</p>
-                    <h2 className="text-3xl font-bold text-blue-600 mb-2 capitalize">{reward.name}</h2>
-                    <p className="text-blue-800 font-semibold">{formatPKR(rewardAmount)} <span className="text-blue-600/80 font-normal">({pkrToUsdStr(rewardAmount)})</span></p>
+                <div className="p-6 space-y-6">
+                  <div className="bg-[#07172b] rounded-2xl p-5 border border-sky-500/25 relative overflow-hidden">
+                    <p className="text-slate-300 text-xs font-bold uppercase tracking-wider mb-1">Reward Value</p>
+                    <h2 className="text-3xl font-extrabold font-display text-sky-300 mb-2 capitalize">{reward.name}</h2>
+                    <p className="text-amber-300 font-extrabold text-xl">{formatPKR(rewardAmount)} <span className="text-slate-300 font-medium text-sm">({pkrToUsdStr(rewardAmount)})</span></p>
                     {isEligible && !reward.userStatus && (
-                      <p className="text-green-600 text-sm mt-2 flex items-center gap-1 font-medium">
+                      <p className="text-emerald-400 text-sm mt-2 flex items-center gap-1.5 font-bold">
                         <CheckCircle className="w-4 h-4" /> This reward is ready to claim!
                       </p>
                     )}
-                    <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-blue-100/50 to-transparent pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-sky-500/10 to-transparent pointer-events-none" />
                   </div>
 
                   <div className="space-y-5">
-                    <h4 className="font-semibold text-gray-700 mb-2 text-sm">Leg Progress</h4>
+                    <h4 className="font-extrabold font-display text-white text-sm">Leg Progress</h4>
                     
                     {/* Left Leg Progress */}
-                    <div>
-                      <div className="flex justify-between items-center mb-1.5">
-                        <span className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
-                          <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
-                            <ArrowRight className="w-3 h-3 text-blue-600" />
+                    <div className="bg-[#07172b] p-4 rounded-xl border border-sky-500/20">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-full bg-sky-500/20 border border-sky-400/30 flex items-center justify-center">
+                            <ArrowRight className="w-3 h-3 text-sky-300" />
                           </div>
                           Left Leg
                         </span>
-                        <span className="text-sm font-semibold text-gray-900">
-                          {formatPKR(leftProgress)} <span className="text-gray-500 font-normal">({pkrToUsdStr(leftProgress)})</span> / {formatPKR(reqVolPkr)} <span className="text-gray-500 font-normal">({pkrToUsdStr(reqVolPkr)})</span>
-                          {leftPercent >= 100 && <CheckCircle className="w-4 h-4 text-green-500 inline ml-2" />}
+                        <span className="text-sm font-bold text-white">
+                          {formatPKR(leftProgress)} <span className="text-slate-300 font-medium">({pkrToUsdStr(leftProgress)})</span> / {formatPKR(reqVolPkr)} <span className="text-slate-300 font-medium">({pkrToUsdStr(reqVolPkr)})</span>
+                          {leftPercent >= 100 && <CheckCircle className="w-4 h-4 text-emerald-400 inline ml-2" />}
                         </span>
                       </div>
-                      <Progress value={leftPercent} className="h-2 bg-blue-100 [&>div]:bg-blue-500" />
+                      <Progress value={leftPercent} className="h-2.5 bg-slate-900 [&>div]:bg-sky-400" />
                     </div>
 
                     {/* Right Leg Progress */}
-                    <div>
-                      <div className="flex justify-between items-center mb-1.5">
-                        <span className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
-                          <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
-                            <ArrowRight className="w-3 h-3 text-blue-600" />
+                    <div className="bg-[#07172b] p-4 rounded-xl border border-sky-500/20">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-full bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center">
+                            <ArrowRight className="w-3 h-3 text-indigo-300" />
                           </div>
                           Right Leg
                         </span>
-                        <span className="text-sm font-semibold text-gray-900">
-                          {formatPKR(rightProgress)} <span className="text-gray-500 font-normal">({pkrToUsdStr(rightProgress)})</span> / {formatPKR(reqVolPkr)} <span className="text-gray-500 font-normal">({pkrToUsdStr(reqVolPkr)})</span>
-                          {rightPercent >= 100 && <CheckCircle className="w-4 h-4 text-green-500 inline ml-2" />}
+                        <span className="text-sm font-bold text-white">
+                          {formatPKR(rightProgress)} <span className="text-slate-300 font-medium">({pkrToUsdStr(rightProgress)})</span> / {formatPKR(reqVolPkr)} <span className="text-slate-300 font-medium">({pkrToUsdStr(reqVolPkr)})</span>
+                          {rightPercent >= 100 && <CheckCircle className="w-4 h-4 text-emerald-400 inline ml-2" />}
                         </span>
                       </div>
-                      <Progress value={rightPercent} className="h-2 bg-blue-100 [&>div]:bg-blue-500" />
+                      <Progress value={rightPercent} className="h-2.5 bg-slate-900 [&>div]:bg-indigo-400" />
                     </div>
                   </div>
 
-                  <div className="mt-8 pt-6 border-t border-gray-100 space-y-4">
+                  <div className="mt-8 pt-6 border-t border-sky-500/20 space-y-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Status:</span>
-                      <span className={`font-medium ${statusColor}`}>{statusText}</span>
+                      <span className="text-slate-300 font-medium">Status:</span>
+                      <span className={`font-bold ${statusColor}`}>{statusText}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-500">Reward Value:</span>
-                      <span className="text-sm font-semibold text-blue-600">{formatPKR(rewardAmount)} <span className="font-normal text-blue-600/70">({pkrToUsdStr(rewardAmount)})</span></span>
+                      <span className="text-sm text-slate-300 font-medium">Reward Value:</span>
+                      <span className="text-sm font-extrabold text-amber-300">{formatPKR(rewardAmount)} <span className="font-medium text-slate-300">({pkrToUsdStr(rewardAmount)})</span></span>
                     </div>
                     <Button 
-                      className={`w-full py-6 text-base font-semibold rounded-xl shadow-sm ${btnColor}`}
+                      className={`w-full py-6 text-base font-extrabold rounded-xl shadow-lg ${btnColor}`}
                       disabled={btnDisabled}
                       onClick={() => {
                         claimMutation.mutate(reward.id);

@@ -91,7 +91,7 @@ export default function AdminLogsPage() {
 
   return (
     <Layout>
-      <div className="bg-gray-50 min-h-screen py-8">
+      <div className="py-8">
         <div className="max-w-5xl mx-auto px-4">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">System Logs</h1>
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">

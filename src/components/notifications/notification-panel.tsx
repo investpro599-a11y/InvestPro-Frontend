@@ -31,15 +31,15 @@ const getNotificationIcon = (type: string) => {
 const getNotificationColor = (type: string) => {
   switch (type) {
     case "investment":
-      return "bg-blue-100 text-blue-600";
+      return "bg-sky-500/20 text-sky-300 border border-sky-400/30";
     case "withdrawal":
-      return "bg-green-100 text-green-600";
+      return "bg-emerald-500/20 text-emerald-300 border border-emerald-400/30";
     case "user":
-      return "bg-purple-100 text-purple-600";
+      return "bg-indigo-500/20 text-indigo-300 border border-indigo-400/30";
     case "system":
-      return "bg-orange-100 text-orange-600";
+      return "bg-amber-500/20 text-amber-300 border border-amber-400/30";
     default:
-      return "bg-gray-100 text-gray-600";
+      return "bg-slate-800 text-slate-300 border border-white/10";
   }
 };
 
@@ -121,14 +121,14 @@ export function NotificationPanel() {
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="glass-card border-sky-500/25 bg-[#0e2238]/95 text-white shadow-xl">
+      <CardHeader className="border-b border-sky-500/20 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Bell className="h-5 w-5" />
-            <CardTitle>Notifications</CardTitle>
+            <Bell className="h-5 w-5 text-sky-400" />
+            <CardTitle className="text-lg font-extrabold font-display text-white">Notifications</CardTitle>
             {unreadCount > 0 && (
-              <Badge variant="destructive" className="ml-2">
+              <Badge variant="destructive" className="ml-2 bg-rose-500 text-white font-bold">
                 {unreadCount}
               </Badge>
             )}
@@ -139,53 +139,54 @@ export function NotificationPanel() {
               size="sm"
               onClick={handleMarkAllAsRead}
               disabled={markAllAsReadMutation.isPending}
+              className="bg-sky-500/20 border-sky-400/30 text-sky-300 hover:bg-sky-500/40"
             >
               <CheckCheck className="h-4 w-4" />
             </Button>
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         {isAdmin ? (
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="requests">Requests</TabsTrigger>
-              <TabsTrigger value="user">Users</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 bg-[#07172b] border border-sky-500/20 p-1 rounded-xl">
+              <TabsTrigger value="all" className="rounded-lg text-xs font-bold data-[state=active]:bg-sky-500 data-[state=active]:text-white">All</TabsTrigger>
+              <TabsTrigger value="requests" className="rounded-lg text-xs font-bold data-[state=active]:bg-sky-500 data-[state=active]:text-white">Requests</TabsTrigger>
+              <TabsTrigger value="user" className="rounded-lg text-xs font-bold data-[state=active]:bg-sky-500 data-[state=active]:text-white">Users</TabsTrigger>
             </TabsList>
             <TabsContent value={activeTab} className="mt-4">
               {filteredNotifications.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No notifications found</p>
+                <div className="text-center py-8 text-slate-300">
+                  <Bell className="h-12 w-12 mx-auto mb-4 opacity-50 text-sky-400" />
+                  <p className="text-sm font-bold">No notifications found</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {filteredNotifications.map((notification) => (
                     <div
                       key={notification.id || notification._id}
-                      className={`p-4 rounded-lg border transition-colors ${
+                      className={`p-3.5 rounded-2xl border transition-all ${
                         notification.status === "unread"
-                          ? "bg-blue-50 border-blue-200"
-                          : "bg-gray-50 border-gray-200"
+                          ? "bg-[#091f38] border-sky-400/50 shadow-md shadow-sky-500/10"
+                          : "bg-[#07172b] border-sky-500/20"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-start space-x-3 flex-1 min-w-0">
-                          <div className={`p-2 rounded-lg flex-shrink-0 ${getNotificationColor(notification.type)}`}>
+                          <div className={`p-2 rounded-xl flex-shrink-0 ${getNotificationColor(notification.type)}`}>
                             {getNotificationIcon(notification.type)}
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2 mb-1">
-                              <h4 className="font-medium text-gray-900 truncate">{notification.title}</h4>
+                              <h4 className="font-bold text-white text-sm truncate">{notification.title}</h4>
                               {notification.status === "unread" && (
-                                <Badge variant="secondary" className="text-xs flex-shrink-0">
+                                <Badge className="text-[10px] bg-sky-500 text-white font-bold flex-shrink-0">
                                   New
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600 mb-2 break-words">{notification.message}</p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-slate-300 mb-2 break-words leading-relaxed font-medium">{notification.message}</p>
+                            <p className="text-[10px] text-slate-400 font-semibold">
                               {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                             </p>
                           </div>
@@ -196,6 +197,7 @@ export function NotificationPanel() {
                             size="sm"
                             onClick={() => handleMarkAsRead(notification)}
                             disabled={markAsReadMutation.isPending}
+                            className="text-sky-300 hover:bg-sky-500/20"
                           >
                             <Check className="h-4 w-4" />
                           </Button>
@@ -209,37 +211,37 @@ export function NotificationPanel() {
           </Tabs>
         ) : (
           notifications.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No notifications found</p>
+            <div className="text-center py-8 text-slate-300">
+              <Bell className="h-12 w-12 mx-auto mb-4 opacity-50 text-sky-400" />
+              <p className="text-sm font-bold">No notifications found</p>
             </div>
           ) : (
             <div className="space-y-3">
               {notifications.map((notification) => (
                 <div
                   key={notification.id || notification._id}
-                  className={`p-4 rounded-lg border transition-colors ${
+                  className={`p-3.5 rounded-2xl border transition-all ${
                     notification.status === "unread"
-                      ? "bg-blue-50 border-blue-200"
-                      : "bg-gray-50 border-gray-200"
+                      ? "bg-[#091f38] border-sky-400/50 shadow-md shadow-sky-500/10"
+                      : "bg-[#07172b] border-sky-500/20"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start space-x-3 flex-1 min-w-0">
-                      <div className={`p-2 rounded-lg flex-shrink-0 ${getNotificationColor(notification.type)}`}>
+                      <div className={`p-2 rounded-xl flex-shrink-0 ${getNotificationColor(notification.type)}`}>
                         {getNotificationIcon(notification.type)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-1">
-                          <h4 className="font-medium text-gray-900 truncate">{notification.title}</h4>
+                          <h4 className="font-bold text-white text-sm truncate">{notification.title}</h4>
                           {notification.status === "unread" && (
-                            <Badge variant="secondary" className="text-xs flex-shrink-0">
+                            <Badge className="text-[10px] bg-sky-500 text-white font-bold flex-shrink-0">
                               New
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 mb-2 break-words">{notification.message}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-slate-300 mb-2 break-words leading-relaxed font-medium">{notification.message}</p>
+                        <p className="text-[10px] text-slate-400 font-semibold">
                           {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                         </p>
                       </div>
@@ -250,6 +252,7 @@ export function NotificationPanel() {
                         size="sm"
                         onClick={() => handleMarkAsRead(notification)}
                         disabled={markAsReadMutation.isPending}
+                        className="text-sky-300 hover:bg-sky-500/20"
                       >
                         <Check className="h-4 w-4" />
                       </Button>

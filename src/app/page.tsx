@@ -48,28 +48,34 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <div className="bg-gray-50">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto space-y-8">
           {/* Dashboard Header */}
-          <div className="mb-6 sm:mb-8">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Investment Dashboard</h1>
-                <p className="text-gray-600 mt-1 text-sm sm:text-base">
-                  Welcome back, {user.fullName}. Here&apos;s your portfolio overview.
+          <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-sky-500/25 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between relative z-10">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-xs font-bold text-sky-300 tracking-wider uppercase mb-1">
+                  <span className="node-dot" /> Real-Time Portfolio Insights
+                </div>
+                <h1 className="text-3xl sm:text-4xl font-extrabold font-display tracking-tight text-white">
+                  Investment <span className="gradient-text-primary">Dashboard</span>
+                </h1>
+                <p className="text-slate-300 text-sm sm:text-base max-w-xl font-medium">
+                  Welcome back, <span className="text-white font-bold">{user.fullName}</span>. Here is your portfolio overview and performance breakdown.
                 </p>
               </div>
-              <div className="mt-2 md:mt-0 flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Button 
                   variant="outline" 
-                  className="flex items-center space-x-2 w-full sm:w-auto"
+                  className="flex items-center justify-center space-x-2 bg-[#0c1e34]/90 border-sky-400/40 text-white hover:bg-sky-500/20"
                   onClick={handleExportReport}
                 >
-                  <FileText className="h-4 w-4" />
-                  <span>Export PDF Report</span>
+                  <FileText className="h-4 w-4 text-sky-400" />
+                  <span className="font-semibold text-white">Export PDF Report</span>
                 </Button>
                 {!isAdmin && (
-                  <Button onClick={() => router.push("/investments")} className="flex items-center space-x-2 w-full sm:w-auto">
+                  <Button onClick={() => router.push("/investments")} className="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-sky-500 text-white font-bold shadow-lg shadow-sky-500/25">
                     <Plus className="h-4 w-4" />
                     <span>New Investment</span>
                   </Button>
@@ -82,7 +88,7 @@ export default function Dashboard() {
           <StatsGrid />
 
           {/* Main Content Grid */}
-          <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-3 mb-8">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Investment Chart */}
             <div className="lg:col-span-2">
               <InvestmentChart />
@@ -96,13 +102,6 @@ export default function Dashboard() {
 
           {/* Admin Dashboard (Only for admin users) */}
           {isAdmin && <AdminDashboard />}
-
-          <p className="mt-4 text-center text-xs sm:text-sm text-gray-600">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-blue-600 hover:underline">
-              Sign up
-            </Link>
-          </p>
         </div>
       </div>
     </Layout>

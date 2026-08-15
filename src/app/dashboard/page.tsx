@@ -81,28 +81,28 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <div className="bg-gray-50">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="py-6 sm:py-8">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 space-y-6">
           {/* Dashboard Header */}
-          <div className="mb-6 sm:mb-8">
+          <div className="glass-panel p-6 rounded-3xl border border-sky-500/25">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-4">
                 <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                  <Avatar className="w-16 h-16 border-2 border-primary/10">
+                  <Avatar className="w-16 h-16 border-2 border-sky-400/40 shadow-lg">
                     <AvatarImage 
                       src={getFileUrl(user.profilePicture)} 
                       crossOrigin="anonymous"
                     />
-                    <AvatarFallback className="text-xl">
+                    <AvatarFallback className="bg-sky-950 text-sky-200 font-bold text-xl">
                       {user.fullName.split(" ").map((n: string) => n[0]).join("").toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Camera className="w-6 h-6 text-white" />
+                  <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Camera className="w-6 h-6 text-sky-300" />
                   </div>
                   {isUploading && (
-                    <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
                     </div>
                   )}
                   <input
@@ -114,23 +114,25 @@ export default function Dashboard() {
                   />
                 </div>
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Investment Dashboard</h1>
-                  <p className="text-gray-600 mt-1 text-sm sm:text-base">
-                    Welcome back, {user.fullName}. Here&apos;s your portfolio overview.
+                  <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-white">
+                    Investment <span className="gradient-text-primary">Dashboard</span>
+                  </h1>
+                  <p className="text-slate-300 mt-1 text-sm sm:text-base font-medium">
+                    Welcome back, <span className="text-white font-bold">{user.fullName}</span>. Here&apos;s your portfolio overview.
                   </p>
                 </div>
               </div>
               <div className="mt-2 md:mt-0 flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <Button 
                   variant="outline" 
-                  className="flex items-center space-x-2 w-full sm:w-auto"
+                  className="bg-sky-500/10 border-sky-400/30 text-sky-200 hover:bg-sky-500/25 font-bold flex items-center space-x-2 w-full sm:w-auto"
                   onClick={handleExportReport}
                 >
                   <FileText className="h-4 w-4" />
                   <span>Export PDF Report</span>
                 </Button>
                 {!isAdmin && (
-                  <Button onClick={() => router.push("/investments")} className="flex items-center space-x-2 w-full sm:w-auto">
+                  <Button onClick={() => router.push("/investments")} className="bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-bold shadow-lg shadow-sky-500/25 flex items-center space-x-2 w-full sm:w-auto">
                     <Plus className="h-4 w-4" />
                     <span>New Investment</span>
                   </Button>
@@ -146,7 +148,7 @@ export default function Dashboard() {
           {!isAdmin && <UserPortfolio />}
 
           {/* Main Content Grid */}
-          <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-3 mb-8">
+          <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-3">
             {/* Investment Chart */}
             <div className="lg:col-span-2">
               <InvestmentChart />
@@ -160,13 +162,6 @@ export default function Dashboard() {
 
           {/* Admin Dashboard (Only for admin users) */}
           {isAdmin && <AdminDashboard />}
-
-          <p className="mt-4 text-center text-xs sm:text-sm text-gray-600">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-blue-600 hover:underline">
-              Sign up
-            </Link>
-          </p>
         </div>
       </div>
     </Layout>

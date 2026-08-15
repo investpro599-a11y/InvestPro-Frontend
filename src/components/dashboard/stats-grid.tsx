@@ -38,7 +38,7 @@ export function StatsGrid() {
   const totalProfits = (stats?.paidCommissions || 0) + (stats?.availableROI || 0);
 
   return (
-    <div className="space-y-4 mb-8">
+    <div className="space-y-6 mb-8">
       {/* Refresh Button */}
       <div className="flex justify-end">
         <Button
@@ -46,204 +46,177 @@ export function StatsGrid() {
           size="sm"
           onClick={handleRefresh}
           disabled={isRefetching}
-          className="flex items-center space-x-2"
+          className="flex items-center space-x-2 rounded-xl border-white/10 bg-slate-900/40 text-slate-300 hover:text-white"
         >
-          <RefreshCw className={`h-4 w-4 ${isRefetching ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-4 w-4 text-blue-400 ${isRefetching ? 'animate-spin' : ''}`} />
           <span>{isRefetching ? 'Refreshing...' : 'Refresh Stats'}</span>
         </Button>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 md:gap-6 mb-8">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 md:gap-6">
         {/* Total Investments Card */}
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardContent className="p-4 sm:p-6">
+        <Card className="glass-card border-sky-500/25 bg-[#0e2238]/90">
+          <CardContent className="p-5 sm:p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-1">
+              <div className="space-y-1">
+                <p className="text-xs sm:text-sm font-bold text-slate-300 flex items-center gap-1.5">
                   Total Investments
-                  <span className="relative group">
-                    <Info className="h-4 w-4 text-gray-400" />
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                      Sum of all investments you have made (regardless of maturity).
-                    </span>
-                  </span>
+                  <span className="node-dot-blue ml-1" />
                 </p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 sm:mt-2">
+                <p className="text-2xl sm:text-3xl font-extrabold font-display text-white tracking-tight">
                   ${(stats?.investmentAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
-              <div className="p-2 sm:p-3 rounded-lg bg-blue-100">
-                <Wallet className="h-6 w-6 text-blue-700" />
+              <div className="p-3.5 rounded-2xl bg-sky-500/15 border border-sky-400/30 text-sky-400">
+                <Wallet className="h-6 w-6" />
               </div>
             </div>
           </CardContent>
         </Card>
+
         {/* Total Commissions Card */}
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardContent className="p-4 sm:p-6">
+        <Card className="glass-card border-indigo-500/25 bg-[#0e2238]/90">
+          <CardContent className="p-5 sm:p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-1">
-                  Total Commissions (Referral Earnings)
-                  <span className="relative group">
-                    <Info className="h-4 w-4 text-gray-400" />
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                      All referral commissions you have earned minus withdrawn commissions.
-                    </span>
-                  </span>
+              <div className="space-y-1">
+                <p className="text-xs sm:text-sm font-bold text-slate-300 flex items-center gap-1.5">
+                  Total Commissions
+                  <span className="node-dot ml-1" />
                 </p>
-                <p className="text-lg sm:text-2xl font-bold text-purple-900 mt-1 sm:mt-2">
+                <p className="text-2xl sm:text-3xl font-extrabold font-display text-indigo-300 tracking-tight">
                   ${parseFloat(String(stats?.totalCommissions || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
-              <div className="p-2 sm:p-3 rounded-lg bg-purple-100">
-                <ArrowUp className="h-6 w-6 text-purple-700" />
+              <div className="p-3.5 rounded-2xl bg-indigo-500/15 border border-indigo-400/30 text-indigo-400">
+                <ArrowUp className="h-6 w-6" />
               </div>
             </div>
           </CardContent>
         </Card>
+
         {/* Daily ROI Card */}
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardContent className="p-4 sm:p-6">
+        <Card className="glass-card border-emerald-500/25 bg-[#0e2238]/90">
+          <CardContent className="p-5 sm:p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-1">
-                  Daily ROI (Your Daily Investment Return)
-                  <span className="relative group">
-                    <Info className="h-4 w-4 text-gray-400" />
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                      This is your daily earning from all active investments (monthly ROI divided by 30).
-                    </span>
-                  </span>
+              <div className="space-y-1">
+                <p className="text-xs sm:text-sm font-bold text-slate-300 flex items-center gap-1.5">
+                  Daily ROI Rate
+                  <span className="node-dot ml-1" />
                 </p>
-                <p className="text-lg sm:text-2xl font-bold text-green-900 mt-1 sm:mt-2">
+                <p className="text-2xl sm:text-3xl font-extrabold font-display text-emerald-400 tracking-tight">
                   ${(stats?.dailyROI || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
-              <div className="p-2 sm:p-3 rounded-lg bg-green-100">
-                <TrendingUp className="h-6 w-6 text-green-700" />
+              <div className="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 text-emerald-400">
+                <TrendingUp className="h-6 w-6" />
               </div>
             </div>
           </CardContent>
         </Card>
+
         {/* Current Balance Card */}
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardContent className="p-4 sm:p-6">
+        <Card className="glass-card border-amber-500/25 bg-[#0e2238]/90">
+          <CardContent className="p-5 sm:p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-1">
+              <div className="space-y-1">
+                <p className="text-xs sm:text-sm font-bold text-slate-300 flex items-center gap-1.5">
                   Current Balance
-                  <span className="relative group">
-                    <Info className="h-4 w-4 text-gray-400" />
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                      Your withdrawable balance: matured principal, all profits, and commissions, minus withdrawals.
-                    </span>
-                  </span>
+                  <span className="node-dot-blue ml-1" />
                 </p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 sm:mt-2">
+                <p className="text-2xl sm:text-3xl font-extrabold font-display text-amber-300 tracking-tight">
                   ${(stats?.currentBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
-              <div className="p-2 sm:p-3 rounded-lg bg-yellow-100">
-                <HandCoins className="h-6 w-6 text-yellow-700" />
+              <div className="p-3.5 rounded-2xl bg-amber-500/15 border border-amber-400/30 text-amber-400">
+                <HandCoins className="h-6 w-6" />
               </div>
             </div>
           </CardContent>
         </Card>
-        {/* Binary Tree Volumes - NEW */}
-        <Card className="hover:shadow-lg transition-shadow border-blue-200 bg-blue-50">
-          <CardContent className="p-4 sm:p-6">
+
+        {/* Binary Tree Volumes */}
+        <Card className="glass-card border-sky-500/20 bg-[#0e2238]/90">
+          <CardContent className="p-5 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs sm:text-sm font-medium text-blue-900 flex items-center gap-1">
+                <p className="text-xs sm:text-sm font-bold text-slate-300">
                   Left Leg Volume
                 </p>
-                <p className="text-lg sm:text-2xl font-bold text-blue-700 mt-1 sm:mt-2">
+                <p className="text-xl sm:text-2xl font-extrabold font-display text-sky-300 mt-1">
                   ${(stats?.leftVolume || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
                 </p>
               </div>
-              <div className="p-2 sm:p-3 rounded-lg bg-blue-200">
-                <Users className="h-6 w-6 text-blue-800" />
+              <div className="p-3 rounded-2xl bg-sky-500/15 border border-sky-400/30 text-sky-400">
+                <Users className="h-5 w-5" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow border-purple-200 bg-purple-50">
-          <CardContent className="p-4 sm:p-6">
+        <Card className="glass-card border-indigo-500/20 bg-[#0e2238]/90">
+          <CardContent className="p-5 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs sm:text-sm font-medium text-purple-900 flex items-center gap-1">
+                <p className="text-xs sm:text-sm font-bold text-slate-300">
                   Right Leg Volume
                 </p>
-                <p className="text-lg sm:text-2xl font-bold text-purple-700 mt-1 sm:mt-2">
+                <p className="text-xl sm:text-2xl font-extrabold font-display text-indigo-300 mt-1">
                   ${(stats?.rightVolume || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
                 </p>
               </div>
-              <div className="p-2 sm:p-3 rounded-lg bg-purple-200">
-                <Users className="h-6 w-6 text-purple-800" />
+              <div className="p-3 rounded-2xl bg-indigo-500/15 border border-indigo-400/30 text-indigo-400">
+                <Users className="h-5 w-5" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow border-green-200 bg-green-50 col-span-1 md:col-span-2 lg:col-span-2">
-          <CardContent className="p-4 sm:p-6">
+        <Card className="glass-card border-teal-500/20 bg-[#0e2238]/90 col-span-1 md:col-span-2 lg:col-span-2">
+          <CardContent className="p-5 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs sm:text-sm font-medium text-green-900 flex items-center gap-1">
+                <p className="text-xs sm:text-sm font-bold text-slate-300 flex items-center gap-1.5">
                   Total Matched Volume
-                  <span className="relative group">
-                    <Info className="h-4 w-4 text-gray-400" />
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                      The lower volume of your two legs. Matches trigger rewards!
-                    </span>
-                  </span>
+                  <span className="node-dot ml-1" />
                 </p>
-                <p className="text-lg sm:text-2xl font-bold text-green-700 mt-1 sm:mt-2">
+                <p className="text-xl sm:text-2xl font-extrabold font-display text-teal-300 mt-1">
                   ${(stats?.matchedVolume || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
                 </p>
               </div>
-              <div className="p-2 sm:p-3 rounded-lg bg-green-200">
-                <TrendingUp className="h-6 w-6 text-green-800" />
+              <div className="p-3 rounded-2xl bg-teal-500/15 border border-teal-400/30 text-teal-400">
+                <TrendingUp className="h-5 w-5" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Daily ROI Summary Block - NEW */}
-        <Card className="hover:shadow-lg transition-shadow col-span-1 md:col-span-2 lg:col-span-4">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="mb-2 md:mb-0">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-1 mb-1">
-                  Daily ROI Summary
-                  <span className="relative group">
-                    <Info className="h-4 w-4 text-gray-400" />
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                      Total daily ROI earned so far, total withdrawn, and your withdrawable ROI balance.
-                    </span>
-                  </span>
+        {/* Daily ROI Summary Block */}
+        <Card className="glass-card border-sky-500/20 bg-[#0c1c32]/95 col-span-1 md:col-span-2 lg:col-span-4">
+          <CardContent className="p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              <div>
+                <p className="text-lg font-extrabold font-display text-white flex items-center gap-2 mb-1">
+                  Daily ROI Earnings Breakdown
                 </p>
-                <p className="text-xs text-gray-500">Withdrawable ROI = Total Daily ROI Earned – Total Withdrawn</p>
+                <p className="text-xs text-slate-300 font-medium">Withdrawable ROI = Total Credited – Withdrawn Balance</p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                <div className="bg-green-50 rounded-lg p-3 flex flex-col items-center w-full min-w-[120px]">
-                  <span className="text-xs text-gray-500 mb-1">Total Earned</span>
-                  <span className="text-lg font-bold text-green-700">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full lg:w-auto">
+                <div className="bg-[#09182b] border border-emerald-500/30 rounded-2xl p-4 text-center">
+                  <span className="text-xs font-bold text-emerald-400 block mb-1">Total Credited</span>
+                  <span className="text-xl font-extrabold font-display text-emerald-300">
                     ${(stats?.totalCreditedROI || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="bg-red-50 rounded-lg p-3 flex flex-col items-center w-full min-w-[120px]">
-                  <span className="text-xs text-gray-500 mb-1">Withdrawn</span>
-                  <span className="text-lg font-bold text-red-700">
+                <div className="bg-[#09182b] border border-rose-500/30 rounded-2xl p-4 text-center">
+                  <span className="text-xs font-bold text-rose-400 block mb-1">Total Withdrawn</span>
+                  <span className="text-xl font-extrabold font-display text-rose-300">
                     ${(stats?.roiWithdrawn || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="bg-blue-50 rounded-lg p-3 flex flex-col items-center w-full min-w-[120px]">
-                  <span className="text-xs text-gray-500 mb-1">Withdrawable</span>
-                  <span className="text-lg font-bold text-blue-700">
+                <div className="bg-[#09182b] border border-sky-500/30 rounded-2xl p-4 text-center">
+                  <span className="text-xs font-bold text-sky-400 block mb-1">Withdrawable ROI</span>
+                  <span className="text-xl font-extrabold font-display text-sky-300">
                     ${(stats?.availableROI || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -252,32 +225,26 @@ export function StatsGrid() {
           </CardContent>
         </Card>
       </div>
+
       {/* Total Profits Summary */}
-      <div className="mt-4">
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-1">
-                  Total Profits (Summary)
-                  <span className="relative group">
-                    <Info className="h-4 w-4 text-gray-400" />
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                      This is the sum of your withdrawable commissions and accumulated ROI earned so far.
-                    </span>
-                  </span>
-                </p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 sm:mt-2">
-                  ${totalProfits.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
-              </div>
-              <div className="p-2 sm:p-3 rounded-lg bg-green-100">
-                <TrendingUp className="h-6 w-6 text-green-700" />
-              </div>
+      <Card className="glass-card border-sky-400/30 bg-gradient-to-r from-[#091b30] via-[#0d2542] to-[#0a1e38]">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                Total Cumulative Profits
+                <span className="node-dot ml-1" />
+              </p>
+              <p className="text-3xl font-extrabold font-display text-emerald-400">
+                ${totalProfits.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="p-4 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-400">
+              <TrendingUp className="h-7 w-7" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
