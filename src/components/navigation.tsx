@@ -55,21 +55,21 @@ export function Navigation() {
   const location = usePathname();
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => { setIsMounted(true); }, []);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("investpro-theme");
-    if (savedTheme === "light") {
-      setIsDarkMode(false);
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-    } else {
+    if (savedTheme === "dark") {
       setIsDarkMode(true);
       document.documentElement.classList.add("dark");
       document.documentElement.classList.remove("light");
+    } else {
+      setIsDarkMode(false);
+      document.documentElement.classList.add("light");
+      document.documentElement.classList.remove("dark");
     }
   }, []);
 
