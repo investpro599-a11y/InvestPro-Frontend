@@ -191,43 +191,43 @@ export function Navigation() {
                   <>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="rounded-full text-sm font-bold text-slate-200 hover:text-white hover:bg-sky-500/15">
-                          <Shield className="h-4 w-4 text-purple-400" /> Admin <ChevronDown className="h-4 w-4 opacity-80" />
+                        <Button variant="ghost" size="sm" className="rounded-full text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-sky-600 dark:hover:text-white hover:bg-sky-500/15">
+                          <Shield className="h-4 w-4 text-purple-500 dark:text-purple-400" /> Admin <ChevronDown className="h-4 w-4 opacity-80" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="bg-[#0a1b2e]/95 backdrop-blur-xl border border-sky-500/25 text-white">
-                        <DropdownMenuItem asChild className="hover:bg-sky-500/20 focus:bg-sky-500/20 text-slate-100">
-                          <Link href="/admin" className="flex items-center gap-2"> <TrendingUp className="h-4 w-4 text-sky-400" /> Dashboard</Link>
+                      <DropdownMenuContent align="start" className="bg-white/95 dark:bg-[#0a1b2e]/95 backdrop-blur-xl border border-sky-500/25 text-slate-900 dark:text-white shadow-xl">
+                        <DropdownMenuItem asChild className="hover:bg-sky-500/15 focus:bg-sky-500/15 text-slate-800 dark:text-slate-100 font-medium">
+                          <Link href="/admin" className="flex items-center gap-2"> <TrendingUp className="h-4 w-4 text-sky-500 dark:text-sky-400" /> Dashboard</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="hover:bg-sky-500/20 focus:bg-sky-500/20 text-slate-100">
-                          <Link href="/admin/users" className="flex items-center gap-2"><Users className="h-4 w-4 text-purple-400" /> User Management</Link>
+                        <DropdownMenuItem asChild className="hover:bg-sky-500/15 focus:bg-sky-500/15 text-slate-800 dark:text-slate-100 font-medium">
+                          <Link href="/admin/users" className="flex items-center gap-2"><Users className="h-4 w-4 text-purple-500 dark:text-purple-400" /> User Management</Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="rounded-full text-sm font-bold text-slate-200 hover:text-white hover:bg-sky-500/15">
-                          <DollarSign className="h-4 w-4 text-emerald-400" /> Approvals <ChevronDown className="h-4 w-4 opacity-80" />
+                        <Button variant="ghost" size="sm" className="rounded-full text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-sky-600 dark:hover:text-white hover:bg-sky-500/15">
+                          <DollarSign className="h-4 w-4 text-emerald-500 dark:text-emerald-400" /> Approvals <ChevronDown className="h-4 w-4 opacity-80" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="bg-[#0a1b2e]/95 backdrop-blur-xl border border-sky-500/25 text-white">
-                        <DropdownMenuItem asChild className="hover:bg-sky-500/20 focus:bg-sky-500/20 text-slate-100">
-                          <Link href="/admin/investment-approvals" className="flex items-center gap-2"><DollarSign className="h-4 w-4 text-emerald-400" /> Investment Approvals</Link>
+                      <DropdownMenuContent align="start" className="bg-white/95 dark:bg-[#0a1b2e]/95 backdrop-blur-xl border border-sky-500/25 text-slate-900 dark:text-white shadow-xl">
+                        <DropdownMenuItem asChild className="hover:bg-sky-500/15 focus:bg-sky-500/15 text-slate-800 dark:text-slate-100 font-medium">
+                          <Link href="/admin/investment-approvals" className="flex items-center gap-2"><DollarSign className="h-4 w-4 text-emerald-500 dark:text-emerald-400" /> Investment Approvals</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="hover:bg-sky-500/20 focus:bg-sky-500/20 text-slate-100">
-                          <Link href="/admin/withdrawal-approvals" className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-teal-400" /> Withdrawal Approvals</Link>
+                        <DropdownMenuItem asChild className="hover:bg-sky-500/15 focus:bg-sky-500/15 text-slate-800 dark:text-slate-100 font-medium">
+                          <Link href="/admin/withdrawal-approvals" className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-teal-500 dark:text-teal-400" /> Withdrawal Approvals</Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="rounded-full text-sm font-bold text-slate-200 hover:text-white hover:bg-sky-500/15">
-                          <Gift className="h-4 w-4 text-amber-400" /> Rewards <ChevronDown className="h-4 w-4 opacity-70" />
+                        <Button variant="ghost" size="sm" className="rounded-full text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-amber-600 dark:hover:text-white hover:bg-sky-500/15">
+                          <Gift className="h-4 w-4 text-amber-500 dark:text-amber-400" /> Rewards <ChevronDown className="h-4 w-4 opacity-70" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="bg-slate-900/90 backdrop-blur-xl border border-white/10 text-slate-100">
-                        <DropdownMenuItem asChild className="hover:bg-slate-800/70 focus:bg-slate-800/70 text-slate-200">
-                          <Link href="/admin/rewards" className="flex items-center gap-2"><Gift className="h-4 w-4 text-amber-400" /> Manage Rewards</Link>
+                      <DropdownMenuContent align="start" className="bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-100 shadow-xl">
+                        <DropdownMenuItem asChild className="hover:bg-sky-500/15 focus:bg-sky-500/15 text-slate-800 dark:text-slate-200 font-medium">
+                          <Link href="/admin/rewards" className="flex items-center gap-2"><Gift className="h-4 w-4 text-amber-500 dark:text-amber-400" /> Manage Rewards</Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -244,14 +244,14 @@ export function Navigation() {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="text-slate-300 hover:text-white hover:bg-sky-500/20 relative rounded-full border border-sky-500/20 bg-[#07182b]/80 shadow-md transition-all duration-300"
+              className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-sky-500/20 relative rounded-full border border-slate-200 dark:border-sky-500/20 bg-white/80 dark:bg-[#07182b]/80 shadow-sm dark:shadow-md transition-all duration-300"
               title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
               aria-label="Toggle Theme Mode"
             >
               {isDarkMode ? (
                 <Sun className="h-5 w-5 text-amber-400 transition-transform duration-300 hover:rotate-45" />
               ) : (
-                <Moon className="h-5 w-5 text-sky-400 transition-transform duration-300 hover:-rotate-12" />
+                <Moon className="h-5 w-5 text-sky-500 transition-transform duration-300 hover:-rotate-12" />
               )}
             </Button>
 
@@ -259,49 +259,49 @@ export function Navigation() {
               <>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-slate-300 hover:text-white hover:bg-white/10 relative rounded-full" aria-label="Notifications">
+                    <Button variant="ghost" size="icon" className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-sky-500/10 relative rounded-full" aria-label="Notifications">
                       <Bell className="h-5 w-5" />
                       {unreadNotifications.length > 0 && (
-                        <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-rose-500 ring-4 ring-slate-950 animate-pulse" aria-label="Unread notifications" />
+                        <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-rose-500 ring-4 ring-white dark:ring-slate-950 animate-pulse" aria-label="Unread notifications" />
                       )}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-96 p-0 bg-slate-900/95 backdrop-blur-2xl border border-white/10 shadow-2xl text-slate-100 rounded-2xl overflow-hidden" align="end">
+                  <PopoverContent className="w-96 p-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-2xl text-slate-900 dark:text-slate-100 rounded-2xl overflow-hidden" align="end">
                     <NotificationPanel />
                   </PopoverContent>
                 </Popover>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center gap-2.5 px-3.5 py-2 rounded-full border border-white/10 bg-slate-900/50 hover:bg-white/10 text-slate-200 transition-all">
+                    <Button variant="ghost" className="flex items-center gap-2.5 px-3.5 py-2 rounded-full border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/50 hover:bg-sky-50 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 transition-all">
                       <Avatar className="h-8 w-8 ring-2 ring-blue-500/40">
                         <AvatarImage src={getFileUrl(user.profilePicture)} />
                         <AvatarFallback className="bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs">
                           {user.fullName.split(" ").map(n => n[0]).join("").toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-sm font-bold font-display tracking-tight text-white">{user.fullName}</span>
+                      <span className="text-sm font-bold font-display tracking-tight text-slate-800 dark:text-white">{user.fullName}</span>
                       <ChevronDown className="h-4 w-4 opacity-60" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-slate-900/95 backdrop-blur-2xl border border-white/10 shadow-2xl text-slate-100 rounded-xl p-1.5">
-                    <DropdownMenuItem asChild className="hover:bg-slate-800/80 focus:bg-slate-800/80 text-slate-200 cursor-pointer rounded-lg">
-                      <Link href="/profile" className="flex items-center gap-2"><User className="h-4 w-4 text-blue-400" /> Profile</Link>
+                  <DropdownMenuContent align="end" className="w-56 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-2xl text-slate-900 dark:text-slate-100 rounded-xl p-1.5">
+                    <DropdownMenuItem asChild className="hover:bg-sky-50 dark:hover:bg-slate-800/80 focus:bg-sky-50 dark:focus:bg-slate-800/80 text-slate-800 dark:text-slate-200 cursor-pointer rounded-lg font-medium">
+                      <Link href="/profile" className="flex items-center gap-2"><User className="h-4 w-4 text-blue-500 dark:text-blue-400" /> Profile</Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="hover:bg-slate-800/80 focus:bg-slate-800/80 text-slate-200 cursor-pointer rounded-lg">
-                      <Link href="/settings" className="flex items-center gap-2"><Settings className="h-4 w-4 text-indigo-400" /> Settings</Link>
+                    <DropdownMenuItem asChild className="hover:bg-sky-50 dark:hover:bg-slate-800/80 focus:bg-sky-50 dark:focus:bg-slate-800/80 text-slate-800 dark:text-slate-200 cursor-pointer rounded-lg font-medium">
+                      <Link href="/settings" className="flex items-center gap-2"><Settings className="h-4 w-4 text-indigo-500 dark:text-indigo-400" /> Settings</Link>
                     </DropdownMenuItem>
                     {isAdmin && (
                       <>
-                        <DropdownMenuSeparator className="bg-white/10" />
-                        <DropdownMenuItem asChild className="hover:bg-slate-800/80 focus:bg-slate-800/80 text-slate-200 cursor-pointer rounded-lg">
-                          <Link href="/admin" className="flex items-center gap-2"><Shield className="h-4 w-4 text-purple-400" /> Admin Panel</Link>
+                        <DropdownMenuSeparator className="bg-slate-200 dark:bg-white/10" />
+                        <DropdownMenuItem asChild className="hover:bg-sky-50 dark:hover:bg-slate-800/80 focus:bg-sky-50 dark:focus:bg-slate-800/80 text-slate-800 dark:text-slate-200 cursor-pointer rounded-lg font-medium">
+                          <Link href="/admin" className="flex items-center gap-2"><Shield className="h-4 w-4 text-purple-500 dark:text-purple-400" /> Admin Panel</Link>
                         </DropdownMenuItem>
                       </>
                     )}
-                    <DropdownMenuSeparator className="bg-white/10" />
-                    <DropdownMenuItem onClick={handleLogout} className="hover:bg-rose-500/20 text-rose-300 focus:bg-rose-500/20 focus:text-rose-200 cursor-pointer rounded-lg flex items-center gap-2">
-                      <LogOut className="h-4 w-4 text-rose-400" /> Logout
+                    <DropdownMenuSeparator className="bg-slate-200 dark:bg-white/10" />
+                    <DropdownMenuItem onClick={handleLogout} className="hover:bg-rose-50 dark:hover:bg-rose-500/20 text-rose-600 dark:text-rose-300 focus:bg-rose-50 dark:focus:bg-rose-500/20 cursor-pointer rounded-lg flex items-center gap-2 font-medium">
+                      <LogOut className="h-4 w-4 text-rose-500 dark:text-rose-400" /> Logout
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

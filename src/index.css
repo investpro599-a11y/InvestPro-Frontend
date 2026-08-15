@@ -295,18 +295,31 @@ html.light [class*="bg-slate-950"], .light [class*="bg-slate-950"] {
 }
 
 /* Light Mode Text Inversion Overrides */
-html.light .text-white, .light .text-white {
+html.light .text-white, .light .text-white,
+html.light .text-slate-50, .light .text-slate-50,
+html.light .text-slate-100, .light .text-slate-100 {
   color: #0f172a !important;
 }
 
-html.light .text-slate-300, .light .text-slate-300,
 html.light .text-slate-200, .light .text-slate-200,
+html.light .text-slate-300, .light .text-slate-300,
 html.light .text-slate-400, .light .text-slate-400 {
-  color: #475569 !important;
+  color: #334155 !important;
 }
 
 html.light .text-sky-300, .light .text-sky-300,
 html.light .text-sky-200, .light .text-sky-200 {
+  color: #0284c7 !important;
+}
+
+/* Light mode dropdown menu & popover item hover states */
+html.light [role="menuitem"], .light [role="menuitem"] {
+  color: #0f172a !important;
+}
+
+html.light [role="menuitem"]:hover, .light [role="menuitem"]:hover,
+html.light [role="menuitem"]:focus, .light [role="menuitem"]:focus {
+  background-color: rgba(14, 165, 233, 0.12) !important;
   color: #0284c7 !important;
 }
 
