@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Layout } from "@/components/layout";
 import { InvestmentForm } from "@/components/investment/investment-form";
 import { InvestmentTable } from "@/components/investment/investment-table";
+import { DailyProfitTracker } from "@/components/dashboard/daily-profit-tracker";
 
 export default function Investments() {
   const { isAuthenticated, isAdmin } = useAuth();
@@ -36,6 +37,7 @@ export default function Investments() {
           <div className="space-y-8">
             <InvestmentForm />
             <InvestmentTable />
+            <DailyProfitTracker />
           </div>
         </div>
       </div>

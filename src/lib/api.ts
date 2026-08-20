@@ -34,6 +34,13 @@ export const dashboardApi = {
     if (!response.ok) throw new Error(result.message || "Failed to get investment chart");
     return unwrap<any>(result);
   },
+
+  getDailyProfits: async () => {
+    const response = await apiRequest("GET", "/dashboard/daily-profits");
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to get daily profit history");
+    return unwrap<any>(result);
+  },
 };
 
 export const investmentApi = {

@@ -18,6 +18,7 @@ import { AdminDashboard } from "@/components/admin/admin-dashboard";
 import Link from "next/link";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { UserPortfolio } from '@/components/dashboard/user-portfolio';
+import { DailyProfitTracker } from "@/components/dashboard/daily-profit-tracker";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getFileUrl } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
@@ -156,6 +157,9 @@ export default function Dashboard() {
             {/* Referral Card */}
             <ReferralCard />
           </div>
+
+          {/* Everyday Profit Tracker */}
+          {!isAdmin && <DailyProfitTracker />}
 
           {/* Recent Activity */}
           <RecentActivity />
