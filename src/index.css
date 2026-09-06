@@ -346,3 +346,13 @@ html.light [role="menuitem"]:focus, .light [role="menuitem"]:focus {
   }
 }
 
+@keyframes growWidth {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+

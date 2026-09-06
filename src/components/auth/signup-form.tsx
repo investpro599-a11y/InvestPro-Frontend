@@ -127,19 +127,8 @@ export function SignupForm({ initialReferralCode }: SignupFormProps) {
       console.log('Calling signup API...');
       await signup(signupData);
       
-      console.log('Signup successful, showing toast...');
-      toast({
-        title: "Signup successful!",
-        description: "Logging you in...",
-      });
-      
       console.log('Attempting login...');
       await login({ emailOrUsername: data.email, password: data.password });
-      
-      console.log('Login successful, redirecting...');
-      // The useAuth hook will handle routing based on user role
-      // All signups are users, so they go to /dashboard
-      window.location.reload();
     } catch (error: any) {
       console.error('Signup error:', error);
       

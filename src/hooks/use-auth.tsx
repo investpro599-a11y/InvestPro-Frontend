@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authApi } from "@/lib/auth";
 import type { User, LoginData, InsertUser } from "../../shared/schema";
@@ -84,7 +84,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
   });
 
-  
   const verifyMutation = useMutation({
     mutationFn: async (data: { email: string; otp: string }) => {
       return await authApi.verifyEmail(data);
@@ -112,16 +111,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signupMutation = useMutation({
     mutationFn: authApi.signup,
     onSuccess: (data) => {
-      // data may be { message, userId } (no user) if backend doesn't return user on signup
       if (data?.user) {
         queryClient.setQueryData(["/auth/me"], data.user);
+        toast({
+          title: "Account created!",
+          description: "Signup successful",
+        });
         if (data.user.role === "admin") {
           router.push("/admin");
         } else {
           router.push("/dashboard");
         }
       }
-      // If no user returned, the signup-form handles login + redirect itself
     },
     onError: (error: any) => {
       toast({
