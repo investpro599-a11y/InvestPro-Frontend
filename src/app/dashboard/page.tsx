@@ -7,18 +7,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { dashboardApi } from "@/lib";
 import { Layout } from "@/components/layout";
 import { StatsGrid } from "@/components/dashboard/stats-grid";
-import { InvestmentChart } from "@/components/dashboard/investment-chart";
-import { ReferralCard } from "@/components/dashboard/referral-card";
-import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { Button } from "@/components/ui/button";
 import { pdfExporter } from "@/lib/pdf-export";
-import { Download, Plus, FileText, Camera } from "lucide-react";
+import { Plus, FileText, Camera } from "lucide-react";
 import { toast } from "sonner";
 import { AdminDashboard } from "@/components/admin/admin-dashboard";
-import Link from "next/link";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { UserPortfolio } from '@/components/dashboard/user-portfolio';
-import { DailyProfitTracker } from "@/components/dashboard/daily-profit-tracker";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getFileUrl } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
@@ -82,14 +75,14 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <div className="py-6 sm:py-8">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 space-y-6">
+      <div className="py-5 sm:py-7">
+        <div className="max-w-7xl mx-auto px-3 sm:px-5 md:px-6 lg:px-8 space-y-6">
           {/* Dashboard Header */}
-          <div className="glass-panel p-6 rounded-3xl border border-sky-500/25">
+          <div className="glass-panel p-5 sm:p-6 rounded-3xl border border-sky-500/25">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-4">
                 <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                  <Avatar className="w-16 h-16 border-2 border-sky-400/40 shadow-lg">
+                  <Avatar className="w-14 h-14 sm:w-16 sm:h-16 border-2 border-sky-400/40 shadow-lg">
                     <AvatarImage 
                       src={getFileUrl(user.profilePicture)} 
                       crossOrigin="anonymous"
@@ -115,25 +108,26 @@ export default function Dashboard() {
                   />
                 </div>
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-white">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-black font-display text-white [html.light_&]:text-slate-900">
                     Investment <span className="gradient-text-primary">Dashboard</span>
                   </h1>
-                  <p className="text-slate-300 mt-1 text-sm sm:text-base font-medium">
-                    Welcome back, <span className="text-white font-bold">{user.fullName}</span>. Here&apos;s your portfolio overview.
+                  <p className="text-slate-300 [html.light_&]:text-slate-600 mt-0.5 text-xs sm:text-sm font-medium">
+                    Welcome back, <span className="text-white [html.light_&]:text-slate-900 font-bold">{user.fullName}</span>. Here&apos;s your portfolio overview.
                   </p>
                 </div>
               </div>
-              <div className="mt-2 md:mt-0 flex flex-col sm:flex-row gap-2 sm:gap-3">
+
+              <div className="mt-1 md:mt-0 flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <Button 
                   variant="outline" 
-                  className="bg-sky-500/10 border-sky-400/30 text-sky-200 hover:bg-sky-500/25 font-bold flex items-center space-x-2 w-full sm:w-auto"
+                  className="bg-sky-500/10 border-sky-400/30 text-sky-200 [html.light_&]:text-sky-800 [html.light_&]:bg-sky-50 hover:bg-sky-500/25 font-bold flex items-center space-x-2 w-full sm:w-auto rounded-xl"
                   onClick={handleExportReport}
                 >
                   <FileText className="h-4 w-4" />
                   <span>Export PDF Report</span>
                 </Button>
                 {!isAdmin && (
-                  <Button onClick={() => router.push("/investments")} className="bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-bold shadow-lg shadow-sky-500/25 flex items-center space-x-2 w-full sm:w-auto">
+                  <Button onClick={() => router.push("/investments")} className="bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-bold shadow-lg shadow-sky-500/25 flex items-center space-x-2 w-full sm:w-auto rounded-xl">
                     <Plus className="h-4 w-4" />
                     <span>New Investment</span>
                   </Button>
@@ -142,27 +136,8 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Stats Grid */}
+          {/* Main Stats Grid & Tabbed View */}
           <StatsGrid />
-
-          {/* User Portfolio Section */}
-          {!isAdmin && <UserPortfolio />}
-
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-3">
-            {/* Investment Chart */}
-            <div className="lg:col-span-2">
-              <InvestmentChart />
-            </div>
-            {/* Referral Card */}
-            <ReferralCard />
-          </div>
-
-          {/* Everyday Profit Tracker */}
-          {!isAdmin && <DailyProfitTracker />}
-
-          {/* Recent Activity */}
-          <RecentActivity />
 
           {/* Admin Dashboard (Only for admin users) */}
           {isAdmin && <AdminDashboard />}
