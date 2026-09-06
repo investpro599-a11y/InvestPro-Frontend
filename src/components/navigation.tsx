@@ -87,6 +87,17 @@ export function Navigation() {
     }
   };
 
+  useEffect(() => {
+    if (drawerOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [drawerOpen]);
+
   const { data: unreadNotifications = [], error: notificationError } = useQuery({
     queryKey: ["notifications/unread"],
     queryFn: notificationApi.getUnread,
@@ -323,148 +334,255 @@ export function Navigation() {
           </div>
         </div>
       </div>
-      {/* Mobile Full-Height Left Sidebar — rendered via portal into document.body */}
+      {/* Mobile Glass Sidebar Drawer — rendered via portal into document.body */}
       {isMobile && drawerOpen && isMounted && ReactDOM.createPortal(
-        <>
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-[9998] flex">
+          {/* Glass Backdrop */}
           <div
-            className="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-300"
             onClick={() => setDrawerOpen(false)}
             aria-hidden="true"
           />
-          {/* Sidebar Panel */}
+
+          {/* Glass Drawer Panel */}
           <div
-            className="fixed top-0 left-0 h-screen z-[9999] flex flex-col bg-[#07172b] border-r border-sky-500/20 shadow-2xl shadow-black/50 overflow-hidden"
-            style={{ width: "80vw", maxWidth: "320px", animation: "slideInFromLeft 0.25s ease-out" }}
+            className="relative z-[9999] w-[82vw] max-w-[340px] h-[100dvh] flex flex-col bg-[#07172b]/95 [html.light_&]:bg-white/95 backdrop-blur-2xl border-r border-sky-500/20 [html.light_&]:border-slate-200/80 shadow-2xl shadow-black/60 overflow-hidden"
+            style={{ animation: "slideInFromLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1)" }}
           >
-            {/* Sidebar Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-sky-500/20 bg-[#061322]">
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-sky-500/15 [html.light_&]:border-slate-200/70 bg-[#061322]/80 [html.light_&]:bg-slate-50/80 backdrop-blur-xl shrink-0">
               <Link href="/dashboard" onClick={() => setDrawerOpen(false)} className="flex items-center gap-2.5">
                 <div className="relative">
                   <div className="absolute -inset-1 bg-gradient-to-r from-sky-500 to-indigo-500 rounded-full blur-md opacity-70" />
                   <img src="/investpro.png" alt="InvestPro" className="relative h-9 w-9 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }} />
                 </div>
-                <span className="text-lg font-extrabold text-white">Invest<span className="text-sky-400">Pro</span></span>
+                <span className="text-xl font-extrabold tracking-tight text-white [html.light_&]:text-slate-900">
+                  Invest<span className="text-sky-400">Pro</span>
+                </span>
               </Link>
-              <Button variant="ghost" size="icon" onClick={() => setDrawerOpen(false)} className="text-slate-400 hover:text-white hover:bg-sky-500/20 rounded-full h-8 w-8">
-                <XCircle className="h-5 w-5" />
-              </Button>
+
+              <div className="flex items-center gap-1.5">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleTheme}
+                  className="text-slate-300 [html.light_&]:text-slate-700 hover:text-white [html.light_&]:hover:text-slate-900 hover:bg-sky-500/20 rounded-full border border-sky-500/20 [html.light_&]:border-slate-300 bg-[#07182b]/80 [html.light_&]:bg-white h-8 w-8 shadow-sm"
+                  title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                  aria-label="Toggle Theme Mode"
+                >
+                  {isDarkMode ? (
+                    <Sun className="h-4 w-4 text-amber-400" />
+                  ) : (
+                    <Moon className="h-4 w-4 text-sky-500" />
+                  )}
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setDrawerOpen(false)}
+                  className="text-slate-400 hover:text-white [html.light_&]:text-slate-600 [html.light_&]:hover:text-slate-900 hover:bg-sky-500/20 [html.light_&]:hover:bg-slate-200 rounded-full h-8 w-8"
+                  aria-label="Close menu"
+                >
+                  <XCircle className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
 
-            {/* User Info */}
-            <div className="flex items-center gap-3 px-5 py-4 border-b border-sky-500/15 bg-sky-500/5">
-              <Avatar className="h-11 w-11 ring-2 ring-sky-500/40">
+            {/* User Info Card */}
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-sky-500/15 [html.light_&]:border-slate-200/70 bg-sky-500/5 [html.light_&]:bg-sky-50/60 shrink-0">
+              <Avatar className="h-11 w-11 ring-2 ring-sky-500/40 shadow-sm">
                 <AvatarImage src={getFileUrl(user.profilePicture)} />
                 <AvatarFallback className="bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-sm">
                   {user.fullName.split(" ").map(n => n[0]).join("").toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <div className="min-w-0">
-                <div className="font-bold text-white text-sm truncate">{user.fullName}</div>
-                <div className="text-xs text-sky-400/80 truncate">{user.email}</div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-white [html.light_&]:text-slate-900 text-sm truncate">{user.fullName}</span>
+                  {isAdmin && (
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-purple-400 text-purple-300 [html.light_&]:text-purple-700 bg-purple-500/10">
+                      Admin
+                    </Badge>
+                  )}
+                </div>
+                <div className="text-xs text-sky-400 [html.light_&]:text-sky-600 truncate">{user.email}</div>
               </div>
             </div>
 
-            {/* Scrollable Nav Links */}
+            {/* Scrollable Nav Links with perfect spacing */}
             <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
-
-              <p className="text-[10px] uppercase font-bold text-slate-500 tracking-widest px-4 pt-1 pb-1">Navigation</p>
-              <Link href="/dashboard" onClick={() => setDrawerOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${ isActive("/dashboard") || isActive("/") ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg" : "text-slate-300 hover:bg-sky-500/15 hover:text-white" }`}>
+              <p className="text-[10px] uppercase font-bold text-slate-400 [html.light_&]:text-slate-500 tracking-widest px-3 pt-2 pb-1">Navigation</p>
+              <Link
+                href="/dashboard"
+                onClick={() => setDrawerOpen(false)}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
+                  isActive("/dashboard") || isActive("/")
+                    ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg shadow-sky-500/25"
+                    : "text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900"
+                }`}
+              >
                 <TrendingUp className="h-4 w-4 shrink-0" /> Dashboard
               </Link>
 
               {!isAdmin && (
                 <>
-                  <Link href="/investments" onClick={() => setDrawerOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${ isActive("/investments") ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg" : "text-slate-300 hover:bg-sky-500/15 hover:text-white" }`}>
+                  <Link
+                    href="/investments"
+                    onClick={() => setDrawerOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
+                      isActive("/investments")
+                        ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg shadow-sky-500/25"
+                        : "text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900"
+                    }`}
+                  >
                     <DollarSign className="h-4 w-4 shrink-0" /> Investments
                   </Link>
-                  <Link href="/withdrawals" onClick={() => setDrawerOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${ isActive("/withdrawals") ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg" : "text-slate-300 hover:bg-sky-500/15 hover:text-white" }`}>
+                  <Link
+                    href="/withdrawals"
+                    onClick={() => setDrawerOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
+                      isActive("/withdrawals")
+                        ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg shadow-sky-500/25"
+                        : "text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900"
+                    }`}
+                  >
                     <CheckCircle className="h-4 w-4 shrink-0" /> Withdrawals
                   </Link>
-                  <Link href="/rewards" onClick={() => setDrawerOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${ isActive("/rewards") ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 shadow-lg" : "text-amber-300 hover:bg-amber-500/15 hover:text-amber-200" }`}>
+                  <Link
+                    href="/rewards"
+                    onClick={() => setDrawerOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
+                      isActive("/rewards")
+                        ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-bold shadow-lg shadow-amber-500/25"
+                        : "text-amber-300 [html.light_&]:text-amber-700 hover:bg-amber-500/15 [html.light_&]:hover:bg-amber-50 hover:text-amber-200"
+                    }`}
+                  >
                     <Gift className="h-4 w-4 shrink-0" /> Rewards
                   </Link>
                 </>
               )}
 
-              <Link href="/genealogy" onClick={() => setDrawerOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${ isActive("/genealogy") ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg" : "text-slate-300 hover:bg-sky-500/15 hover:text-white" }`}>
+              <Link
+                href="/genealogy"
+                onClick={() => setDrawerOpen(false)}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
+                  isActive("/genealogy")
+                    ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg shadow-sky-500/25"
+                    : "text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900"
+                }`}
+              >
                 <Network className="h-4 w-4 shrink-0" /> Genealogy
               </Link>
 
               {isAdmin && (
                 <>
-                  <p className="text-[10px] uppercase font-bold text-slate-500 tracking-widest px-4 pt-4 pb-1">Admin Panel</p>
-                  <Link href="/admin" onClick={() => setDrawerOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${ isActive("/admin") ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg" : "text-slate-300 hover:bg-purple-500/15 hover:text-white" }`}>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 [html.light_&]:text-slate-500 tracking-widest px-3 pt-4 pb-1">Admin Panel</p>
+                  <Link
+                    href="/admin"
+                    onClick={() => setDrawerOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
+                      isActive("/admin")
+                        ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25"
+                        : "text-slate-300 [html.light_&]:text-slate-700 hover:bg-purple-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900"
+                    }`}
+                  >
                     <Shield className="h-4 w-4 shrink-0 text-purple-400" /> Admin Dashboard
                   </Link>
-                  <Link href="/admin/users" onClick={() => setDrawerOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-300 hover:bg-sky-500/15 hover:text-white transition-all">
+                  <Link
+                    href="/admin/users"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900 transition-all"
+                  >
                     <Users className="h-4 w-4 shrink-0 text-purple-400" /> User Management
                   </Link>
-                  <Link href="/admin/investment-approvals" onClick={() => setDrawerOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-300 hover:bg-sky-500/15 hover:text-white transition-all">
+                  <Link
+                    href="/admin/investment-approvals"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900 transition-all"
+                  >
                     <DollarSign className="h-4 w-4 shrink-0 text-emerald-400" /> Investment Approvals
                   </Link>
-                  <Link href="/admin/withdrawal-approvals" onClick={() => setDrawerOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-300 hover:bg-sky-500/15 hover:text-white transition-all">
+                  <Link
+                    href="/admin/withdrawal-approvals"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900 transition-all"
+                  >
                     <CheckCircle className="h-4 w-4 shrink-0 text-teal-400" /> Withdrawal Approvals
                   </Link>
-                  <Link href="/admin/rewards" onClick={() => setDrawerOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-300 hover:bg-sky-500/15 hover:text-white transition-all">
+                  <Link
+                    href="/admin/rewards"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900 transition-all"
+                  >
                     <Gift className="h-4 w-4 shrink-0 text-amber-400" /> Rewards Management
                   </Link>
-                  <Link href="/admin/logs" onClick={() => setDrawerOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-300 hover:bg-sky-500/15 hover:text-white transition-all">
+                  <Link
+                    href="/admin/logs"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900 transition-all"
+                  >
                     <FileText className="h-4 w-4 shrink-0 text-slate-400" /> System Logs
                   </Link>
-                  <Link href="/admin/database-config" onClick={() => setDrawerOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-300 hover:bg-sky-500/15 hover:text-white transition-all">
+                  <Link
+                    href="/admin/database-config"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900 transition-all"
+                  >
                     <Settings className="h-4 w-4 shrink-0 text-sky-400" /> Database Config
                   </Link>
-                  <Link href="/admin/genealogy" onClick={() => setDrawerOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-300 hover:bg-sky-500/15 hover:text-white transition-all">
+                  <Link
+                    href="/admin/genealogy"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900 transition-all"
+                  >
                     <Network className="h-4 w-4 shrink-0 text-indigo-400" /> Genealogy Mgmt
                   </Link>
                 </>
               )}
 
-              <p className="text-[10px] uppercase font-bold text-slate-500 tracking-widest px-4 pt-4 pb-1">Account</p>
-              <Link href="/profile" onClick={() => setDrawerOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-300 hover:bg-sky-500/15 hover:text-white transition-all">
+              <p className="text-[10px] uppercase font-bold text-slate-400 [html.light_&]:text-slate-500 tracking-widest px-3 pt-4 pb-1">Account</p>
+              <Link
+                href="/profile"
+                onClick={() => setDrawerOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900 transition-all"
+              >
                 <User className="h-4 w-4 shrink-0 text-blue-400" /> Profile
               </Link>
-              <Link href="/settings" onClick={() => setDrawerOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-300 hover:bg-sky-500/15 hover:text-white transition-all">
+              <Link
+                href="/settings"
+                onClick={() => setDrawerOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900 transition-all"
+              >
                 <Settings className="h-4 w-4 shrink-0 text-indigo-400" /> Settings
               </Link>
               {unreadNotifications.length > 0 && (
-                <div className="flex items-center gap-3 px-4 py-3 rounded-xl">
-                  <Bell className="h-4 w-4 shrink-0 text-sky-400" />
-                  <span className="text-sm font-bold text-slate-300">Notifications</span>
-                  <Badge variant="destructive" className="ml-auto h-5 min-w-5 rounded-full px-1 text-xs">
+                <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-sky-500/10 [html.light_&]:bg-sky-50 border border-sky-500/20">
+                  <div className="flex items-center gap-3">
+                    <Bell className="h-4 w-4 shrink-0 text-sky-400" />
+                    <span className="text-sm font-bold text-slate-200 [html.light_&]:text-slate-800">Notifications</span>
+                  </div>
+                  <Badge variant="destructive" className="h-5 min-w-5 rounded-full px-1.5 text-xs">
                     {unreadNotifications.length > 9 ? "9+" : unreadNotifications.length}
                   </Badge>
                 </div>
               )}
             </div>
 
-            {/* Sidebar Footer — Logout */}
-            <div className="px-3 py-3 border-t border-sky-500/15">
+            {/* Footer — Logout */}
+            <div className="px-4 py-3.5 border-t border-sky-500/15 [html.light_&]:border-slate-200/70 bg-[#061322]/80 [html.light_&]:bg-slate-50/80 backdrop-blur-xl shrink-0 pb-safe">
               <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-rose-400 hover:bg-rose-500/15 hover:text-rose-300 transition-all"
+                onClick={() => {
+                  setDrawerOpen(false);
+                  handleLogout();
+                }}
+                className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-bold text-rose-400 [html.light_&]:text-rose-600 bg-rose-500/10 hover:bg-rose-500/20 [html.light_&]:bg-rose-50 [html.light_&]:hover:bg-rose-100 border border-rose-500/20 [html.light_&]:border-rose-200 transition-all"
               >
                 <LogOut className="h-4 w-4 shrink-0" /> Logout
               </button>
             </div>
           </div>
-        </>
+        </div>
       , document.body)}
     </nav>
   );

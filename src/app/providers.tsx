@@ -24,7 +24,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <AuthProvider>
           <TooltipProvider>
             <Toaster />
-            <SonnerToaster position="top-center" richColors />
+            <SonnerToaster position="bottom-right" richColors />
             <div className="min-h-screen bg-background">
               {children}
             </div>
