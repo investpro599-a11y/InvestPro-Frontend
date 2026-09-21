@@ -41,6 +41,33 @@ function applyThemeToDocument(resolved: ResolvedTheme) {
   }
 }
 
+function disableAnimation() {
+  if (typeof document === "undefined") return () => {};
+  const css = document.createElement("style");
+  css.appendChild(
+    document.createTextNode(
+      `*,*::before,*::after{-webkit-transition:none!important;-moz-transition:none!important;-o-transition:none!important;-ms-transition:none!important;transition:none!important}`
+    )
+  );
+  document.head.appendChild(css);
+
+  return () => {
+    // Force browser style reflow
+    (() => window.getComputedStyle(document.body))();
+
+    // Restore smooth UI transitions cleanly on the next animation frame
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        try {
+          if (css.parentNode) {
+            document.head.removeChild(css);
+          }
+        } catch {}
+      });
+    });
+  };
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("system");
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("dark");
@@ -79,8 +106,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
         if (!savedTheme || savedTheme === "system") {
           const newResolved: ResolvedTheme = e.matches ? "dark" : "light";
+          const enable = disableAnimation();
           setResolvedTheme(newResolved);
           applyThemeToDocument(newResolved);
+          enable();
         }
       } catch {}
     };
@@ -95,10 +124,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setTheme = (newTheme: Theme) => {
+    const enable = disableAnimation();
     const resolved = newTheme === "system" ? getSystemTheme() : newTheme;
     applyThemeToDocument(resolved);
     setThemeState(newTheme);
     setResolvedTheme(resolved);
+    enable();
 
     try {
       localStorage.setItem(THEME_STORAGE_KEY, newTheme);
