@@ -9,7 +9,7 @@ interface ThemeContextType {
   theme: Theme;
   resolvedTheme: ResolvedTheme;
   setTheme: (theme: Theme) => void;
-  toggleTheme: (event?: React.MouseEvent | MouseEvent) => void;
+  toggleTheme: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -107,62 +107,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const toggleTheme = (event?: React.MouseEvent | MouseEvent) => {
+  const toggleTheme = () => {
     const nextTheme: Theme = resolvedTheme === "dark" ? "light" : "dark";
-
-    const updateDOM = () => {
-      applyThemeToDocument(nextTheme);
-      setThemeState(nextTheme);
-      setResolvedTheme(nextTheme);
-    };
-
-    // If View Transitions are not supported or reduced motion is preferred, fallback gracefully
-    if (
-      typeof document === "undefined" ||
-      !("startViewTransition" in document) ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      updateDOM();
-      try {
-        localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
-      } catch {}
-      return;
-    }
-
-    // Determine circular ripple origin from click coordinates or center of screen
-    const x = event ? event.clientX : window.innerWidth / 2;
-    const y = event ? event.clientY : 40;
-    const endRadius = Math.hypot(
-      Math.max(x, window.innerWidth - x),
-      Math.max(y, window.innerHeight - y)
-    );
-
-    const transition = (document as any).startViewTransition(() => {
-      updateDOM();
-    });
-
-    transition.ready.then(() => {
-      const clipPath = [
-        `circle(0px at ${x}px ${y}px)`,
-        `circle(${endRadius}px at ${x}px ${y}px)`,
-      ];
-      document.documentElement.animate(
-        {
-          clipPath: clipPath,
-        },
-        {
-          duration: 400,
-          easing: "cubic-bezier(0.16, 1, 0.3, 1)",
-          pseudoElement: "::view-transition-new(root)",
-        }
-      );
-    });
-
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
-    } catch (e) {
-      console.error("Failed to save theme in localStorage:", e);
-    }
+    setTheme(nextTheme);
   };
 
   return (

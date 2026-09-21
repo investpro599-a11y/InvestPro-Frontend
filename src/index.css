@@ -213,9 +213,8 @@
 /* Smooth Global Theme Switching Transitions */
 html,
 body {
-  transition: background 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.25s ease,
+              color 0.2s ease;
 }
 
 .glass-panel,
@@ -224,25 +223,10 @@ body {
 .glass-input,
 nav,
 main {
-  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Native Circular Wave View Transition Styles */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
-::view-transition-old(root) {
-  z-index: 1;
-}
-
-::view-transition-new(root) {
-  z-index: 99999;
+  transition: background-color 0.25s ease,
+              border-color 0.25s ease,
+              box-shadow 0.25s ease,
+              color 0.2s ease;
 }
 
 /* Full White Light Mode Theme Overrides */
