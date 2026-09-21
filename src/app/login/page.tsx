@@ -81,15 +81,8 @@ export default function Login() {
                 </div>
               </div>
 
-              {/* Desktop Header: Navigation, Switcher Tabs, and Title */}
-              <div className="hidden lg:block space-y-3">
-                <Link 
-                  href="/" 
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors w-fit mb-1"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" /> Back
-                </Link>
-
+              {/* Desktop Header: Switcher Tabs and Title */}
+              <div className="hidden lg:block space-y-3 pt-1">
                 <div className="grid grid-cols-2 p-1 bg-slate-100 dark:bg-[#07182b] rounded-2xl border border-slate-200 dark:border-sky-500/20 shadow-inner">
                   <Link
                     href="/login"
