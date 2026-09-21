@@ -28,14 +28,28 @@
 @layer base {
   * {
     @apply border-slate-800/60;
+    box-sizing: border-box;
+  }
+
+  html {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    position: relative;
     background: radial-gradient(circle at 50% 0%, #0d233a 0%, #081728 45%, #030a14 100%) !important;
     background-attachment: fixed !important;
     color: #f8fafc !important;
     font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -194,6 +208,41 @@
   background: linear-gradient(-45deg, #030a14, #081a2e, #061527, #0b2848, #040d1a);
   background-size: 400% 400%;
   animation: gradientShift 18s ease infinite;
+}
+
+/* Smooth Global Theme Switching Transitions */
+html,
+body {
+  transition: background 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel,
+.glass-card,
+.glass-nav,
+.glass-input,
+nav,
+main {
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Native Circular Wave View Transition Styles */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 99999;
 }
 
 /* Full White Light Mode Theme Overrides */

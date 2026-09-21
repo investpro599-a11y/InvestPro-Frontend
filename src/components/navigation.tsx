@@ -48,44 +48,18 @@ import { usePathname } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { toast } from "sonner";
+import { useTheme } from "@/components/theme-provider";
 
 export function Navigation() {
   const { user, logout, isAdmin } = useAuth();
   const location = usePathname();
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { resolvedTheme, toggleTheme } = useTheme();
+  const isDarkMode = resolvedTheme === "dark";
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => { setIsMounted(true); }, []);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("investpro-theme");
-    if (savedTheme === "dark") {
-      setIsDarkMode(true);
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-    } else {
-      setIsDarkMode(false);
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    if (isDarkMode) {
-      setIsDarkMode(false);
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("investpro-theme", "light");
-    } else {
-      setIsDarkMode(true);
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-      localStorage.setItem("investpro-theme", "dark");
-    }
-  };
 
   useEffect(() => {
     if (drawerOpen) {
@@ -266,58 +240,60 @@ export function Navigation() {
               )}
             </Button>
 
-            {!isMobile ? (
-              <>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-sky-500/10 relative rounded-full" aria-label="Notifications">
-                      <Bell className="h-5 w-5" />
-                      {unreadNotifications.length > 0 && (
-                        <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-rose-500 ring-4 ring-white dark:ring-slate-950 animate-pulse" aria-label="Unread notifications" />
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-96 p-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-2xl text-slate-900 dark:text-slate-100 rounded-2xl overflow-hidden" align="end">
-                    <NotificationPanel />
-                  </PopoverContent>
-                </Popover>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center gap-2.5 px-3.5 py-2 rounded-full border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/50 hover:bg-sky-50 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 transition-all">
-                      <Avatar className="h-8 w-8 ring-2 ring-blue-500/40">
-                        <AvatarImage src={getFileUrl(user.profilePicture)} />
-                        <AvatarFallback className="bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs">
-                          {user.fullName.split(" ").map(n => n[0]).join("").toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm font-bold font-display tracking-tight text-slate-800 dark:text-white">{user.fullName}</span>
-                      <ChevronDown className="h-4 w-4 opacity-60" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-2xl text-slate-900 dark:text-slate-100 rounded-xl p-1.5">
-                    <DropdownMenuItem asChild className="hover:bg-sky-50 dark:hover:bg-slate-800/80 focus:bg-sky-50 dark:focus:bg-slate-800/80 text-slate-800 dark:text-slate-200 cursor-pointer rounded-lg font-medium">
-                      <Link href="/profile" className="flex items-center gap-2"><User className="h-4 w-4 text-blue-500 dark:text-blue-400" /> Profile</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="hover:bg-sky-50 dark:hover:bg-slate-800/80 focus:bg-sky-50 dark:focus:bg-slate-800/80 text-slate-800 dark:text-slate-200 cursor-pointer rounded-lg font-medium">
-                      <Link href="/settings" className="flex items-center gap-2"><Settings className="h-4 w-4 text-indigo-500 dark:text-indigo-400" /> Settings</Link>
-                    </DropdownMenuItem>
-                    {isAdmin && (
-                      <>
-                        <DropdownMenuSeparator className="bg-slate-200 dark:bg-white/10" />
-                        <DropdownMenuItem asChild className="hover:bg-sky-50 dark:hover:bg-slate-800/80 focus:bg-sky-50 dark:focus:bg-slate-800/80 text-slate-800 dark:text-slate-200 cursor-pointer rounded-lg font-medium">
-                          <Link href="/admin" className="flex items-center gap-2"><Shield className="h-4 w-4 text-purple-500 dark:text-purple-400" /> Admin Panel</Link>
-                        </DropdownMenuItem>
-                      </>
+            {/* Desktop Actions */}
+            <div className="hidden md:flex items-center gap-2.5">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-sky-500/10 relative rounded-full" aria-label="Notifications">
+                    <Bell className="h-5 w-5" />
+                    {unreadNotifications.length > 0 && (
+                      <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-rose-500 ring-4 ring-white dark:ring-slate-950 animate-pulse" aria-label="Unread notifications" />
                     )}
-                    <DropdownMenuSeparator className="bg-slate-200 dark:bg-white/10" />
-                    <DropdownMenuItem onClick={handleLogout} className="hover:bg-rose-50 dark:hover:bg-rose-500/20 text-rose-600 dark:text-rose-300 focus:bg-rose-50 dark:focus:bg-rose-500/20 cursor-pointer rounded-lg flex items-center gap-2 font-medium">
-                      <LogOut className="h-4 w-4 text-rose-500 dark:text-rose-400" /> Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
-            ) : (
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[calc(100vw-2rem)] max-w-sm p-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-2xl text-slate-900 dark:text-slate-100 rounded-2xl overflow-hidden" align="end">
+                  <NotificationPanel />
+                </PopoverContent>
+              </Popover>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2.5 px-3.5 py-2 rounded-full border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/50 hover:bg-sky-50 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 transition-all">
+                    <Avatar className="h-8 w-8 ring-2 ring-blue-500/40">
+                      <AvatarImage src={getFileUrl(user.profilePicture)} />
+                      <AvatarFallback className="bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs">
+                        {user.fullName.split(" ").map(n => n[0]).join("").toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-bold font-display tracking-tight text-slate-800 dark:text-white">{user.fullName}</span>
+                    <ChevronDown className="h-4 w-4 opacity-60" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-2xl text-slate-900 dark:text-slate-100 rounded-xl p-1.5">
+                  <DropdownMenuItem asChild className="hover:bg-sky-50 dark:hover:bg-slate-800/80 focus:bg-sky-50 dark:focus:bg-slate-800/80 text-slate-800 dark:text-slate-200 cursor-pointer rounded-lg font-medium">
+                    <Link href="/profile" className="flex items-center gap-2"><User className="h-4 w-4 text-blue-500 dark:text-blue-400" /> Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="hover:bg-sky-50 dark:hover:bg-slate-800/80 focus:bg-sky-50 dark:focus:bg-slate-800/80 text-slate-800 dark:text-slate-200 cursor-pointer rounded-lg font-medium">
+                    <Link href="/settings" className="flex items-center gap-2"><Settings className="h-4 w-4 text-indigo-500 dark:text-indigo-400" /> Settings</Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator className="bg-slate-200 dark:bg-white/10" />
+                      <DropdownMenuItem asChild className="hover:bg-sky-50 dark:hover:bg-slate-800/80 focus:bg-sky-50 dark:focus:bg-slate-800/80 text-slate-800 dark:text-slate-200 cursor-pointer rounded-lg font-medium">
+                        <Link href="/admin" className="flex items-center gap-2"><Shield className="h-4 w-4 text-purple-500 dark:text-purple-400" /> Admin Panel</Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuSeparator className="bg-slate-200 dark:bg-white/10" />
+                  <DropdownMenuItem onClick={handleLogout} className="hover:bg-rose-50 dark:hover:bg-rose-500/20 text-rose-600 dark:text-rose-300 focus:bg-rose-50 dark:focus:bg-rose-500/20 cursor-pointer rounded-lg flex items-center gap-2 font-medium">
+                    <LogOut className="h-4 w-4 text-rose-500 dark:text-rose-400" /> Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* Mobile Hamburger Button */}
+            <div className="flex md:hidden">
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -330,7 +306,7 @@ export function Navigation() {
                   <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-rose-500 border-2 border-slate-900 animate-pulse" aria-label="Unread notifications" />
                 )}
               </Button>
-            )}
+            </div>
           </div>
         </div>
       </div>

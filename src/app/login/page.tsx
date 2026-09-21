@@ -7,26 +7,52 @@ import { useAuth } from "@/hooks/use-auth";
 import { LoginForm } from "@/components/auth/login-form";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
+import { useTheme } from "@/components/theme-provider";
+import { Button } from "@/components/ui/button";
+import { Sun, Moon } from "lucide-react";
+
 export default function Login() {
   const { isAuthenticated, user } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const { resolvedTheme, toggleTheme } = useTheme();
+  const isDarkMode = resolvedTheme === "dark";
 
   useEffect(() => {
     if (isAuthenticated && user) {
       if (user.role === "admin") {
         router.push("/admin");
       } else {
-      router.push("/dashboard");
+        router.push("/dashboard");
       }
     }
   }, [isAuthenticated, user, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Ambient Lighting Spheres */}
-      <div className="fixed top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-glow" />
-      <div className="fixed bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none -z-10 animate-float" />
+    <div className="min-h-screen flex items-center justify-center animated-moving-gradient py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Ambient Lighting Spheres strictly contained */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse-glow" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-float" />
+      </div>
+
+      {/* Top right theme toggle */}
+      <div className="absolute top-5 right-5 z-20">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-sky-500/20 rounded-full border border-slate-200 dark:border-sky-500/20 bg-white/80 dark:bg-[#07182b]/80 shadow-md backdrop-blur-md transition-all duration-300"
+          title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          aria-label="Toggle Theme Mode"
+        >
+          {isDarkMode ? (
+            <Sun className="h-5 w-5 text-amber-400 transition-transform duration-300 hover:rotate-45" />
+          ) : (
+            <Moon className="h-5 w-5 text-sky-500 transition-transform duration-300 hover:-rotate-12" />
+          )}
+        </Button>
+      </div>
 
       <div className="max-w-md w-full space-y-8 relative z-10">
         <Card className="glass-panel border-white/15 p-2 shadow-2xl rounded-3xl">
@@ -36,18 +62,18 @@ export default function Login() {
               <img src="/investpro.png" alt="InvestPro Logo" className="relative h-20 w-20 object-contain" />
             </div>
             <div className="space-y-1.5">
-              <h2 className="text-3xl font-extrabold font-display tracking-tight text-white">
+              <h2 className="text-3xl font-extrabold font-display tracking-tight text-slate-900 dark:text-white">
                 Welcome to <span className="gradient-text-primary">InvestPro</span>
               </h2>
-              <p className="text-slate-400 text-sm font-medium">Sign in to access your investment portal</p>
+              <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">Sign in to access your investment portal</p>
             </div>
           </CardHeader>
           <CardContent className="pb-8">
             <LoginForm />
             <div className="mt-6 text-center">
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 Don&apos;t have an account?{' '}
-                <Link href="/signup" className="text-blue-400 font-semibold hover:text-blue-300 hover:underline transition-colors">
+                <Link href="/signup" className="text-blue-500 dark:text-blue-400 font-semibold hover:text-blue-600 dark:hover:text-blue-300 hover:underline transition-colors">
                   Create an account
                 </Link>
               </p>

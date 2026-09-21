@@ -287,21 +287,36 @@ export function WithdrawalForm() {
     }
   };
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Request Withdrawal</CardTitle>
-        <div className="text-sm text-gray-600 space-y-1">
-          <p><strong>Available Balances:</strong></p>
-          <p>• ROI (Your investment returns): ${availableROI.toLocaleString()}</p>
-          <p>• Commission (Withdrawable): ${availableCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span title="This is the amount you can withdraw right now. It is your total paid commissions minus any already withdrawn.">ⓘ</span></p>
-          <p>• Principal (Matured): ${availableMaturedPrincipal.toLocaleString()}</p>
-          <p>• <b>Total Balance:</b> ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-          <p className="text-xs text-gray-500 mt-2">
-            Note: You can only withdraw principal after your investment matures (6, 12, or 18 months). If you have no matured investments, principal withdrawal is disabled.
+    <Card className="glass-card border border-sky-500/20 shadow-2xl">
+      <CardHeader className="border-b border-white/10 pb-5">
+        <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
+          Request Withdrawal
+        </CardTitle>
+        <div className="space-y-3 pt-2">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-700/50">
+              <span className="text-xs font-medium text-slate-400 block">ROI (Returns)</span>
+              <span className="text-base sm:text-lg font-bold text-emerald-400">${availableROI.toLocaleString()}</span>
+            </div>
+            <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-700/50">
+              <span className="text-xs font-medium text-slate-400 block">Commission</span>
+              <span className="text-base sm:text-lg font-bold text-sky-400">${availableCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            </div>
+            <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-700/50">
+              <span className="text-xs font-medium text-slate-400 block">Principal (Matured)</span>
+              <span className="text-base sm:text-lg font-bold text-indigo-400">${availableMaturedPrincipal.toLocaleString()}</span>
+            </div>
+            <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-700/50">
+              <span className="text-xs font-medium text-slate-400 block">Total Balance</span>
+              <span className="text-base sm:text-lg font-bold text-amber-400">${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            </div>
+          </div>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            <span className="text-slate-300 font-medium">Note:</span> You can only withdraw principal after your investment matures (6, 12, or 18 months). If you have no matured investments, principal withdrawal is disabled.
           </p>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -310,7 +325,7 @@ export function WithdrawalForm() {
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
+                    <FormLabel className="text-slate-200 font-medium">
                       Withdrawal Amount (USD)
                     </FormLabel>
                     <FormControl>
@@ -318,10 +333,11 @@ export function WithdrawalForm() {
                         type="number" 
                         placeholder="Enter amount in USD" 
                         {...field}
+                        value={field.value ?? ""}
                         onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
@@ -331,27 +347,26 @@ export function WithdrawalForm() {
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Withdrawal Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel className="text-slate-200 font-medium">Withdrawal Type</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select Type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="roi">ROI Withdrawal (Available: ${availableROI.toLocaleString()})</SelectItem>
-                        <SelectItem value="commission">Commission Withdrawal (Available: ${availableCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</SelectItem>
+                        <SelectItem value="roi">
+                          ROI Withdrawal (Available: ${availableROI.toLocaleString()})
+                        </SelectItem>
+                        <SelectItem value="commission">
+                          Commission Withdrawal (Available: ${availableCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                        </SelectItem>
                         <SelectItem value="principal" disabled={availableMaturedPrincipal === 0}>
-                          Principal Withdrawal (Available: ${availableMaturedPrincipal.toLocaleString()})
+                          Principal Withdrawal {availableMaturedPrincipal === 0 ? "(Available: $0 - Locked)" : `(Available: $${availableMaturedPrincipal.toLocaleString()})`}
                         </SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                    {availableMaturedPrincipal === 0 && (
-                      <div className="text-xs text-red-600 mt-1">
-                        You cannot withdraw your principal until your investment matures (6, 12, or 18 months).
-                      </div>
-                    )}
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
@@ -362,7 +377,7 @@ export function WithdrawalForm() {
               name="method"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Withdrawal Method</FormLabel>
+                  <FormLabel className="text-slate-200 font-medium">Withdrawal Method</FormLabel>
                   <Select onValueChange={(value) => {
                     field.onChange(value);
                     setSelectedMethod(value);
@@ -374,7 +389,7 @@ export function WithdrawalForm() {
                     form.setValue("accountName", "");
                     form.setValue("platform", "");
                     form.setValue("walletAddress", "");
-                  }} defaultValue={field.value}>
+                  }} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select Method" />
@@ -388,7 +403,7 @@ export function WithdrawalForm() {
                       <SelectItem value="others">Others</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
@@ -404,23 +419,23 @@ export function WithdrawalForm() {
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Additional Notes</FormLabel>
+                  <FormLabel className="text-slate-200 font-medium">Additional Notes</FormLabel>
                   <FormControl>
                     <Textarea rows={3} placeholder="Any special instructions..." {...field} value={field.value || ""} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
 
-            <div className="flex justify-end space-x-4">
-              <Button type="button" variant="outline" onClick={() => {
+            <div className="flex justify-end space-x-4 pt-2">
+              <Button type="button" variant="outline" className="border-slate-700 bg-slate-800/60 text-slate-300 hover:bg-slate-700 hover:text-white" onClick={() => {
                 form.reset();
                 setSelectedMethod("");
               }}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={createWithdrawalMutation.isPending} className="bg-green-600 hover:bg-green-700">
+              <Button type="submit" disabled={createWithdrawalMutation.isPending} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold shadow-lg shadow-blue-500/20">
                 {createWithdrawalMutation.isPending ? "Submitting..." : "Request Withdrawal"}
               </Button>
             </div>

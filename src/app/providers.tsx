@@ -8,6 +8,8 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { useState } from "react";
 
+import { ThemeProvider } from "@/components/theme-provider";
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
@@ -20,17 +22,19 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <SonnerToaster position="top-center" richColors />
-            <div className="min-h-screen bg-background">
-              {children}
-            </div>
-          </TooltipProvider>
-        </AuthProvider>
-      </QueryClientProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <SonnerToaster position="top-center" richColors />
+              <div className="min-h-screen">
+                {children}
+              </div>
+            </TooltipProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 } 
