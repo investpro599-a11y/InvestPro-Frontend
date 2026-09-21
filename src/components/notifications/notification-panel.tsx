@@ -31,15 +31,15 @@ const getNotificationIcon = (type: string) => {
 const getNotificationColor = (type: string) => {
   switch (type) {
     case "investment":
-      return "bg-sky-500/20 text-sky-300 border border-sky-400/30";
+      return "bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-400/30";
     case "withdrawal":
-      return "bg-emerald-500/20 text-emerald-300 border border-emerald-400/30";
+      return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30";
     case "user":
-      return "bg-indigo-500/20 text-indigo-300 border border-indigo-400/30";
+      return "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-400/30";
     case "system":
-      return "bg-amber-500/20 text-amber-300 border border-amber-400/30";
+      return "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/30";
     default:
-      return "bg-slate-800 text-slate-300 border border-white/10";
+      return "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10";
   }
 };
 
@@ -121,12 +121,12 @@ export function NotificationPanel() {
   }
 
   return (
-    <Card className="glass-card border-sky-500/25 bg-[#0e2238]/95 text-white shadow-xl">
-      <CardHeader className="border-b border-sky-500/20 pb-4">
+    <Card className="glass-card border-slate-200/80 dark:border-sky-500/25 bg-white/95 dark:bg-[#0e2238]/95 text-slate-900 dark:text-white shadow-xl">
+      <CardHeader className="border-b border-slate-200/80 dark:border-sky-500/20 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Bell className="h-5 w-5 text-sky-400" />
-            <CardTitle className="text-lg font-extrabold font-display text-white">Notifications</CardTitle>
+            <Bell className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+            <CardTitle className="text-lg font-extrabold font-display text-slate-900 dark:text-white">Notifications</CardTitle>
             {unreadCount > 0 && (
               <Badge variant="destructive" className="ml-2 bg-rose-500 text-white font-bold">
                 {unreadCount}
@@ -139,7 +139,7 @@ export function NotificationPanel() {
               size="sm"
               onClick={handleMarkAllAsRead}
               disabled={markAllAsReadMutation.isPending}
-              className="bg-sky-500/20 border-sky-400/30 text-sky-300 hover:bg-sky-500/40"
+              className="bg-sky-500/10 dark:bg-sky-500/20 border-sky-300 dark:border-sky-400/30 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20"
             >
               <CheckCheck className="h-4 w-4" />
             </Button>
@@ -149,15 +149,15 @@ export function NotificationPanel() {
       <CardContent className="pt-6">
         {isAdmin ? (
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-3 bg-[#07172b] border border-sky-500/20 p-1 rounded-xl">
+            <TabsList className="grid w-full grid-cols-3 bg-slate-100 dark:bg-[#07172b] border border-slate-200 dark:border-sky-500/20 p-1 rounded-xl">
               <TabsTrigger value="all" className="rounded-lg text-xs font-bold data-[state=active]:bg-sky-500 data-[state=active]:text-white">All</TabsTrigger>
               <TabsTrigger value="requests" className="rounded-lg text-xs font-bold data-[state=active]:bg-sky-500 data-[state=active]:text-white">Requests</TabsTrigger>
               <TabsTrigger value="user" className="rounded-lg text-xs font-bold data-[state=active]:bg-sky-500 data-[state=active]:text-white">Users</TabsTrigger>
             </TabsList>
             <TabsContent value={activeTab} className="mt-4">
               {filteredNotifications.length === 0 ? (
-                <div className="text-center py-8 text-slate-300">
-                  <Bell className="h-12 w-12 mx-auto mb-4 opacity-50 text-sky-400" />
+                <div className="text-center py-8 text-slate-500 dark:text-slate-300">
+                  <Bell className="h-12 w-12 mx-auto mb-4 opacity-50 text-sky-500 dark:text-sky-400" />
                   <p className="text-sm font-bold">No notifications found</p>
                 </div>
               ) : (
@@ -167,8 +167,8 @@ export function NotificationPanel() {
                       key={notification.id || notification._id}
                       className={`p-3.5 rounded-2xl border transition-all ${
                         notification.status === "unread"
-                          ? "bg-[#091f38] border-sky-400/50 shadow-md shadow-sky-500/10"
-                          : "bg-[#07172b] border-sky-500/20"
+                          ? "bg-sky-50/80 dark:bg-[#091f38] border-sky-300 dark:border-sky-400/50 shadow-md shadow-sky-500/10"
+                          : "bg-slate-50/70 dark:bg-[#07172b] border-slate-200 dark:border-sky-500/20"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -178,15 +178,15 @@ export function NotificationPanel() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2 mb-1">
-                              <h4 className="font-bold text-white text-sm truncate">{notification.title}</h4>
+                              <h4 className="font-bold text-slate-900 dark:text-white text-sm truncate">{notification.title}</h4>
                               {notification.status === "unread" && (
                                 <Badge className="text-[10px] bg-sky-500 text-white font-bold flex-shrink-0">
                                   New
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-xs text-slate-300 mb-2 break-words leading-relaxed font-medium">{notification.message}</p>
-                            <p className="text-[10px] text-slate-400 font-semibold">
+                            <p className="text-xs text-slate-600 dark:text-slate-300 mb-2 break-words leading-relaxed font-medium">{notification.message}</p>
+                            <p className="text-[10px] text-slate-400 dark:text-slate-400 font-semibold">
                               {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                             </p>
                           </div>
@@ -197,7 +197,7 @@ export function NotificationPanel() {
                             size="sm"
                             onClick={() => handleMarkAsRead(notification)}
                             disabled={markAsReadMutation.isPending}
-                            className="text-sky-300 hover:bg-sky-500/20"
+                            className="text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 hover:bg-sky-500/10 h-8 w-8 p-0 shrink-0"
                           >
                             <Check className="h-4 w-4" />
                           </Button>
@@ -210,20 +210,20 @@ export function NotificationPanel() {
             </TabsContent>
           </Tabs>
         ) : (
-          notifications.length === 0 ? (
-            <div className="text-center py-8 text-slate-300">
-              <Bell className="h-12 w-12 mx-auto mb-4 opacity-50 text-sky-400" />
+          filteredNotifications.length === 0 ? (
+            <div className="text-center py-8 text-slate-500 dark:text-slate-300">
+              <Bell className="h-12 w-12 mx-auto mb-4 opacity-50 text-sky-500 dark:text-sky-400" />
               <p className="text-sm font-bold">No notifications found</p>
             </div>
           ) : (
             <div className="space-y-3">
-              {notifications.map((notification) => (
+              {filteredNotifications.map((notification) => (
                 <div
                   key={notification.id || notification._id}
                   className={`p-3.5 rounded-2xl border transition-all ${
                     notification.status === "unread"
-                      ? "bg-[#091f38] border-sky-400/50 shadow-md shadow-sky-500/10"
-                      : "bg-[#07172b] border-sky-500/20"
+                      ? "bg-sky-50/80 dark:bg-[#091f38] border-sky-300 dark:border-sky-400/50 shadow-md shadow-sky-500/10"
+                      : "bg-slate-50/70 dark:bg-[#07172b] border-slate-200 dark:border-sky-500/20"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -233,15 +233,15 @@ export function NotificationPanel() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-1">
-                          <h4 className="font-bold text-white text-sm truncate">{notification.title}</h4>
+                          <h4 className="font-bold text-slate-900 dark:text-white text-sm truncate">{notification.title}</h4>
                           {notification.status === "unread" && (
                             <Badge className="text-[10px] bg-sky-500 text-white font-bold flex-shrink-0">
                               New
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs text-slate-300 mb-2 break-words leading-relaxed font-medium">{notification.message}</p>
-                        <p className="text-[10px] text-slate-400 font-semibold">
+                        <p className="text-xs text-slate-600 dark:text-slate-300 mb-2 break-words leading-relaxed font-medium">{notification.message}</p>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-400 font-semibold">
                           {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                         </p>
                       </div>
@@ -252,7 +252,7 @@ export function NotificationPanel() {
                         size="sm"
                         onClick={() => handleMarkAsRead(notification)}
                         disabled={markAsReadMutation.isPending}
-                        className="text-sky-300 hover:bg-sky-500/20"
+                        className="text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 hover:bg-sky-500/10 h-8 w-8 p-0 shrink-0"
                       >
                         <Check className="h-4 w-4" />
                       </Button>

@@ -345,6 +345,49 @@ html.light .text-sky-200, .light .text-sky-200 {
   color: #0284c7 !important;
 }
 
+/* Accessible High-Contrast Colored Text in Light Mode */
+html.light .text-amber-300, .light .text-amber-300,
+html.light .text-amber-400, .light .text-amber-400,
+html.light .text-yellow-300, .light .text-yellow-300,
+html.light .text-yellow-400, .light .text-yellow-400 {
+  color: #b45309 !important;
+}
+
+html.light .text-emerald-300, .light .text-emerald-300,
+html.light .text-emerald-400, .light .text-emerald-400,
+html.light .text-green-300, .light .text-green-300,
+html.light .text-green-400, .light .text-green-400 {
+  color: #047857 !important;
+}
+
+html.light .text-indigo-300, .light .text-indigo-300,
+html.light .text-indigo-400, .light .text-indigo-400,
+html.light .text-purple-300, .light .text-purple-300,
+html.light .text-purple-400, .light .text-purple-400 {
+  color: #4338ca !important;
+}
+
+html.light .text-rose-300, .light .text-rose-300,
+html.light .text-rose-400, .light .text-rose-400,
+html.light .text-red-300, .light .text-red-300,
+html.light .text-red-400, .light .text-red-400 {
+  color: #be123c !important;
+}
+
+/* Ensure vibrant colored action buttons & badges preserve white text */
+html.light button[class*="bg-primary"], .light button[class*="bg-primary"],
+html.light button[class*="bg-blue"], .light button[class*="bg-blue"],
+html.light button[class*="from-blue"], .light button[class*="from-blue"],
+html.light button[class*="bg-emerald"], .light button[class*="bg-emerald"],
+html.light button[class*="bg-green"], .light button[class*="bg-green"],
+html.light button[class*="bg-rose"], .light button[class*="bg-rose"],
+html.light button[class*="bg-red"], .light button[class*="bg-red"],
+html.light button[class*="bg-gradient"], .light button[class*="bg-gradient"],
+html.light .btn-primary, .light .btn-primary,
+html.light [data-force-white="true"], .light [data-force-white="true"] {
+  color: #ffffff !important;
+}
+
 /* Light mode dropdown menu & popover item hover states */
 html.light [role="menuitem"], .light [role="menuitem"] {
   color: #0f172a !important;
