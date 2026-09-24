@@ -23,17 +23,17 @@ import { Withdrawal, Investment, PaginatedResponse } from "@shared/schema";
 import { WithdrawalDetails } from "./withdrawal-details";
 
 const getStatusColor = (status: string) => {
-  switch (status) {
+  switch (status?.toLowerCase()) {
     case "pending":
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-amber-500/15 text-amber-300 border border-amber-500/30";
     case "processing":
-      return "bg-blue-100 text-blue-800";
+      return "bg-sky-500/15 text-sky-300 border border-sky-500/30";
     case "completed":
-      return "bg-green-100 text-green-800";
+      return "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
     case "rejected":
-      return "bg-red-100 text-red-800";
+      return "bg-rose-500/15 text-rose-300 border border-rose-500/30";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-slate-700/50 text-slate-300 border border-slate-600/50";
   }
 };
 
@@ -216,83 +216,85 @@ export function WithdrawalTable() {
       </div>
 
       {/* Withdrawal Table */}
-    <Card>
-      <CardHeader>
-        <CardTitle>Your Withdrawals</CardTitle>
+    <Card className="glass-card border border-sky-500/20 shadow-2xl">
+      <CardHeader className="border-b border-white/10 pb-5">
+        <CardTitle className="text-xl font-bold text-white">Your Withdrawals</CardTitle>
         {!hasMaturedPrincipal && (
-          <div className="text-xs text-red-600 mt-2">
-            You cannot withdraw your principal until your investment matures (6, 12, or 18 months).
+          <div className="text-xs text-amber-400/90 mt-1 font-medium">
+            Note: You cannot withdraw your principal until your investment matures (6, 12, or 18 months).
           </div>
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
           {filteredWithdrawals.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-              <p>
+          <div className="text-center py-8 text-slate-400">
+              <p className="text-base font-medium text-slate-300">
                 {withdrawals.length === 0
                   ? "No withdrawals found"
                   : "No withdrawals match your search criteria"}
               </p>
-              <p className="text-sm">
+              <p className="text-xs text-slate-400 mt-1">
                 {withdrawals.length === 0
                   ? "Request your first withdrawal to get started"
                   : "Try adjusting your search or filters"}
               </p>
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Amount</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Method</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>TXID</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-                {filteredWithdrawals.map((withdrawal) => (
-                <TableRow key={withdrawal.id || withdrawal._id}>
-                  <TableCell className="font-medium">
-                    {withdrawal.type === "commission"
-                      ? `$${parseFloat(String(withdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                      : `$${parseFloat(String(withdrawal.amount)).toLocaleString()}`}
-                  </TableCell>
-                  <TableCell className="capitalize">{withdrawal.type}</TableCell>
-                  <TableCell>
-                    {format(new Date(withdrawal.createdAt), "MMM dd, yyyy")}
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="font-medium">{getMethodDisplayName(withdrawal.method)}</div>
-                      <div className="text-xs text-gray-500">
-                        {getMethodDetails(withdrawal)}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(withdrawal.status)}>
-                      {withdrawal.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {withdrawal.txid ? (
-                      <Button variant="link" size="sm" className="h-auto p-0">
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <WithdrawalDetails withdrawal={withdrawal} />
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-slate-800 hover:bg-transparent">
+                  <TableHead className="text-slate-300 font-semibold">Amount</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Type</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Date</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Method</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Status</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">TXID</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                  {filteredWithdrawals.map((withdrawal) => (
+                  <TableRow key={withdrawal.id || withdrawal._id} className="border-slate-800/80 hover:bg-slate-800/30">
+                    <TableCell className="font-semibold text-slate-100">
+                      {withdrawal.type === "commission"
+                        ? `$${parseFloat(String(withdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                        : `$${parseFloat(String(withdrawal.amount)).toLocaleString()}`}
+                    </TableCell>
+                    <TableCell className="capitalize text-slate-200 font-medium">{withdrawal.type}</TableCell>
+                    <TableCell className="text-slate-300">
+                      {format(new Date(withdrawal.createdAt), "MMM dd, yyyy")}
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-0.5">
+                        <div className="font-medium text-slate-200 text-sm">{getMethodDisplayName(withdrawal.method)}</div>
+                        <div className="text-xs text-slate-400 font-mono">
+                          {getMethodDetails(withdrawal)}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(withdrawal.status)}>
+                        {withdrawal.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {withdrawal.txid ? (
+                        <span className="text-xs font-mono text-sky-400 bg-sky-500/10 px-2 py-1 rounded border border-sky-500/20">
+                          {withdrawal.txid.length > 12 ? `${withdrawal.txid.slice(0, 10)}...` : withdrawal.txid}
+                        </span>
+                      ) : (
+                        <span className="text-slate-500">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <WithdrawalDetails withdrawal={withdrawal} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </CardContent>
     </Card>

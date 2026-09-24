@@ -173,17 +173,17 @@ export function WithdrawalApproval() {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-amber-500/15 text-amber-300 border border-amber-500/30";
       case "processing":
-        return "bg-blue-100 text-blue-800";
+        return "bg-sky-500/15 text-sky-300 border border-sky-500/30";
       case "completed":
-        return "bg-green-100 text-green-800";
+        return "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
       case "rejected":
-        return "bg-red-100 text-red-800";
+        return "bg-rose-500/15 text-rose-300 border border-rose-500/30";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-slate-700/50 text-slate-300 border border-slate-600/50";
     }
   };
 
@@ -222,129 +222,131 @@ export function WithdrawalApproval() {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="glass-card border border-sky-500/20 shadow-2xl">
         <CardHeader>
-          <CardTitle>Withdrawal Approvals</CardTitle>
+          <CardTitle className="text-white">Withdrawal Approvals</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8">Loading...</div>
+          <div className="text-center py-8 text-slate-400">Loading...</div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Withdrawal Approvals</CardTitle>
-        <div className="text-sm text-gray-600">
+    <Card className="glass-card border border-sky-500/20 shadow-2xl">
+      <CardHeader className="border-b border-white/10 pb-5">
+        <CardTitle className="text-xl font-bold text-white">Withdrawal Approvals</CardTitle>
+        <div className="text-xs text-slate-400 mt-1 font-medium">
           {pendingWithdrawals.length} pending withdrawals
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         {pendingWithdrawals.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-slate-400">
             No pending withdrawals
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Method</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {pendingWithdrawals.map((withdrawal) => (
-                <TableRow key={withdrawal.id}>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">
-                        {(withdrawal.userId as any)?.fullName || "Unknown User"}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {(withdrawal.userId as any)?.email || "No email"}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    ${parseFloat(String(withdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </TableCell>
-                  <TableCell className="capitalize">{withdrawal.type}</TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="font-medium">{getMethodDisplayName(withdrawal.method)}</div>
-                      <div className="text-xs text-gray-500">
-                        {getMethodDetails(withdrawal)}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(withdrawal.createdAt), "MMM dd, yyyy")}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        onClick={() => handleApprove(withdrawal)}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleReject(withdrawal)}
-                      >
-                        Reject
-                      </Button>
-                    </div>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-slate-800 hover:bg-transparent">
+                  <TableHead className="text-slate-300 font-semibold">User</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Amount</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Type</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Method</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Date</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {pendingWithdrawals.map((withdrawal) => (
+                  <TableRow key={withdrawal.id} className="border-slate-800/80 hover:bg-slate-800/30">
+                    <TableCell>
+                      <div>
+                        <div className="font-semibold text-slate-200">
+                          {(withdrawal.userId as any)?.fullName || "Unknown User"}
+                        </div>
+                        <div className="text-xs text-slate-400">
+                          {(withdrawal.userId as any)?.email || "No email"}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-semibold text-slate-100">
+                      ${parseFloat(String(withdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </TableCell>
+                    <TableCell className="capitalize text-slate-200 font-medium">{withdrawal.type}</TableCell>
+                    <TableCell>
+                      <div className="space-y-0.5">
+                        <div className="font-medium text-slate-200 text-sm">{getMethodDisplayName(withdrawal.method)}</div>
+                        <div className="text-xs text-slate-400 font-mono">
+                          {getMethodDetails(withdrawal)}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-slate-300">
+                      {format(new Date(withdrawal.createdAt), "MMM dd, yyyy")}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          onClick={() => handleApprove(withdrawal)}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleReject(withdrawal)}
+                        >
+                          Reject
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent>
+          <DialogContent className="bg-slate-900 border border-sky-500/20 text-slate-100 shadow-2xl">
             <DialogHeader>
-              <DialogTitle>Approve Withdrawal</DialogTitle>
+              <DialogTitle className="text-white text-lg font-bold">Approve Withdrawal</DialogTitle>
             </DialogHeader>
             {selectedWithdrawal && (
-              <div className="space-y-4">
+              <div className="space-y-4 pt-2">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="font-medium">Amount:</p>
-                    <p>${parseFloat(String(selectedWithdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    <p className="font-medium text-slate-400 text-xs">Amount</p>
+                    <p className="text-white font-bold text-base mt-0.5">${parseFloat(String(selectedWithdrawal.amount)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                   </div>
                   <div>
-                    <p className="font-medium">Type:</p>
-                    <p className="capitalize">{selectedWithdrawal.type}</p>
+                    <p className="font-medium text-slate-400 text-xs">Type</p>
+                    <p className="capitalize text-slate-200 font-medium mt-0.5">{selectedWithdrawal.type}</p>
                   </div>
                   <div>
-                    <p className="font-medium">Method:</p>
-                    <p>{getMethodDisplayName(selectedWithdrawal.method)}</p>
+                    <p className="font-medium text-slate-400 text-xs">Method</p>
+                    <p className="text-slate-200 font-medium mt-0.5">{getMethodDisplayName(selectedWithdrawal.method)}</p>
                   </div>
                   <div>
-                    <p className="font-medium">User:</p>
-                    <p>{(selectedWithdrawal.userId as any)?.fullName}</p>
+                    <p className="font-medium text-slate-400 text-xs">User</p>
+                    <p className="text-slate-200 font-medium mt-0.5">{(selectedWithdrawal.userId as any)?.fullName}</p>
                   </div>
                 </div>
 
                 <div>
-                  <p className="font-medium text-gray-600">Method Details:</p>
-                  <p className="text-sm bg-gray-50 p-2 rounded">
+                  <p className="font-medium text-slate-400 text-sm mb-1">Method Details:</p>
+                  <p className="text-sm bg-slate-800/60 text-slate-200 border border-slate-700/50 p-2.5 rounded-lg font-mono">
                     {getMethodDetails(selectedWithdrawal)}
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Transaction ID *
                   </label>
                   <Input
@@ -355,7 +357,7 @@ export function WithdrawalApproval() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Payment Proof *
                   </label>
                   <Input
@@ -363,19 +365,19 @@ export function WithdrawalApproval() {
                     accept="image/*,.pdf"
                     onChange={(e) => setPaymentProof(e.target.files?.[0] || null)}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-slate-400 mt-1">
                     Upload a screenshot or PDF of the payment proof
                   </p>
                 </div>
 
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                <div className="flex justify-end space-x-2 pt-2">
+                  <Button variant="outline" className="border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700" onClick={() => setIsDialogOpen(false)}>
                     Cancel
                   </Button>
                   <Button 
                     onClick={handleConfirmApproval}
                     disabled={approveWithdrawalMutation.isPending || !txid.trim()}
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
                   >
                     {approveWithdrawalMutation.isPending ? "Processing..." : "Approve & Complete"}
                   </Button>

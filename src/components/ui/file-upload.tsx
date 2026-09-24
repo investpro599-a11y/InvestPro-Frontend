@@ -62,24 +62,28 @@ export function FileUpload({
 
   return (
     <div className={cn("space-y-2", className)}>
-      <Label>{label}</Label>
+      <Label className="text-slate-200 font-medium">{label}</Label>
       {description && (
-        <p className="text-sm text-gray-500">{description}</p>
+        <p className="text-xs sm:text-sm text-slate-400">{description}</p>
       )}
       
       {!selectedFile ? (
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-          <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-          <p className="text-sm text-gray-600 mb-2">
+        <div className="border-2 border-dashed border-slate-700/80 bg-slate-900/40 rounded-xl p-6 text-center hover:border-slate-500 hover:bg-slate-900/60 transition-all duration-200 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+          <Upload className="h-8 w-8 mx-auto mb-2 text-slate-400" />
+          <p className="text-sm text-slate-200 mb-1 font-medium">
             Click to upload or drag and drop
           </p>
-          <p className="text-xs text-gray-500 mb-4">
+          <p className="text-xs text-slate-400 mb-4">
             {accept} (max {maxSize}MB)
           </p>
           <Button
             type="button"
             variant="outline"
-            onClick={() => fileInputRef.current?.click()}
+            className="border-slate-700 bg-slate-800/80 text-slate-200 hover:bg-slate-700 hover:text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              fileInputRef.current?.click();
+            }}
           >
             Choose File
           </Button>
@@ -92,13 +96,15 @@ export function FileUpload({
           />
         </div>
       ) : (
-        <div className="border rounded-lg p-4 bg-gray-50">
+        <div className="border border-slate-700/80 rounded-xl p-4 bg-slate-900/60 backdrop-blur-md">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              {getFileIcon(selectedFile)}
+              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                {getFileIcon(selectedFile)}
+              </div>
               <div>
-                <p className="text-sm font-medium">{selectedFile.name}</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-sm font-medium text-slate-200">{selectedFile.name}</p>
+                <p className="text-xs text-slate-400">
                   {formatFileSize(selectedFile.size)}
                 </p>
               </div>
@@ -107,6 +113,7 @@ export function FileUpload({
               type="button"
               variant="ghost"
               size="sm"
+              className="text-slate-400 hover:text-red-400 hover:bg-red-500/10"
               onClick={handleRemoveFile}
             >
               <X className="h-4 w-4" />

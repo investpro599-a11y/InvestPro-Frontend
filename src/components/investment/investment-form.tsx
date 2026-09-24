@@ -102,11 +102,13 @@ export function InvestmentForm() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Create New Investment</CardTitle>
+    <Card className="glass-card border border-sky-500/20 shadow-2xl">
+      <CardHeader className="border-b border-white/10 pb-5">
+        <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
+          Create New Investment
+        </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -115,11 +117,11 @@ export function InvestmentForm() {
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Investment Amount (USD)</FormLabel>
+                    <FormLabel className="text-slate-200 font-medium">Investment Amount (USD)</FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="Enter amount" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
@@ -129,7 +131,7 @@ export function InvestmentForm() {
                 name="plan"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Investment Plan</FormLabel>
+                    <FormLabel className="text-slate-200 font-medium">Investment Plan</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -142,7 +144,7 @@ export function InvestmentForm() {
                         <SelectItem value="18months">18 Months (9% Monthly ROI)</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormMessage />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
@@ -150,8 +152,8 @@ export function InvestmentForm() {
 
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Bitcoin className="h-5 w-5 text-green-600" />
-                <span className="font-medium">Payment Method: USDT TRC20</span>
+                <Bitcoin className="h-5 w-5 text-emerald-400" />
+                <span className="font-semibold text-slate-200">Payment Method: USDT TRC20</span>
               </div>
               
               <FormField
@@ -159,23 +161,30 @@ export function InvestmentForm() {
                 name="paymentMethod"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>TRC20 ID</FormLabel>
+                    <FormLabel className="text-slate-200 font-medium">TRC20 ID</FormLabel>
                     <div className="flex items-center gap-2">
                       <FormControl>
                         <Input 
                           value={TRC_ID}
-                          disabled
-                          className="bg-gray-50 font-mono text-sm"
+                          readOnly
+                          className="font-mono text-xs sm:text-sm bg-slate-950/80 text-emerald-400 border border-slate-700/80 focus:border-emerald-500/50 selection:bg-emerald-500 selection:text-slate-950 font-semibold cursor-text"
                         />
                       </FormControl>
-                      <Button type="button" size="icon" variant="outline" onClick={handleCopy} aria-label="Copy TRC20 address">
+                      <Button 
+                        type="button" 
+                        size="icon" 
+                        variant="outline" 
+                        onClick={handleCopy} 
+                        aria-label="Copy TRC20 address"
+                        className="border-slate-700 bg-slate-800/80 text-slate-200 hover:bg-slate-700 hover:text-white shrink-0"
+                      >
                         <Copy className="h-4 w-4" />
                       </Button>
                     </div>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs sm:text-sm text-slate-400">
                       Send your USDT to this TRC20 address. Make sure to use the TRC20 network.
                     </p>
-                    <FormMessage />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
@@ -195,17 +204,17 @@ export function InvestmentForm() {
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Additional Notes</FormLabel>
+                  <FormLabel className="text-slate-200 font-medium">Additional Notes</FormLabel>
                   <FormControl>
                     <Textarea rows={3} placeholder="Any additional information..." {...field} value={field.value || ""} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
 
-            <div className="flex justify-end space-x-4">
-              <Button type="button" variant="outline" onClick={() => {
+            <div className="flex justify-end space-x-4 pt-2">
+              <Button type="button" variant="outline" className="border-slate-700 bg-slate-800/60 text-slate-300 hover:bg-slate-700 hover:text-white" onClick={() => {
                 form.reset();
                 setSelectedFile(null);
               }}>
@@ -214,7 +223,7 @@ export function InvestmentForm() {
               <Button 
                 type="submit" 
                 disabled={createInvestmentMutation.isPending}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold shadow-lg shadow-emerald-500/20"
               >
                 {createInvestmentMutation.isPending ? "Creating..." : "Create Investment"}
               </Button>

@@ -225,8 +225,8 @@ export function InvestmentDetails({ investment, trigger }: InvestmentDetailsProp
                 <>
                   <Separator />
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-600">Notes</p>
-                    <p className="text-sm bg-gray-50 p-3 rounded-md">{investment.notes}</p>
+                    <p className="text-sm font-medium text-slate-400">Notes</p>
+                    <p className="text-sm bg-slate-800/60 text-slate-200 border border-slate-700/50 p-3 rounded-md">{investment.notes}</p>
                   </div>
                 </>
               )}

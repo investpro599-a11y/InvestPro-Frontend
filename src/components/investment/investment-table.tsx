@@ -25,19 +25,18 @@ import { useToast } from "@/hooks/use-toast";
 import type { Investment } from "@shared/schema";
 
 const getStatusColor = (status: string) => {
-  switch (status) {
+  switch (status?.toLowerCase()) {
     case "pending":
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-amber-500/15 text-amber-300 border border-amber-500/30";
     case "active":
-      return "bg-green-100 text-green-800";
     case "completed":
-      return "bg-green-100 text-green-800";
+      return "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
     case "maturing":
-      return "bg-blue-100 text-blue-800";
+      return "bg-blue-500/15 text-blue-300 border border-blue-500/30";
     case "cancelled":
-      return "bg-red-100 text-red-800";
+      return "bg-rose-500/15 text-rose-300 border border-rose-500/30";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-slate-700/50 text-slate-300 border border-slate-600/50";
   }
 };
 
@@ -230,99 +229,102 @@ export function InvestmentTable() {
       </div>
 
       {/* Investment Table */}
-    <Card>
-      <CardHeader>
-        <CardTitle>Your Investments</CardTitle>
+    <Card className="glass-card border border-sky-500/20 shadow-2xl">
+      <CardHeader className="border-b border-white/10 pb-5">
+        <CardTitle className="text-xl font-bold text-white">Your Investments</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
           {filteredInvestments.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-              <p>
+          <div className="text-center py-8 text-slate-400">
+              <p className="text-base font-medium text-slate-300">
                 {data.length === 0
                   ? "No investments found"
                   : "No investments match your search criteria"}
               </p>
-              <p className="text-sm">
+              <p className="text-xs text-slate-400 mt-1">
                 {data.length === 0
                   ? "Create your first investment to get started"
                   : "Try adjusting your search or filters"}
               </p>
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Amount</TableHead>
-                <TableHead>Plan</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>ROI Rate</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-                {filteredInvestments.map((investment) => (
-                <TableRow key={investment.id || investment._id}>
-                  <TableCell className="font-medium">
-                    ${investment.amount.toLocaleString()}
-                  </TableCell>
-                  <TableCell>{investment.plan}</TableCell>
-                  <TableCell>{format(new Date(investment.createdAt), "MMM dd, yyyy")}</TableCell>
-                  <TableCell>{investment.roiRate}%</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(investment.status)}>
-                      {investment.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                        <InvestmentDetails investment={investment} />
-                        {investment.status === "pending" && (
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button 
-                                variant="destructive" 
-                                size="sm"
-                                disabled={cancellingId === String(investment.id || investment._id)}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Cancel Investment</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Are you sure you want to cancel this investment? This action cannot be undone.
-                                  <br />
-                                  <br />
-                                  <strong>Investment Details:</strong>
-                                  <br />
-                                  Amount: ${investment.amount.toLocaleString()}
-                                  <br />
-                                  Plan: {investment.plan === "6months" ? "6 Months" : 
-                                         investment.plan === "12months" ? "12 Months" : "18 Months"}
-                                  <br />
-                                  ID: {investment.id || investment._id}
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>No, keep it</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleCancelInvestment(String(investment.id || investment._id))}
-                                  className="bg-red-600 hover:bg-red-700"
-                                >
-                                  {cancellingId === String(investment.id || investment._id) ? "Cancelling..." : "Yes, cancel investment"}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        )}
-                    </div>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-slate-800 hover:bg-transparent">
+                  <TableHead className="text-slate-300 font-semibold">Amount</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Plan</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Date</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">ROI Rate</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Status</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                  {filteredInvestments.map((investment) => (
+                  <TableRow key={investment.id || investment._id} className="border-slate-800/80 hover:bg-slate-800/30">
+                    <TableCell className="font-semibold text-slate-100">
+                      ${investment.amount.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="capitalize text-slate-200 font-medium">
+                      {investment.plan === "6months" ? "6 Months" : investment.plan === "12months" ? "12 Months" : "18 Months"}
+                    </TableCell>
+                    <TableCell className="text-slate-300">{format(new Date(investment.createdAt), "MMM dd, yyyy")}</TableCell>
+                    <TableCell className="text-emerald-400 font-semibold">{investment.roiRate}%</TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(investment.status)}>
+                        {investment.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                          <InvestmentDetails investment={investment} />
+                          {investment.status === "pending" && (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button 
+                                  variant="destructive" 
+                                  size="sm"
+                                  disabled={cancellingId === String(investment.id || investment._id)}
+                                  className="h-8 w-8 p-0"
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="bg-slate-900 border border-slate-700 text-slate-100">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle className="text-white">Cancel Investment</AlertDialogTitle>
+                                  <AlertDialogDescription className="text-slate-300">
+                                    Are you sure you want to cancel this investment? This action cannot be undone.
+                                    <br />
+                                    <br />
+                                    <span className="text-slate-200 font-semibold">Investment Details:</span>
+                                    <br />
+                                    Amount: ${investment.amount.toLocaleString()}
+                                    <br />
+                                    Plan: {investment.plan === "6months" ? "6 Months" : 
+                                           investment.plan === "12months" ? "12 Months" : "18 Months"}
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel className="border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700">No, keep it</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleCancelInvestment(String(investment.id || investment._id))}
+                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                  >
+                                    {cancellingId === String(investment.id || investment._id) ? "Cancelling..." : "Yes, cancel investment"}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </CardContent>
     </Card>
