@@ -343,3 +343,83 @@ export interface SecurityQuestion {
   question: string;
   answer: string;
 }
+
+export interface InventoryItem {
+  name: string;
+  category: string;
+  costUsd: number;
+  description?: string;
+}
+
+export interface Flat {
+  _id?: string;
+  id: number;
+  title: string;
+  description: string;
+  unitType: string;
+  location: string;
+  totalPriceUsd: number;
+  monthlyRentUsd: number;
+  annualYieldPercent: number;
+  images: string[];
+  features: string[];
+  inventory: InventoryItem[];
+  status: 'available' | 'in_setup' | 'active' | 'fully_occupied';
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  // Backward compatibility
+  totalValue?: number;
+  slotPrice?: number;
+  totalSlots?: number;
+  availableSlots?: number;
+  roiPercentage?: number;
+  expectedMonthlyReturn?: string;
+}
+
+export interface FlatInvestment {
+  _id?: string;
+  id: number;
+  userId: number;
+  userName?: string;
+  userEmail?: string;
+  flatId: number;
+  flat?: Flat;
+  amountUsd: number;
+  monthlyRentUsd: number;
+  ownershipSharePercent?: number;
+  paymentMethod?: string;
+  paymentProof?: string;
+  totalPaidUsd: number;
+  setupPhase: 'payment_pending' | 'furnishing' | 'live_on_airbnb' | 'completed';
+  status: 'pending_approval' | 'active' | 'completed' | 'rejected' | 'cancelled';
+  createdAt: string | Date;
+  activatedAt?: string | Date;
+  approvedAt?: string | Date;
+  approvedBy?: number;
+  // Backward compatibility
+  slots?: number;
+  amountInvested?: number;
+  monthlyRoi?: number;
+  totalEarned?: number;
+}
+
+export interface AirbnbPayout {
+  _id?: string;
+  id: number;
+  userId: number;
+  flatInvestmentId: number;
+  flatTitle: string;
+  amountUsd: number;
+  monthYear: string;
+  note?: string;
+  paidAt: string | Date;
+  paidBy: number;
+}
+
+export interface AirbnbWalletData {
+  balanceUsd: number;
+  totalEarnedUsd: number;
+  activeUnitsCount: number;
+  investments: FlatInvestment[];
+  payouts: AirbnbPayout[];
+}
