@@ -23,15 +23,15 @@ import { useQuery } from "@tanstack/react-query";
 import { notificationApi } from "@/lib";
 import { getFileUrl } from "@/lib/utils";
 import {
-  ChartLine, 
-  Bell, 
-  ChevronDown, 
-  User, 
-  Settings, 
-  LogOut, 
-  Shield, 
-  Users, 
-  FileText, 
+  ChartLine,
+  Bell,
+  ChevronDown,
+  User,
+  Settings,
+  LogOut,
+  Shield,
+  Users,
+  FileText,
   Network,
   TrendingUp,
   DollarSign,
@@ -39,12 +39,14 @@ import {
   XCircle,
   Menu,
   Gift,
+  Building2,
   Sun,
-  Moon
+  Moon,
+  ArrowLeftRight
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { NotificationPanel } from "@/components/notifications/notification-panel";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
@@ -53,11 +55,14 @@ import { useTheme } from "@/components/theme-provider";
 export function Navigation() {
   const { user, logout, isAdmin } = useAuth();
   const location = usePathname();
+  const router = useRouter();
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { resolvedTheme, toggleTheme } = useTheme();
   const isDarkMode = resolvedTheme === "dark";
   const [isMounted, setIsMounted] = useState(false);
+
+  const isPropertyMode = location === "/flats" || location.startsWith("/flats");
 
   useEffect(() => { setIsMounted(true); }, []);
 
@@ -94,14 +99,13 @@ export function Navigation() {
 
   // Mobile menu links
   const navLinkClass = (path: string) =>
-    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
-      isActive(path)
-        ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg shadow-sky-500/25"
-        : "text-slate-300 hover:bg-sky-500/15 hover:text-white"
+    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${isActive(path)
+      ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg shadow-sky-500/25"
+      : "text-slate-300 hover:bg-sky-500/15 hover:text-white"
     }`;
 
   return (
-    <nav className="glass-nav sticky top-0 z-50 transition-all duration-300 shadow-2xl bg-[#061322]/90 border-b border-sky-500/20">
+    <nav className="glass-nav sticky top-0 z-50 transition-all duration-300 shadow-md dark:shadow-2xl bg-white/95 dark:bg-[#061322]/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-sky-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           <div className="flex items-center gap-6">
@@ -110,21 +114,20 @@ export function Navigation() {
                 <div className="absolute -inset-1 bg-gradient-to-r from-sky-500 to-indigo-500 rounded-full blur-md opacity-85 group-hover:opacity-100 transition duration-300" />
                 <img src="/investpro.png" alt="InvestPro Logo" className="relative h-12 w-12 object-contain" />
               </div>
-              <span className="text-2xl font-extrabold font-display tracking-tight text-white">
-                Invest<span className="text-sky-400">Pro</span>
+              <span className="text-2xl font-extrabold font-display tracking-tight text-slate-900 dark:text-white">
+                Invest<span className="text-sky-500">Pro</span>
               </span>
             </Link>
 
             {/* Desktop Nav Pills */}
             {!isMobile && (
-              <div className="hidden md:flex gap-1.5 bg-[#091a2e]/90 backdrop-blur-xl border border-sky-500/25 rounded-full p-1.5 shadow-inner">
+              <div className="hidden md:flex gap-1.5 bg-slate-100/90 dark:bg-[#091a2e]/90 backdrop-blur-xl border border-slate-200/80 dark:border-sky-500/25 rounded-full p-1.5 shadow-inner">
                 <Link
                   href="/dashboard"
-                  className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
-                    isActive("/dashboard") || isActive("/")
-                      ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-lg shadow-sky-500/30 border border-sky-300/40"
-                      : "text-slate-200 hover:text-white hover:bg-sky-500/15"
-                  }`}
+                  className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${isActive("/dashboard") || isActive("/")
+                      ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-lg shadow-sky-500/30"
+                      : "text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/15"
+                    }`}
                 >
                   Dashboard
                 </Link>
@@ -132,43 +135,48 @@ export function Navigation() {
                   <>
                     <Link
                       href="/investments"
-                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
-                        isActive("/investments")
-                          ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-lg shadow-sky-500/30 border border-sky-300/40"
-                          : "text-slate-200 hover:text-white hover:bg-sky-500/15"
-                      }`}
+                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${isActive("/investments")
+                          ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-lg shadow-sky-500/30"
+                          : "text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/15"
+                        }`}
                     >
                       Investments
                     </Link>
                     <Link
                       href="/withdrawals"
-                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
-                        isActive("/withdrawals")
-                          ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-lg shadow-sky-500/30 border border-sky-300/40"
-                          : "text-slate-200 hover:text-white hover:bg-sky-500/15"
-                      }`}
+                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${isActive("/withdrawals")
+                          ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-lg shadow-sky-500/30"
+                          : "text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/15"
+                        }`}
                     >
                       Withdrawals
                     </Link>
                     <Link
                       href="/rewards"
-                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                        isActive("/rewards")
-                          ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-bold shadow-lg shadow-amber-500/30 border border-amber-300/40"
-                          : "text-amber-300 hover:text-amber-200 hover:bg-white/10"
-                      }`}
+                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${isActive("/rewards")
+                          ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-bold shadow-lg shadow-amber-500/30"
+                          : "text-amber-600 dark:text-amber-300 hover:text-amber-700 dark:hover:text-amber-200 hover:bg-amber-100/50 dark:hover:bg-white/10"
+                        }`}
                     >
                       <Gift className="h-4 w-4" /> Rewards
                     </Link>
                   </>
                 )}
                 <Link
+                  href="/flats"
+                  className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${isActive("/flats")
+                      ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-lg shadow-sky-500/30"
+                      : "text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/15"
+                    }`}
+                >
+                  Property Investment
+                </Link>
+                <Link
                   href="/genealogy"
-                  className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
-                    isActive("/genealogy")
-                      ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-lg shadow-sky-500/30 border border-sky-300/40"
-                      : "text-slate-200 hover:text-white hover:bg-sky-500/15"
-                  }`}
+                  className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${isActive("/genealogy")
+                      ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-lg shadow-sky-500/30"
+                      : "text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/15"
+                    }`}
                 >
                   Genealogy
                 </Link>
@@ -276,6 +284,14 @@ export function Navigation() {
                   <DropdownMenuItem asChild className="hover:bg-sky-50 dark:hover:bg-slate-800/80 focus:bg-sky-50 dark:focus:bg-slate-800/80 text-slate-800 dark:text-slate-200 cursor-pointer rounded-lg font-medium">
                     <Link href="/settings" className="flex items-center gap-2"><Settings className="h-4 w-4 text-indigo-500 dark:text-indigo-400" /> Settings</Link>
                   </DropdownMenuItem>
+                  {!isAdmin && (
+                    <DropdownMenuItem
+                      onClick={() => window.dispatchEvent(new CustomEvent("investpro:open-mode-modal"))}
+                      className="hover:bg-sky-50 dark:hover:bg-slate-800/80 focus:bg-sky-50 dark:focus:bg-slate-800/80 text-slate-800 dark:text-slate-200 cursor-pointer rounded-lg font-medium flex items-center gap-2"
+                    >
+                      <ArrowLeftRight className="h-4 w-4 text-sky-500 dark:text-sky-400" /> Choose Portfolio Track
+                    </DropdownMenuItem>
+                  )}
                   {isAdmin && (
                     <>
                       <DropdownMenuSeparator className="bg-slate-200 dark:bg-white/10" />
@@ -294,10 +310,10 @@ export function Navigation() {
 
             {/* Mobile Hamburger Button */}
             <div className="flex md:hidden">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setDrawerOpen(true)} 
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setDrawerOpen(true)}
                 className="text-slate-200 hover:bg-sky-500/20 rounded-full border border-sky-500/20 bg-[#07182b]/80 shadow-md"
                 aria-label="Open menu"
               >
@@ -330,7 +346,7 @@ export function Navigation() {
               <Link href="/dashboard" onClick={() => setDrawerOpen(false)} className="flex items-center gap-2.5">
                 <div className="relative">
                   <div className="absolute -inset-1 bg-gradient-to-r from-sky-500 to-indigo-500 rounded-full blur-md opacity-70" />
-                  <img src="/investpro.png" alt="InvestPro" className="relative h-9 w-9 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }} />
+                  <img src="/investpro.png" alt="InvestPro" className="relative h-9 w-9 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                 </div>
                 <span className="text-xl font-extrabold tracking-tight text-white [html.light_&]:text-slate-900">
                   Invest<span className="text-sky-400">Pro</span>
@@ -392,11 +408,10 @@ export function Navigation() {
               <Link
                 href="/dashboard"
                 onClick={() => setDrawerOpen(false)}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
-                  isActive("/dashboard") || isActive("/")
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${isActive("/dashboard") || isActive("/")
                     ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg shadow-sky-500/25"
                     : "text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900"
-                }`}
+                  }`}
               >
                 <TrendingUp className="h-4 w-4 shrink-0" /> Dashboard
               </Link>
@@ -406,33 +421,30 @@ export function Navigation() {
                   <Link
                     href="/investments"
                     onClick={() => setDrawerOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
-                      isActive("/investments")
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${isActive("/investments")
                         ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg shadow-sky-500/25"
                         : "text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900"
-                    }`}
+                      }`}
                   >
                     <DollarSign className="h-4 w-4 shrink-0" /> Investments
                   </Link>
                   <Link
                     href="/withdrawals"
                     onClick={() => setDrawerOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
-                      isActive("/withdrawals")
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${isActive("/withdrawals")
                         ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg shadow-sky-500/25"
                         : "text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900"
-                    }`}
+                      }`}
                   >
                     <CheckCircle className="h-4 w-4 shrink-0" /> Withdrawals
                   </Link>
                   <Link
                     href="/rewards"
                     onClick={() => setDrawerOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
-                      isActive("/rewards")
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${isActive("/rewards")
                         ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-bold shadow-lg shadow-amber-500/25"
                         : "text-amber-300 [html.light_&]:text-amber-700 hover:bg-amber-500/15 [html.light_&]:hover:bg-amber-50 hover:text-amber-200"
-                    }`}
+                      }`}
                   >
                     <Gift className="h-4 w-4 shrink-0" /> Rewards
                   </Link>
@@ -440,13 +452,24 @@ export function Navigation() {
               )}
 
               <Link
-                href="/genealogy"
+                href="/flats"
                 onClick={() => setDrawerOpen(false)}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
-                  isActive("/genealogy")
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${isActive("/flats")
                     ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg shadow-sky-500/25"
                     : "text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900"
-                }`}
+                  }`}
+              >
+                <Building2 className={`h-4 w-4 shrink-0 ${isActive("/flats") ? "text-white" : "text-emerald-400"}`} />
+                <span>Property Investment</span>
+              </Link>
+
+              <Link
+                href="/genealogy"
+                onClick={() => setDrawerOpen(false)}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${isActive("/genealogy")
+                    ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-lg shadow-sky-500/25"
+                    : "text-slate-300 [html.light_&]:text-slate-700 hover:bg-sky-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900"
+                  }`}
               >
                 <Network className="h-4 w-4 shrink-0" /> Genealogy
               </Link>
@@ -457,11 +480,10 @@ export function Navigation() {
                   <Link
                     href="/admin"
                     onClick={() => setDrawerOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
-                      isActive("/admin")
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${isActive("/admin")
                         ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25"
                         : "text-slate-300 [html.light_&]:text-slate-700 hover:bg-purple-500/15 [html.light_&]:hover:bg-slate-100 hover:text-white [html.light_&]:hover:text-slate-900"
-                    }`}
+                      }`}
                   >
                     <Shield className="h-4 w-4 shrink-0 text-purple-400" /> Admin Dashboard
                   </Link>
@@ -559,7 +581,7 @@ export function Navigation() {
             </div>
           </div>
         </div>
-      , document.body)}
+        , document.body)}
     </nav>
   );
 }

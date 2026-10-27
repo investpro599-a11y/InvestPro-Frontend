@@ -12,7 +12,12 @@ import type {
   GenealogyTree,
   AdminStats,
   LogEntry,
-  Commission
+  Commission,
+  Flat,
+  FlatInvestment,
+  AirbnbWalletData,
+  AirbnbPayout,
+  InventoryItem
 } from "../../shared/schema";
 
 // Helper: unwrap ApiResponse envelope OR return raw response as-is
@@ -435,6 +440,165 @@ export const databaseConfigApi = {
     const response = await apiRequest("POST", `/admin/db/collection/${collection}/import`, { documents: docs });
     const result = await response.json();
     if (!response.ok) throw new Error(result.message || "Failed to import documents");
+    return unwrap<any>(result);
+  },
+};
+
+export const flatsApi = {
+  getAll: async (): Promise<Flat[]> => {
+    const response = await apiRequest("GET", "/flats");
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to fetch flats");
+    return unwrap<Flat[]>(result);
+  },
+
+  getById: async (id: number): Promise<Flat> => {
+    const response = await apiRequest("GET", `/flats/${id}`);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to fetch flat");
+    return unwrap<Flat>(result);
+  },
+
+  invest: async (
+    flatId: number,
+    data?: { amountUsd?: number; ownershipSharePercent?: number; paymentMethod?: string; paymentProof?: string }
+  ): Promise<any> => {
+    const response = await apiRequest("POST", `/flats/${flatId}/invest`, data || {});
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to submit property investment");
+    return unwrap<any>(result);
+  },
+
+  getMyInvestments: async (): Promise<FlatInvestment[]> => {
+    const response = await apiRequest("GET", "/flats/user/my-investments");
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to fetch flat investments");
+    return unwrap<FlatInvestment[]>(result);
+  },
+
+  getWallet: async (): Promise<AirbnbWalletData> => {
+    const response = await apiRequest("GET", "/flats/user/wallet");
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to fetch Airbnb wallet");
+    return unwrap<AirbnbWalletData>(result);
+  },
+
+  createFlat: async (data: any): Promise<Flat> => {
+    const response = await apiRequest("POST", "/admin/flats", data);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to create flat");
+    return unwrap<Flat>(result);
+  },
+
+  updateFlat: async (id: number, data: any): Promise<Flat> => {
+    const response = await apiRequest("PUT", `/admin/flats/${id}`, data);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to update flat");
+    return unwrap<Flat>(result);
+  },
+
+  deleteFlat: async (id: number): Promise<boolean> => {
+    const response = await apiRequest("DELETE", `/admin/flats/${id}`);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to delete flat");
+    return true;
+  },
+
+  getAllInvestments: async (): Promise<FlatInvestment[]> => {
+    const response = await apiRequest("GET", "/admin/flats/investments");
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to fetch all flat investments");
+    return unwrap<FlatInvestment[]>(result);
+  },
+
+  approveInvestment: async (id: number): Promise<any> => {
+    const response = await apiRequest("POST", `/admin/flats/investments/${id}/approve`);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to approve investment");
+    return unwrap<any>(result);
+  },
+
+  rejectInvestment: async (id: number, reason?: string): Promise<any> => {
+    const response = await apiRequest("POST", `/admin/flats/investments/${id}/reject`, { reason });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to reject investment");
+    return unwrap<any>(result);
+  },
+
+  updateSetupPhase: async (id: number, setupPhase: string): Promise<any> => {
+    const response = await apiRequest("PUT", `/admin/flats/investments/${id}/phase`, { setupPhase });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to update setup phase");
+    return unwrap<any>(result);
+  },
+
+  disburseRentalPayout: async (id: number, data: { amountUsd: number; monthYear: string; note?: string; payoutType?: string; daysCount?: number }): Promise<any> => {
+    const response = await apiRequest("POST", `/admin/flats/investments/${id}/disburse`, data);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to disburse payout");
+    return unwrap<any>(result);
+  },
+
+  seedDemoData: async (): Promise<any> => {
+    const response = await apiRequest("POST", "/admin/flats/seed-demo");
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to seed demo data");
+    return unwrap<any>(result);
+  },
+
+  requestWithdrawal: async (data: { amountUsd: number; paymentMethod: string; walletAddressOrAccount: string }): Promise<any> => {
+    const response = await apiRequest("POST", "/flats/user/withdraw", data);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to submit withdrawal request");
+    return unwrap<any>(result);
+  },
+
+  getAdminTreasury: async (): Promise<any> => {
+    const response = await apiRequest("GET", "/admin/treasury");
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to fetch admin treasury");
+    return unwrap<any>(result);
+  },
+
+  injectCapital: async (amountUsd: number, note?: string): Promise<any> => {
+    const response = await apiRequest("POST", "/admin/treasury/inject-capital", { amountUsd, note });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to inject capital");
+    return unwrap<any>(result);
+  },
+
+  recordGrossRent: async (amountUsd: number, note?: string): Promise<any> => {
+    const response = await apiRequest("POST", "/admin/treasury/record-gross-rent", { amountUsd, note });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to record gross rent");
+    return unwrap<any>(result);
+  },
+
+  withdrawAdminProfit: async (amountUsd: number, note?: string): Promise<any> => {
+    const response = await apiRequest("POST", "/admin/treasury/withdraw-profit", { amountUsd, note });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to withdraw admin profit");
+    return unwrap<any>(result);
+  },
+
+  payUtilityExpense: async (amountUsd: number, note?: string): Promise<any> => {
+    const response = await apiRequest("POST", "/admin/treasury/pay-utility", { amountUsd, note });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to record utility payment");
+    return unwrap<any>(result);
+  },
+
+  getAdminWithdrawalRequests: async (): Promise<any[]> => {
+    const response = await apiRequest("GET", "/admin/flats/withdrawals");
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to fetch property withdrawals");
+    return unwrap<any[]>(result);
+  },
+
+  processWithdrawalRequest: async (id: number, data: { action: 'approve' | 'reject'; txid?: string; notes?: string }): Promise<any> => {
+    const response = await apiRequest("POST", `/admin/flats/withdrawals/${id}/process`, data);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to process withdrawal");
     return unwrap<any>(result);
   },
 };

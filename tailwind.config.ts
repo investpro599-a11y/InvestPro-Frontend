@@ -12,8 +12,24 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", "sans-serif"],
-        display: ["var(--font-plus-jakarta)", "sans-serif"],
+        sans: [
+          "var(--font-inter)",
+          "'Inter'",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "'Segoe UI'",
+          "Roboto",
+          "sans-serif",
+        ],
+        display: [
+          "var(--font-plus-jakarta)",
+          "'Plus Jakarta Sans'",
+          "var(--font-inter)",
+          "'Inter'",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "sans-serif",
+        ],
       },
       boxShadow: {
         glass: "0 8px 32px 0 rgba(0, 0, 0, 0.08)",

@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { PortfolioSelectionModal } from "@/components/portfolio-selection-modal";
 
 interface LayoutProps {
   children: ReactNode;
@@ -21,6 +22,7 @@ export function Layout({ children, showFooter = true }: LayoutProps) {
       </div>
 
       <Navigation />
+      <PortfolioSelectionModal />
       <main className="flex-1 w-full max-w-full overflow-x-hidden relative z-10">
         {children}
       </main>

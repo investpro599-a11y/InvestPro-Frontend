@@ -23,7 +23,7 @@ export default function Login() {
       if (user.role === "admin") {
         router.push("/admin");
       } else {
-        router.push("/dashboard");
+        router.push("/dashboard?select=true");
       }
     }
   }, [isAuthenticated, user, router]);

@@ -360,6 +360,7 @@ export interface Flat {
   location: string;
   totalPriceUsd: number;
   monthlyRentUsd: number;
+  dailyRateUsd?: number;
   annualYieldPercent: number;
   images: string[];
   features: string[];
@@ -386,6 +387,7 @@ export interface FlatInvestment {
   flat?: Flat;
   amountUsd: number;
   monthlyRentUsd: number;
+  dailyRateUsd?: number;
   ownershipSharePercent?: number;
   paymentMethod?: string;
   paymentProof?: string;
@@ -422,4 +424,47 @@ export interface AirbnbWalletData {
   activeUnitsCount: number;
   investments: FlatInvestment[];
   payouts: AirbnbPayout[];
+  withdrawals?: PropertyWithdrawal[];
 }
+
+export interface PropertyWithdrawal {
+  id: number;
+  _id?: string;
+  userId: number;
+  userName?: string;
+  userEmail?: string;
+  amountUsd: number;
+  paymentMethod: string;
+  walletAddressOrAccount: string;
+  status: 'pending' | 'approved' | 'rejected';
+  txid?: string;
+  processedBy?: number;
+  processedAt?: string | Date;
+  notes?: string;
+  createdAt: string | Date;
+}
+
+export interface AdminTreasury {
+  id: number;
+  _id?: string;
+  injectedCapitalUsd: number;
+  grossRentCollectedUsd: number;
+  netAdminProfitUsd: number;
+  utilityExpenseReserveUsd: number;
+  totalDividendsPaidUsd: number;
+  availableDisbursePoolUsd: number;
+  updatedAt?: string | Date;
+}
+
+export interface AdminCapitalTransaction {
+  id: number;
+  _id?: string;
+  adminId: number;
+  amountUsd: number;
+  type: string;
+  title: string;
+  note?: string;
+  referenceId?: string;
+  createdAt: string | Date;
+}
+

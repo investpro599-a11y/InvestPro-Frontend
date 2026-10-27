@@ -72,7 +72,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.user.role === "admin") {
         router.push("/admin");
       } else {
-        router.push("/dashboard");
+        try {
+          sessionStorage.setItem("investpro_show_mode_modal", "true");
+        } catch (e) {}
+        router.push("/dashboard?select=true");
       }
     },
     onError: (error: any) => {
@@ -95,7 +98,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data.user.role === "admin") {
           router.push("/admin");
         } else {
-          router.push("/dashboard");
+          try {
+            sessionStorage.setItem("investpro_show_mode_modal", "true");
+          } catch (e) {}
+          router.push("/dashboard?select=true");
         }
       }
     },
@@ -120,7 +126,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data.user.role === "admin") {
           router.push("/admin");
         } else {
-          router.push("/dashboard");
+          try {
+            sessionStorage.setItem("investpro_show_mode_modal", "true");
+          } catch (e) {}
+          router.push("/dashboard?select=true");
         }
       }
     },

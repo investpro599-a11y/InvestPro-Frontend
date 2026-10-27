@@ -30,8 +30,15 @@ export default function Dashboard() {
   useEffect(() => {
     if (!isAuthenticated) {
       router.push("/login");
+    } else if (!isAdmin) {
+      try {
+        const preferred = localStorage.getItem("investpro_preferred_mode");
+        if (preferred === "property") {
+          router.push("/flats");
+        }
+      } catch (e) {}
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isAdmin, router]);
 
   const handleExportReport = () => {
     if (stats) {
