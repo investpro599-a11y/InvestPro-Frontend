@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -21,7 +21,7 @@ interface PortfolioSelectionModalProps {
   onClose?: () => void;
 }
 
-export function PortfolioSelectionModal({
+function PortfolioSelectionModalContent({
   forceOpen = false,
   onClose
 }: PortfolioSelectionModalProps) {
@@ -316,5 +316,13 @@ export function PortfolioSelectionModal({
         </div>
       </div>
     </div>
+  );
+}
+
+export function PortfolioSelectionModal(props: PortfolioSelectionModalProps) {
+  return (
+    <Suspense fallback={null}>
+      <PortfolioSelectionModalContent {...props} />
+    </Suspense>
   );
 }

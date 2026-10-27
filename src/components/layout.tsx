@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PortfolioSelectionModal } from "@/components/portfolio-selection-modal";
@@ -22,7 +22,9 @@ export function Layout({ children, showFooter = true }: LayoutProps) {
       </div>
 
       <Navigation />
-      <PortfolioSelectionModal />
+      <Suspense fallback={null}>
+        <PortfolioSelectionModal />
+      </Suspense>
       <main className="flex-1 w-full max-w-full overflow-x-hidden relative z-10">
         {children}
       </main>
