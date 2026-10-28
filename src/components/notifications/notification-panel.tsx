@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Check, CheckCheck, AlertCircle, User, DollarSign, Coins, Settings } from "lucide-react";
+import { Bell, Check, CheckCheck, AlertCircle, User, DollarSign, Coins, Settings, Building2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { Notification } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
@@ -17,6 +17,10 @@ const getNotificationIcon = (type: string) => {
   switch (type) {
     case "investment":
       return <Coins className="h-4 w-4" />;
+    case "airbnb_rental_payout":
+      return <DollarSign className="h-4 w-4 text-emerald-500" />;
+    case "flat_investment":
+      return <Building2 className="h-4 w-4 text-sky-500" />;
     case "withdrawal":
       return <DollarSign className="h-4 w-4" />;
     case "user":
@@ -31,6 +35,10 @@ const getNotificationIcon = (type: string) => {
 const getNotificationColor = (type: string) => {
   switch (type) {
     case "investment":
+      return "bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-400/30";
+    case "airbnb_rental_payout":
+      return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30";
+    case "flat_investment":
       return "bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-400/30";
     case "withdrawal":
       return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30";

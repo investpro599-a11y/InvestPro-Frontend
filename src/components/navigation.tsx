@@ -99,221 +99,221 @@ function NavigationContent() {
   if (!user) return null;
 
   return (
-    <nav className="glass-nav sticky top-0 z-50 transition-all duration-300 shadow-md dark:shadow-2xl bg-white/95 dark:bg-[#061322]/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-sky-500/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20 items-center">
-          {/* Logo & Ecosystem Badge */}
-          <div className="flex items-center gap-4 lg:gap-6">
+    <nav className="glass-nav sticky top-0 z-50 transition-all duration-300 shadow-lg bg-white/95 dark:bg-[#061322]/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-sky-500/20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-3">
+          {/* Left: Logo & Ecosystem Badge */}
+          <div className="flex items-center gap-3 shrink-0">
             <Link
               href={isPropertyMode ? "/flats" : "/dashboard"}
-              className="flex items-center gap-3 group focus:outline-none rounded-xl transition-transform hover:scale-[1.02]"
+              className="flex items-center gap-2.5 group focus:outline-none rounded-xl transition-transform hover:scale-[1.01] shrink-0"
             >
-              <div className="relative">
-                <div className={`absolute -inset-1 rounded-full blur-md opacity-85 group-hover:opacity-100 transition duration-300 ${
-                  isPropertyMode ? "bg-gradient-to-r from-indigo-500 to-purple-500" : "bg-gradient-to-r from-sky-500 to-indigo-500"
+              <div className="relative shrink-0">
+                <div className={`absolute -inset-1 rounded-full blur-md opacity-75 group-hover:opacity-100 transition duration-300 ${
+                  isPropertyMode ? "bg-gradient-to-r from-blue-500 to-sky-400" : "bg-gradient-to-r from-sky-500 to-indigo-500"
                 }`} />
-                <img src="/investpro.png" alt="InvestPro Logo" className="relative h-11 w-11 object-contain" />
+                <img src="/investpro.png" alt="InvestPro Logo" className="relative h-9 w-9 sm:h-10 sm:w-10 object-contain" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xl sm:text-2xl font-extrabold font-display tracking-tight text-slate-900 dark:text-white leading-none">
-                  Invest<span className={isPropertyMode ? "text-indigo-400" : "text-sky-500"}>Pro</span>
+                <span className="text-lg sm:text-xl font-extrabold font-display tracking-tight text-slate-900 dark:text-white leading-none whitespace-nowrap">
+                  Invest<span className="text-sky-500">Pro</span>
                 </span>
                 {isPropertyMode && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 mt-0.5">
+                  <span className="text-[9px] font-extrabold uppercase tracking-widest text-sky-400/90 mt-0.5 whitespace-nowrap">
                     Property App
                   </span>
                 )}
               </div>
             </Link>
 
-            {/* Track indicator badge on tablet/desktop */}
-            <div className="hidden sm:flex items-center">
+            {/* Track indicator badge on extra-large desktop so it never squeezes nav links */}
+            <div className="hidden xl:flex items-center shrink-0">
               {isPropertyMode ? (
-                <Badge className="bg-indigo-500/15 text-indigo-400 dark:text-indigo-300 border border-indigo-400/30 text-xs px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1.5 shadow-sm">
-                  <Building2 className="h-3.5 w-3.5 text-indigo-400" />
+                <Badge className="bg-sky-500/10 text-sky-400 dark:text-sky-300 border border-sky-400/25 text-[11px] px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1.5 whitespace-nowrap">
+                  <Building2 className="h-3 w-3 text-sky-400 shrink-0" />
                   <span>Real Estate & Flats</span>
                 </Badge>
               ) : (
-                <Badge className="bg-sky-500/15 text-sky-500 dark:text-sky-300 border border-sky-400/30 text-xs px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1.5 shadow-sm">
-                  <TrendingUp className="h-3.5 w-3.5 text-sky-400" />
+                <Badge className="bg-sky-500/10 text-sky-500 dark:text-sky-300 border border-sky-400/25 text-[11px] px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1.5 whitespace-nowrap">
+                  <TrendingUp className="h-3 w-3 text-sky-400 shrink-0" />
                   <span>Daily Yields & ROI</span>
                 </Badge>
               )}
             </div>
-
-            {/* Desktop Nav Pills: COMPLETELY SEPARATED PER APP */}
-            {!isMobile && (
-              <div className="hidden md:flex gap-1.5 bg-slate-100/90 dark:bg-[#091a2e]/90 backdrop-blur-xl border border-slate-200/80 dark:border-sky-500/25 rounded-full p-1.5 shadow-inner">
-                {isPropertyMode ? (
-                  /* ================= PROPERTY INVESTMENT APP NAV ================= */
-                  <>
-                    <Link
-                      href="/flats?tab=marketplace"
-                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                        isActive("/flats") && activeTabParam === "marketplace"
-                          ? "bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg shadow-indigo-500/30"
-                          : "text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-indigo-500/15"
-                      }`}
-                    >
-                      <Building2 className="h-4 w-4" />
-                      <span>Flats Marketplace</span>
-                    </Link>
-
-                    <Link
-                      href="/flats?tab=wallet"
-                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                        isActive("/flats") && activeTabParam === "wallet"
-                          ? "bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg shadow-indigo-500/30"
-                          : "text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-indigo-500/15"
-                      }`}
-                    >
-                      <Wallet className="h-4 w-4" />
-                      <span>Rental Portfolio & Wallet</span>
-                    </Link>
-
-                    {isAdmin && (
-                      <Link
-                        href="/flats?tab=admin"
-                        className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                          isActive("/flats") && activeTabParam === "admin"
-                            ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/30"
-                            : "text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-purple-500/15"
-                        }`}
-                      >
-                        <Shield className="h-4 w-4 text-purple-400" />
-                        <span>Property Admin Desk</span>
-                      </Link>
-                    )}
-                  </>
-                ) : (
-                  /* ================= REGULAR INVESTMENT APP NAV ================= */
-                  <>
-                    <Link
-                      href="/dashboard"
-                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
-                        isActive("/dashboard") || isActive("/")
-                          ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-lg shadow-sky-500/30"
-                          : "text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/15"
-                      }`}
-                    >
-                      Dashboard
-                    </Link>
-
-                    {!isAdmin && (
-                      <>
-                        <Link
-                          href="/investments"
-                          className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
-                            isActive("/investments")
-                              ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-lg shadow-sky-500/30"
-                              : "text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/15"
-                          }`}
-                        >
-                          Investments
-                        </Link>
-                        <Link
-                          href="/withdrawals"
-                          className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
-                            isActive("/withdrawals")
-                              ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-lg shadow-sky-500/30"
-                              : "text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/15"
-                          }`}
-                        >
-                          Withdrawals
-                        </Link>
-                        <Link
-                          href="/rewards"
-                          className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                            isActive("/rewards")
-                              ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-bold shadow-lg shadow-amber-500/30"
-                              : "text-amber-600 dark:text-amber-300 hover:text-amber-700 dark:hover:text-amber-200 hover:bg-amber-100/50 dark:hover:bg-white/10"
-                          }`}
-                        >
-                          <Gift className="h-4 w-4" /> Rewards
-                        </Link>
-                      </>
-                    )}
-
-                    <Link
-                      href="/genealogy"
-                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
-                        isActive("/genealogy")
-                          ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-lg shadow-sky-500/30"
-                          : "text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/15"
-                      }`}
-                    >
-                      Genealogy
-                    </Link>
-
-                    {isAdmin && (
-                      <>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="rounded-full text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-sky-600 dark:hover:text-white hover:bg-sky-500/15">
-                              <Shield className="h-4 w-4 text-purple-500 dark:text-purple-400" /> Admin <ChevronDown className="h-4 w-4 opacity-80" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="bg-white/95 dark:bg-[#0a1b2e]/95 backdrop-blur-xl border border-sky-500/25 text-slate-900 dark:text-white shadow-xl">
-                            <DropdownMenuItem asChild className="hover:bg-sky-500/15 focus:bg-sky-500/15 text-slate-800 dark:text-slate-100 font-medium">
-                              <Link href="/admin" className="flex items-center gap-2"> <TrendingUp className="h-4 w-4 text-sky-500 dark:text-sky-400" /> Dashboard</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild className="hover:bg-sky-500/15 focus:bg-sky-500/15 text-slate-800 dark:text-slate-100 font-medium">
-                              <Link href="/admin/users" className="flex items-center gap-2"><Users className="h-4 w-4 text-purple-500 dark:text-purple-400" /> User Management</Link>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="rounded-full text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-sky-600 dark:hover:text-white hover:bg-sky-500/15">
-                              <DollarSign className="h-4 w-4 text-emerald-500 dark:text-emerald-400" /> Approvals <ChevronDown className="h-4 w-4 opacity-80" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="bg-white/95 dark:bg-[#0a1b2e]/95 backdrop-blur-xl border border-sky-500/25 text-slate-900 dark:text-white shadow-xl">
-                            <DropdownMenuItem asChild className="hover:bg-sky-500/15 focus:bg-sky-500/15 text-slate-800 dark:text-slate-100 font-medium">
-                              <Link href="/admin/investment-approvals" className="flex items-center gap-2"><DollarSign className="h-4 w-4 text-emerald-500 dark:text-emerald-400" /> Investment Approvals</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild className="hover:bg-sky-500/15 focus:bg-sky-500/15 text-slate-800 dark:text-slate-100 font-medium">
-                              <Link href="/admin/withdrawal-approvals" className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-teal-500 dark:text-teal-400" /> Withdrawal Approvals</Link>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
           </div>
 
+          {/* Center: Desktop Nav Pills (Single-line, balanced, aesthetically aligned) */}
+          {!isMobile && (
+            <div className="hidden md:flex items-center gap-1 bg-slate-100/90 dark:bg-[#091a2e]/95 backdrop-blur-xl border border-slate-200/80 dark:border-sky-500/25 rounded-full p-1 shadow-inner shrink-0">
+              {isPropertyMode ? (
+                /* ================= PROPERTY INVESTMENT APP NAV ================= */
+                <>
+                  <Link
+                    href="/flats?tab=marketplace"
+                    className={`px-3.5 lg:px-4 py-1.5 rounded-full text-xs lg:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap ${
+                      isActive("/flats") && activeTabParam === "marketplace"
+                        ? "bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/25"
+                        : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/10"
+                    }`}
+                  >
+                    <Building2 className="h-3.5 w-3.5 shrink-0" />
+                    <span>Flats Marketplace</span>
+                  </Link>
+
+                  <Link
+                    href="/flats?tab=wallet"
+                    className={`px-3.5 lg:px-4 py-1.5 rounded-full text-xs lg:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap ${
+                      isActive("/flats") && activeTabParam === "wallet"
+                        ? "bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/25"
+                        : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/10"
+                    }`}
+                  >
+                    <Wallet className="h-3.5 w-3.5 shrink-0" />
+                    <span>Portfolio & Wallet</span>
+                  </Link>
+
+                  {isAdmin && (
+                    <Link
+                      href="/flats?tab=admin"
+                      className={`px-3.5 lg:px-4 py-1.5 rounded-full text-xs lg:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap ${
+                        isActive("/flats") && activeTabParam === "admin"
+                          ? "bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/25"
+                          : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/10"
+                      }`}
+                    >
+                      <Shield className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+                      <span>Admin Desk</span>
+                    </Link>
+                  )}
+                </>
+              ) : (
+                /* ================= REGULAR INVESTMENT APP NAV ================= */
+                <>
+                  <Link
+                    href="/dashboard"
+                    className={`px-3.5 lg:px-4 py-1.5 rounded-full text-xs lg:text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                      isActive("/dashboard") || isActive("/")
+                        ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-md shadow-sky-500/25"
+                        : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/10"
+                    }`}
+                  >
+                    Dashboard
+                  </Link>
+
+                  {!isAdmin && (
+                    <>
+                      <Link
+                        href="/investments"
+                        className={`px-3.5 lg:px-4 py-1.5 rounded-full text-xs lg:text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                          isActive("/investments")
+                            ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-md shadow-sky-500/25"
+                            : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/10"
+                        }`}
+                      >
+                        Investments
+                      </Link>
+                      <Link
+                        href="/withdrawals"
+                        className={`px-3.5 lg:px-4 py-1.5 rounded-full text-xs lg:text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                          isActive("/withdrawals")
+                            ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-md shadow-sky-500/25"
+                            : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/10"
+                        }`}
+                      >
+                        Withdrawals
+                      </Link>
+                      <Link
+                        href="/rewards"
+                        className={`px-3.5 lg:px-4 py-1.5 rounded-full text-xs lg:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap ${
+                          isActive("/rewards")
+                            ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-bold shadow-md shadow-amber-500/25"
+                            : "text-amber-600 dark:text-amber-300 hover:text-amber-700 dark:hover:text-amber-200 hover:bg-amber-100/50 dark:hover:bg-white/10"
+                        }`}
+                      >
+                        <Gift className="h-3.5 w-3.5 shrink-0" /> Rewards
+                      </Link>
+                    </>
+                  )}
+
+                  <Link
+                    href="/genealogy"
+                    className={`px-3.5 lg:px-4 py-1.5 rounded-full text-xs lg:text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                      isActive("/genealogy")
+                        ? "bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 text-white shadow-md shadow-sky-500/25"
+                        : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-sky-500/10"
+                    }`}
+                  >
+                    Genealogy
+                  </Link>
+
+                  {isAdmin && (
+                    <>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="rounded-full text-xs lg:text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-sky-600 dark:hover:text-white hover:bg-sky-500/15 h-8 px-3 whitespace-nowrap">
+                            <Shield className="h-3.5 w-3.5 text-purple-500 dark:text-purple-400 shrink-0 mr-1" /> Admin <ChevronDown className="h-3.5 w-3.5 opacity-80 ml-1 shrink-0" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="bg-white/95 dark:bg-[#0a1b2e]/95 backdrop-blur-xl border border-sky-500/25 text-slate-900 dark:text-white shadow-xl">
+                          <DropdownMenuItem asChild className="hover:bg-sky-500/15 focus:bg-sky-500/15 text-slate-800 dark:text-slate-100 font-medium">
+                            <Link href="/admin" className="flex items-center gap-2"> <TrendingUp className="h-4 w-4 text-sky-500 dark:text-sky-400" /> Dashboard</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild className="hover:bg-sky-500/15 focus:bg-sky-500/15 text-slate-800 dark:text-slate-100 font-medium">
+                            <Link href="/admin/users" className="flex items-center gap-2"><Users className="h-4 w-4 text-purple-500 dark:text-purple-400" /> User Management</Link>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="rounded-full text-xs lg:text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-sky-600 dark:hover:text-white hover:bg-sky-500/15 h-8 px-3 whitespace-nowrap">
+                            <DollarSign className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400 shrink-0 mr-1" /> Approvals <ChevronDown className="h-3.5 w-3.5 opacity-80 ml-1 shrink-0" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="bg-white/95 dark:bg-[#0a1b2e]/95 backdrop-blur-xl border border-sky-500/25 text-slate-900 dark:text-white shadow-xl">
+                          <DropdownMenuItem asChild className="hover:bg-sky-500/15 focus:bg-sky-500/15 text-slate-800 dark:text-slate-100 font-medium">
+                            <Link href="/admin/investment-approvals" className="flex items-center gap-2"><DollarSign className="h-4 w-4 text-emerald-500 dark:text-emerald-400" /> Investment Approvals</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild className="hover:bg-sky-500/15 focus:bg-sky-500/15 text-slate-800 dark:text-slate-100 font-medium">
+                            <Link href="/admin/withdrawal-approvals" className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-teal-500 dark:text-teal-400" /> Withdrawal Approvals</Link>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
           {/* Header Right Actions (Desktop & Mobile) */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 shrink-0">
             {/* Quick Portal Switcher Button */}
             {isPropertyMode ? (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => switchMode("regular")}
-                className="hidden md:inline-flex items-center gap-2 rounded-full text-xs font-bold bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-300 border-sky-400/30 hover:border-sky-400/60 shadow-sm transition-all py-1.5 px-3.5"
+                className="hidden md:inline-flex items-center gap-1.5 rounded-full text-xs font-bold bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-300 border-sky-400/30 hover:border-sky-400/60 shadow-sm transition-all h-9 px-3.5 whitespace-nowrap shrink-0"
                 title="Switch to Regular Investment Track"
               >
-                <TrendingUp className="h-3.5 w-3.5 text-sky-400" />
-                <span className="hidden xl:inline">Switch to Regular App</span>
-                <span className="xl:hidden">Regular App</span>
-                <ArrowLeftRight className="h-3 w-3 text-sky-400/70" />
+                <TrendingUp className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+                <span className="hidden lg:inline">Switch to Regular App</span>
+                <span className="lg:hidden">Regular App</span>
+                <ArrowLeftRight className="h-3 w-3 text-sky-400/70 shrink-0" />
               </Button>
             ) : (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => switchMode("property")}
-                className="hidden md:inline-flex items-center gap-2 rounded-full text-xs font-bold bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border-indigo-400/30 hover:border-indigo-400/60 shadow-sm transition-all py-1.5 px-3.5"
+                className="hidden md:inline-flex items-center gap-1.5 rounded-full text-xs font-bold bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border-indigo-400/30 hover:border-indigo-400/60 shadow-sm transition-all h-9 px-3.5 whitespace-nowrap shrink-0"
                 title="Switch to Property Investment Track"
               >
-                <Building2 className="h-3.5 w-3.5 text-indigo-400" />
-                <span className="hidden xl:inline">Switch to Property App</span>
-                <span className="xl:hidden">Property App</span>
-                <ArrowLeftRight className="h-3 w-3 text-indigo-400/70" />
+                <Building2 className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+                <span className="hidden lg:inline">Switch to Property App</span>
+                <span className="lg:hidden">Property App</span>
+                <ArrowLeftRight className="h-3 w-3 text-indigo-400/70 shrink-0" />
               </Button>
             )}
 
@@ -334,13 +334,15 @@ function NavigationContent() {
             </Button>
 
             {/* Desktop Actions */}
-            <div className="hidden md:flex items-center gap-2.5">
+            <div className="hidden md:flex items-center gap-2 shrink-0">
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-sky-500/10 relative rounded-full" aria-label="Notifications">
-                    <Bell className="h-5 w-5" />
+                  <Button variant="ghost" size="icon" className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-sky-500/10 relative rounded-full border border-slate-200 dark:border-sky-500/20 bg-white/80 dark:bg-[#07182b]/80 h-9 w-9 shrink-0" aria-label="Notifications">
+                    <Bell className="h-4 w-4" />
                     {unreadNotifications.length > 0 && (
-                      <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-rose-500 ring-4 ring-white dark:ring-slate-950 animate-pulse" aria-label="Unread notifications" />
+                      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white dark:ring-[#061322] animate-pulse" aria-label="Unread notifications">
+                        {unreadNotifications.length}
+                      </span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -351,15 +353,15 @@ function NavigationContent() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2.5 px-3.5 py-2 rounded-full border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/50 hover:bg-sky-50 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 transition-all">
-                    <Avatar className="h-8 w-8 ring-2 ring-blue-500/40">
+                  <Button variant="ghost" className="flex items-center gap-2 px-3 py-1.5 h-9 rounded-full border border-slate-200 dark:border-sky-500/25 bg-white/80 dark:bg-[#07182b]/90 hover:bg-sky-50 dark:hover:bg-sky-500/15 text-slate-800 dark:text-slate-200 transition-all whitespace-nowrap shrink-0">
+                    <Avatar className="h-6 w-6 ring-2 ring-sky-500/40 shrink-0">
                       <AvatarImage src={getFileUrl(user.profilePicture)} />
-                      <AvatarFallback className="bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs">
+                      <AvatarFallback className="bg-gradient-to-tr from-blue-600 to-sky-500 text-white font-bold text-[10px]">
                         {user.fullName.split(" ").map(n => n[0]).join("").toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm font-bold font-display tracking-tight text-slate-800 dark:text-white">{user.fullName}</span>
-                    <ChevronDown className="h-4 w-4 opacity-60" />
+                    <span className="text-xs lg:text-sm font-bold font-display tracking-tight text-slate-800 dark:text-white whitespace-nowrap">{user.fullName}</span>
+                    <ChevronDown className="h-3.5 w-3.5 opacity-60 shrink-0" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-2xl text-slate-900 dark:text-slate-100 rounded-xl p-1.5">

@@ -13,6 +13,7 @@ import { authApi } from "@/lib/auth";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { Eye, EyeOff } from "lucide-react";
 import { SECURITY_QUESTIONS, SecurityQuestion } from "../../../shared/schema";
 
 interface SignupFormProps {
@@ -61,6 +62,8 @@ export function SignupForm({ initialReferralCode }: SignupFormProps) {
   const [step, setStep] = useState<'form' | 'otp'>('form');
   const [pendingEmail, setPendingEmail] = useState('');
   const [otpValue, setOtpValue] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { verifyEmail } = useAuth();
 
   
@@ -379,14 +382,29 @@ export function SignupForm({ initialReferralCode }: SignupFormProps) {
               <FormItem>
                 <FormLabel>Password *</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="password" 
-                    placeholder="Create password" 
-                    {...field} 
-                    autoComplete="new-password"
-                    required
-                    disabled={isSubmitting}
-                  />
+                  <div className="relative">
+                    <Input 
+                      type={showPassword ? "text" : "password"} 
+                      placeholder="Create password" 
+                      className="pr-10"
+                      {...field} 
+                      autoComplete="new-password"
+                      required
+                      disabled={isSubmitting}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors focus:outline-none"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -399,14 +417,29 @@ export function SignupForm({ initialReferralCode }: SignupFormProps) {
               <FormItem>
                 <FormLabel>Confirm Password *</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="password" 
-                    placeholder="Confirm password" 
-                    {...field} 
-                    autoComplete="new-password"
-                    required
-                    disabled={isSubmitting}
-                  />
+                  <div className="relative">
+                    <Input 
+                      type={showConfirmPassword ? "text" : "password"} 
+                      placeholder="Confirm password" 
+                      className="pr-10"
+                      {...field} 
+                      autoComplete="new-password"
+                      required
+                      disabled={isSubmitting}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors focus:outline-none"
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

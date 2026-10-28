@@ -532,11 +532,32 @@ export const flatsApi = {
     return unwrap<any>(result);
   },
 
-  disburseRentalPayout: async (id: number, data: { amountUsd: number; monthYear: string; note?: string; payoutType?: string; daysCount?: number }): Promise<any> => {
+  disburseRentalPayout: async (id: number, data: { amountUsd: number; monthYear: string; note?: string; payoutType?: string; daysCount?: number; bankAccount?: string; destination?: string }): Promise<any> => {
     const response = await apiRequest("POST", `/admin/flats/investments/${id}/disburse`, data);
     const result = await response.json();
     if (!response.ok) throw new Error(result.message || "Failed to disburse payout");
     return unwrap<any>(result);
+  },
+
+  getInvestors: async (): Promise<any[]> => {
+    const response = await apiRequest("GET", "/admin/flats/investors");
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to fetch property investors");
+    return unwrap<any[]>(result);
+  },
+
+  creditInvestor: async (userId: number, data: { amountUsd: number; monthYear?: string; propertyTitle?: string; bankAccount?: string; destination?: string; note?: string }): Promise<any> => {
+    const response = await apiRequest("POST", `/admin/flats/investors/${userId}/credit`, data);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to credit investor account");
+    return unwrap<any>(result);
+  },
+
+  runMonthlyReturns: async (monthYear?: string): Promise<any> => {
+    const response = await apiRequest("POST", "/admin/flats/run-monthly-returns", { monthYear });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to run monthly returns");
+    return result;
   },
 
   seedDemoData: async (): Promise<any> => {

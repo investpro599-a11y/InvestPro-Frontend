@@ -21,7 +21,10 @@ import {
   Home,
   Info,
   ExternalLink,
+  ChevronLeft,
   ChevronRight,
+  Upload,
+  Image as ImageIcon,
   Tv,
   Bed,
   Sofa,
@@ -96,6 +99,193 @@ const getRecommendedInventory = (totalPrice: number): InventoryItem[] => [
   { name: "Lease Security Deposit & Reserve Fund", category: "Operations", costUsd: Math.round(totalPrice * 0.38), description: "Initial building lease deposit, utility setup & operating reserve" },
 ];
 
+const DEFAULT_PROPERTY_IMAGE = 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80';
+
+// Client-side image compressor so uploaded pictures store reliably in MongoDB across local & deployed environments
+const compressImageFile = (file: File, maxDimension = 1280, quality = 0.82): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error(`Failed to read ${file.name}`));
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      const img = new window.Image();
+      img.onerror = () => resolve(dataUrl);
+      img.onload = () => {
+        try {
+          let { width, height } = img;
+          if (width > maxDimension || height > maxDimension) {
+            if (width >= height) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve(dataUrl);
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        } catch {
+          resolve(dataUrl);
+        }
+      };
+      img.src = dataUrl;
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
+// Reusable multi-picture sequential carousel (displays pictures one after another with auto-slide + controls)
+function PropertyImageCarousel({
+  images,
+  title,
+  heightClass = 'h-56',
+  autoPlayMs = 3500,
+  showThumbnails = false,
+  children,
+}: {
+  images?: string[];
+  title: string;
+  heightClass?: string;
+  autoPlayMs?: number;
+  showThumbnails?: boolean;
+  children?: React.ReactNode;
+}) {
+  const validImages = Array.isArray(images) && images.filter(Boolean).length > 0
+    ? images.filter(Boolean)
+    : [DEFAULT_PROPERTY_IMAGE];
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    if (currentIndex >= validImages.length) {
+      setCurrentIndex(0);
+    }
+  }, [validImages.length, currentIndex]);
+
+  useEffect(() => {
+    if (validImages.length <= 1 || isPaused || !autoPlayMs) return;
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % validImages.length);
+    }, autoPlayMs);
+    return () => clearInterval(timer);
+  }, [validImages.length, isPaused, autoPlayMs]);
+
+  const goPrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev - 1 + validImages.length) % validImages.length);
+  };
+
+  const goNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev + 1) % validImages.length);
+  };
+
+  return (
+    <div className="space-y-2">
+      <div
+        className={`relative ${heightClass} w-full overflow-hidden bg-slate-100 dark:bg-slate-800 select-none`}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={() => setIsPaused(true)}
+        onTouchEnd={() => setIsPaused(false)}
+      >
+        {validImages.map((imgSrc, idx) => (
+          <img
+            key={`${idx}-${imgSrc.slice(0, 32)}`}
+            src={imgSrc}
+            alt={`${title} - Photo ${idx + 1}`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+              idx === currentIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+            }`}
+          />
+        ))}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30 z-10 pointer-events-none" />
+
+        {validImages.length > 1 && (
+          <>
+            {/* Prev / Next Controls */}
+            <button
+              type="button"
+              onClick={goPrev}
+              aria-label="Previous picture"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 h-8 w-8 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white border border-white/20 flex items-center justify-center backdrop-blur-sm transition-all shadow-md"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={goNext}
+              aria-label="Next picture"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 h-8 w-8 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white border border-white/20 flex items-center justify-center backdrop-blur-sm transition-all shadow-md"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+
+            {/* Counter Badge */}
+            <div className="absolute top-3 right-3 z-20 bg-slate-950/75 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-white/20 backdrop-blur-md flex items-center gap-1">
+              <ImageIcon className="h-3 w-3 text-sky-400" />
+              <span>{currentIndex + 1} / {validImages.length}</span>
+            </div>
+
+            {/* Dot Indicators */}
+            <div className="absolute bottom-3 right-3 z-20 flex items-center gap-1.5 bg-slate-950/60 px-2 py-1 rounded-full backdrop-blur-sm border border-white/10">
+              {validImages.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentIndex(idx);
+                  }}
+                  aria-label={`View picture ${idx + 1}`}
+                  className={`h-1.5 rounded-full transition-all ${
+                    idx === currentIndex ? 'w-4 bg-emerald-400' : 'w-1.5 bg-white/60 hover:bg-white'
+                  }`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        <div className="relative z-20 w-full h-full pointer-events-none">
+          {children}
+        </div>
+      </div>
+
+      {/* Optional Thumbnail Strip for Detail / Inspect Modals */}
+      {showThumbnails && validImages.length > 1 && (
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          {validImages.map((imgSrc, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => setCurrentIndex(idx)}
+              className={`relative h-14 w-20 rounded-xl overflow-hidden shrink-0 border-2 transition-all ${
+                idx === currentIndex
+                  ? 'border-emerald-500 ring-2 ring-emerald-500/30 scale-[1.02]'
+                  : 'border-slate-200 dark:border-slate-800 opacity-70 hover:opacity-100'
+              }`}
+            >
+              <img src={imgSrc} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+              <span className="absolute bottom-0.5 right-1 bg-slate-950/80 text-white text-[9px] font-bold px-1 rounded">
+                #{idx + 1}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PropertyInvestmentPageContent() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
@@ -151,8 +341,120 @@ function PropertyInvestmentPageContent() {
   const [newPropYield, setNewPropYield] = useState('21');
   const [newPropDesc, setNewPropDesc] = useState('');
   const [newPropFeatures, setNewPropFeatures] = useState('Prime Location, Smart Lock, Resort Pool, High Occupancy, 100% Bills Covered');
-  const [newPropImages, setNewPropImages] = useState('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80');
+  const [newPropImages, setNewPropImages] = useState('');
+  const [newPropImageList, setNewPropImageList] = useState<string[]>([DEFAULT_PROPERTY_IMAGE]);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
   const [newPropInventory, setNewPropInventory] = useState<InventoryItem[]>([]);
+
+  // Admin Edit Existing Property Photos State
+  const [editingPhotosFlat, setEditingPhotosFlat] = useState<Flat | null>(null);
+  const [editingPhotosList, setEditingPhotosList] = useState<string[]>([]);
+  const [editingPhotoUrlInput, setEditingPhotoUrlInput] = useState('');
+
+  // Admin Bank/Account Payout & Direct Credit State
+  const [payoutBankAccount, setPayoutBankAccount] = useState<string>('');
+  const [payoutDestination, setPayoutDestination] = useState<string>('Bank Account & Property Wallet');
+  const [selectedInvestorForCredit, setSelectedInvestorForCredit] = useState<any | null>(null);
+  const [creditAmount, setCreditAmount] = useState<string>('');
+  const [creditMonthYear, setCreditMonthYear] = useState<string>('October 2026');
+  const [creditPropertyTitle, setCreditPropertyTitle] = useState<string>('');
+  const [creditBankAccount, setCreditBankAccount] = useState<string>('');
+  const [creditDestination, setCreditDestination] = useState<string>('Investor Bank Account & Property Wallet');
+  const [creditNote, setCreditNote] = useState<string>('Monthly return on property investment');
+
+  const handleReplaceSingleImage = async (
+    file: File | undefined,
+    index: number,
+    targetSetter: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error(`${file.name} is not an image file`);
+      return;
+    }
+    setIsUploadingImages(true);
+    try {
+      const compressed = await compressImageFile(file);
+      targetSetter((prev) => {
+        const copy = [...prev];
+        copy[index] = compressed;
+        return copy;
+      });
+      toast.success(`Changed picture #${index + 1}`);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to replace picture');
+    } finally {
+      setIsUploadingImages(false);
+    }
+  };
+
+  const handleUploadPropertyFiles = async (
+    files: FileList | null,
+    targetSetter: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    if (!files || files.length === 0) return;
+    setIsUploadingImages(true);
+    try {
+      const fileArray = Array.from(files);
+      const compressedList: string[] = [];
+      for (const file of fileArray) {
+        if (!file.type.startsWith('image/')) {
+          toast.error(`${file.name} is not an image file`);
+          continue;
+        }
+        const compressed = await compressImageFile(file);
+        compressedList.push(compressed);
+      }
+      if (compressedList.length > 0) {
+        targetSetter((prev) => {
+          // If only the default placeholder was there, replace it with the uploaded photo(s); otherwise append one after another
+          const base = prev.length === 1 && prev[0] === DEFAULT_PROPERTY_IMAGE ? [] : prev;
+          return [...base, ...compressedList];
+        });
+        toast.success(`Added ${compressedList.length} picture${compressedList.length > 1 ? 's' : ''}`);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to process selected pictures');
+    } finally {
+      setIsUploadingImages(false);
+    }
+  };
+
+  const handleAddImageUrl = (
+    rawInput: string,
+    clearInput: () => void,
+    targetSetter: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    const urls = rawInput
+      .split(/[\n,]+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (urls.length === 0) {
+      toast.error('Please paste at least one image URL');
+      return;
+    }
+    targetSetter((prev) => {
+      const base = prev.length === 1 && prev[0] === DEFAULT_PROPERTY_IMAGE ? [] : prev;
+      return [...base, ...urls];
+    });
+    clearInput();
+    toast.success(`Added ${urls.length} image URL${urls.length > 1 ? 's' : ''}`);
+  };
+
+  const moveImageInList = (
+    index: number,
+    direction: -1 | 1,
+    targetSetter: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    targetSetter((prev) => {
+      const nextIndex = index + direction;
+      if (nextIndex < 0 || nextIndex >= prev.length) return prev;
+      const copy = [...prev];
+      const [item] = copy.splice(index, 1);
+      copy.splice(nextIndex, 0, item);
+      return copy;
+    });
+  };
 
   // Admin Custom Inventory Item Builder State
   const [customItemName, setCustomItemName] = useState('');
@@ -282,9 +584,28 @@ function PropertyInvestmentPageContent() {
       // Reset form
       setNewPropTitle('');
       setNewPropDesc('');
+      setNewPropImages('');
+      setNewPropImageList([DEFAULT_PROPERTY_IMAGE]);
       setNewPropInventory([]);
     },
     onError: (err: any) => toast.error(err.message || 'Failed to create property'),
+  });
+
+  // Admin Update Property Images Mutation
+  const updatePropertyImagesMutation = useMutation({
+    mutationFn: async ({ id, images }: { id: number; images: string[] }) => {
+      return await flatsApi.updateFlat(id, { images });
+    },
+    onSuccess: () => {
+      toast.success('Property pictures updated successfully!');
+      queryClient.invalidateQueries({ queryKey: ['flats'] });
+      queryClient.invalidateQueries({ queryKey: ['airbnbWallet'] });
+      queryClient.invalidateQueries({ queryKey: ['adminFlatInvestments'] });
+      setEditingPhotosFlat(null);
+      setEditingPhotosList([]);
+      setEditingPhotoUrlInput('');
+    },
+    onError: (err: any) => toast.error(err.message || 'Failed to update property pictures'),
   });
 
   // Admin Delete Property Mutation
@@ -299,19 +620,63 @@ function PropertyInvestmentPageContent() {
     onError: (err: any) => toast.error(err.message || 'Failed to delete property'),
   });
 
-  // Admin Disburse Rental Dividend Mutation (supports daily and monthly)
+  // Admin Disburse Rental Dividend Mutation (supports daily, monthly, and bank account transfer)
   const disburseMutation = useMutation({
-    mutationFn: async ({ id, amountUsd, monthYear, note, payoutType, daysCount }: { id: number; amountUsd: number; monthYear: string; note: string; payoutType?: string; daysCount?: number }) => {
-      return await flatsApi.disburseRentalPayout(id, { amountUsd, monthYear, note, payoutType, daysCount });
+    mutationFn: async ({ id, amountUsd, monthYear, note, payoutType, daysCount, bankAccount, destination }: { id: number; amountUsd: number; monthYear: string; note: string; payoutType?: string; daysCount?: number; bankAccount?: string; destination?: string }) => {
+      return await flatsApi.disburseRentalPayout(id, { amountUsd, monthYear, note, payoutType, daysCount, bankAccount, destination });
     },
     onSuccess: () => {
-      toast.success('Rental dividend disbursed directly to investor Property Wallet!');
+      toast.success('Monthly return sent to investor account & notification delivered!');
       queryClient.invalidateQueries({ queryKey: ['adminFlatInvestments'] });
+      queryClient.invalidateQueries({ queryKey: ['adminPropertyInvestors'] });
       queryClient.invalidateQueries({ queryKey: ['airbnbWallet'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications/unread'] });
       setIsAdminPayoutModalOpen(false);
       setSelectedInvestmentForPayout(null);
     },
     onError: (err: any) => toast.error(err.message || 'Failed to disburse dividend'),
+  });
+
+  // Fetch all users & property investors summary for Admin
+  const { data: allPropertyInvestors = [], isLoading: isLoadingInvestors } = useQuery<any[]>({
+    queryKey: ['adminPropertyInvestors'],
+    queryFn: flatsApi.getInvestors,
+    enabled: isAdmin,
+  });
+
+  // Admin Direct Credit to Any Investor's Bank / Property Account Mutation
+  const creditInvestorMutation = useMutation({
+    mutationFn: async ({ userId, data }: { userId: number; data: { amountUsd: number; monthYear?: string; propertyTitle?: string; bankAccount?: string; destination?: string; note?: string } }) => {
+      return await flatsApi.creditInvestor(userId, data);
+    },
+    onSuccess: () => {
+      toast.success('Funds added to investor account & notification sent!');
+      queryClient.invalidateQueries({ queryKey: ['adminPropertyInvestors'] });
+      queryClient.invalidateQueries({ queryKey: ['adminFlatInvestments'] });
+      queryClient.invalidateQueries({ queryKey: ['airbnbWallet'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications/unread'] });
+      setSelectedInvestorForCredit(null);
+      setCreditAmount('');
+    },
+    onError: (err: any) => toast.error(err.message || 'Failed to send money to investor account'),
+  });
+
+  // Admin Run End-of-Month Auto-Returns & Notify All Investors Mutation
+  const runMonthlyReturnsMutation = useMutation({
+    mutationFn: async (monthYear?: string) => {
+      return await flatsApi.runMonthlyReturns(monthYear);
+    },
+    onSuccess: (res) => {
+      toast.success(res.message || 'End-of-month property returns & notifications processed!');
+      queryClient.invalidateQueries({ queryKey: ['adminPropertyInvestors'] });
+      queryClient.invalidateQueries({ queryKey: ['adminFlatInvestments'] });
+      queryClient.invalidateQueries({ queryKey: ['airbnbWallet'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications/unread'] });
+    },
+    onError: (err: any) => toast.error(err.message || 'Failed to run monthly returns'),
   });
 
   // User Dedicated Property Rental Withdrawal Mutation
@@ -686,15 +1051,13 @@ function PropertyInvestmentPageContent() {
                       key={flat.id}
                       className="glass-card bg-[#0e2238]/90 [html.light_&]:bg-white border-sky-500/20 [html.light_&]:border-slate-200/80 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group"
                     >
-                      {/* Image Header with Badges */}
-                      <div className="relative h-56 w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
-                        <img
-                          src={flat.images?.[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80'}
-                          alt={flat.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30" />
-
+                      {/* Multi-Picture Sequential Carousel Header with Badges */}
+                      <PropertyImageCarousel
+                        images={flat.images}
+                        title={flat.title}
+                        heightClass="h-56"
+                        autoPlayMs={3500}
+                      >
                         {/* Top Badges */}
                         <div className="absolute top-3 left-3 flex items-center gap-2">
                           <span className="bg-emerald-500 text-slate-950 font-black text-xs px-3 py-1 rounded-full shadow-md">
@@ -708,9 +1071,9 @@ function PropertyInvestmentPageContent() {
                         {/* Location Pill */}
                         <div className="absolute bottom-3 left-3 flex items-center gap-1.5 text-xs font-semibold text-white bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-lg border border-white/20">
                           <MapPin className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                          <span className="truncate max-w-[220px]">{flat.location || 'United States'}</span>
+                          <span className="truncate max-w-[200px]">{flat.location || 'United States'}</span>
                         </div>
-                      </div>
+                      </PropertyImageCarousel>
 
                       {/* Card Content */}
                       <CardContent className="p-5 flex-1 flex flex-col justify-between">
@@ -762,20 +1125,41 @@ function PropertyInvestmentPageContent() {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="grid grid-cols-2 gap-2 pt-2">
-                          <Button
-                            variant="outline"
-                            onClick={() => openInspectModal(flat)}
-                            className="w-full py-2.5 rounded-xl font-bold text-xs border-sky-400/30 text-sky-200 [html.light_&]:text-slate-700 [html.light_&]:border-slate-300 hover:bg-sky-500/10 [html.light_&]:hover:bg-slate-100"
-                          >
-                            Inspect Items
-                          </Button>
-                          <Button
-                            onClick={() => openPropertyDetail(flat)}
-                            className="w-full py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white shadow-md shadow-sky-500/25"
-                          >
-                            Acquire Unit &rarr;
-                          </Button>
+                        <div className="space-y-2 pt-2">
+                          <div className="grid grid-cols-2 gap-2">
+                            <Button
+                              variant="outline"
+                              onClick={() => openInspectModal(flat)}
+                              className="w-full py-2.5 rounded-xl font-bold text-xs border-sky-400/30 text-sky-200 [html.light_&]:text-slate-700 [html.light_&]:border-slate-300 hover:bg-sky-500/10 [html.light_&]:hover:bg-slate-100"
+                            >
+                              Inspect Items
+                            </Button>
+                            <Button
+                              onClick={() => openPropertyDetail(flat)}
+                              className="w-full py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white shadow-md shadow-sky-500/25"
+                            >
+                              Acquire Unit &rarr;
+                            </Button>
+                          </div>
+                          {isAdmin && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => {
+                                setEditingPhotosFlat(flat);
+                                setEditingPhotosList(
+                                  Array.isArray(flat.images) && flat.images.length > 0
+                                    ? [...flat.images]
+                                    : [DEFAULT_PROPERTY_IMAGE]
+                                );
+                                setEditingPhotoUrlInput('');
+                              }}
+                              className="w-full py-2 rounded-xl font-bold text-xs bg-sky-500/10 border-sky-400/35 text-sky-300 [html.light_&]:text-sky-700 [html.light_&]:bg-sky-50 hover:bg-sky-500/20 flex items-center justify-center gap-1.5"
+                            >
+                              <ImageIcon className="h-3.5 w-3.5" />
+                              <span>Change / Manage Pictures ({flat.images?.length || 1})</span>
+                            </Button>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -788,6 +1172,41 @@ function PropertyInvestmentPageContent() {
         {/* TAB 2: MY PROPERTIES & DEDICATED WALLET */}
         {activeTab === 'wallet' && (
           <div className="space-y-8">
+            {/* Automatic End-of-Month Return Notification Alert for Investor */}
+            {(myPayouts.length > 0 || myInvestments.length > 0) && (
+              <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-950/60 via-[#08242b]/80 to-teal-950/50 [html.light_&]:from-emerald-50 [html.light_&]:via-teal-50/70 [html.light_&]:to-emerald-50 border border-emerald-500/35 [html.light_&]:border-emerald-300 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-3.5">
+                  <div className="h-12 w-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 [html.light_&]:text-emerald-700 shrink-0">
+                    <Sparkles className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500 text-slate-950">
+                        Automated Monthly Return Notice
+                      </span>
+                      {myPayouts[0] && (
+                        <span className="text-xs font-bold text-emerald-300 [html.light_&]:text-emerald-800">
+                          Latest: {new Date(myPayouts[0].paidAt).toLocaleDateString()} ({myPayouts[0].monthYear})
+                        </span>
+                      )}
+                    </div>
+                    {myPayouts[0] ? (
+                      <p className="text-xs sm:text-sm font-semibold text-white [html.light_&]:text-slate-900 mt-1">
+                        Admin has sent you a return of <strong className="text-emerald-400 [html.light_&]:text-emerald-700">{formatUSD(myPayouts[0].amountUsd)} USD</strong> on the property <strong>&ldquo;{myPayouts[0].flatTitle}&rdquo;</strong> you invested in ({myPayouts[0].monthYear}).
+                      </p>
+                    ) : (
+                      <p className="text-xs sm:text-sm font-semibold text-white [html.light_&]:text-slate-900 mt-1">
+                        Your monthly property investment return notifications are automatically delivered at the end of each month once Admin disburses your rental yield.
+                      </p>
+                    )}
+                    <p className="text-[11px] text-slate-300 [html.light_&]:text-slate-600 mt-0.5">
+                      Automatic end-of-month notification schedule active • Returns are credited directly to your registered investor account.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Dedicated Property Wallet Hero Card */}
             <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-sky-500/25 [html.light_&]:bg-white [html.light_&]:border-slate-200/80 shadow-md">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
@@ -1015,11 +1434,20 @@ function PropertyInvestmentPageContent() {
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <Button
+                  type="button"
+                  onClick={() => runMonthlyReturnsMutation.mutate(undefined)}
+                  disabled={runMonthlyReturnsMutation.isPending}
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold px-4 py-2.5 rounded-xl shadow-md flex items-center gap-2 text-xs sm:text-sm"
+                >
+                  <Send className="h-4 w-4" />
+                  <span>{runMonthlyReturnsMutation.isPending ? 'Sending Monthly Returns...' : '⚡ Run End-of-Month Returns & Notify All'}</span>
+                </Button>
+                <Button
                   onClick={() => {
                     setNewPropInventory(getRecommendedInventory(Number(newPropPrice) || 3000));
                     setIsAdminAddModalOpen(true);
                   }}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-md flex items-center gap-2"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-md flex items-center gap-2 text-xs sm:text-sm"
                 >
                   <Plus className="h-4 w-4" />
                   + Add New Property Listing
@@ -1174,22 +1602,21 @@ function PropertyInvestmentPageContent() {
                               {formatUSD(inv.totalPaidUsd || 0)}
                             </td>
                             <td className="px-6 py-4 text-right">
-                              {isLive ? (
-                                <Button
-                                  size="sm"
-                                  onClick={() => {
-                                    setSelectedInvestmentForPayout(inv);
-                                    setPayoutAmount(String(inv.monthlyRentUsd || (inv.flat?.monthlyRentUsd ?? 0)));
-                                    setIsAdminPayoutModalOpen(true);
-                                  }}
-                                  className="bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-xs shadow-md"
-                                >
-                                  <DollarSign className="h-3.5 w-3.5 mr-1" />
-                                  Disburse Rent
-                                </Button>
-                              ) : (
-                                <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">In Setup</span>
-                              )}
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedInvestmentForPayout(inv);
+                                  setPayoutAmount(String(inv.monthlyRentUsd || (inv.flat?.monthlyRentUsd ?? 0)));
+                                  const investorObj = allPropertyInvestors.find((u: any) => u.id === inv.userId);
+                                  setPayoutBankAccount(investorObj?.bankOrWalletAccount || '');
+                                  setPayoutDestination('Bank Account & Property Wallet');
+                                  setIsAdminPayoutModalOpen(true);
+                                }}
+                                className="bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-xs shadow-md"
+                              >
+                                <DollarSign className="h-3.5 w-3.5 mr-1" />
+                                Add Property ROI to Wallet
+                              </Button>
                             </td>
                           </tr>
                         );
@@ -1198,6 +1625,109 @@ function PropertyInvestmentPageContent() {
                   </table>
                 </div>
               )}
+            </div>
+
+            {/* Eligible Investors Directory & Direct Bank/Account Deposit Control */}
+            <div>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Landmark className="h-5 w-5 text-sky-400" />
+                    Property Investors & Eligible Users — Bank & Account Controls ({allPropertyInvestors.length})
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    View everyone eligible to invest or currently holding properties. Send monthly returns or add money directly to any investor&apos;s bank account or wallet with instant user notification.
+                  </p>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-sky-500/20 bg-white dark:bg-[#091a2e]/90 shadow-md">
+                <table className="w-full text-left text-sm text-slate-700 dark:text-slate-300">
+                  <thead className="bg-slate-100 dark:bg-slate-950/80 text-xs uppercase font-bold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-sky-500/20">
+                    <tr>
+                      <th className="px-5 py-4">User / Eligibility</th>
+                      <th className="px-5 py-4">Bank / Wallet Account</th>
+                      <th className="px-5 py-4">Property Holdings</th>
+                      <th className="px-5 py-4">Monthly Return</th>
+                      <th className="px-5 py-4">Account Balance / Earned</th>
+                      <th className="px-5 py-4 text-right">Admin Bank / Account Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                    {isLoadingInvestors ? (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-8 text-center text-xs text-slate-400">
+                          Loading investors directory...
+                        </td>
+                      </tr>
+                    ) : (
+                      allPropertyInvestors.map((invUser: any) => (
+                        <tr key={invUser.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                          <td className="px-5 py-4">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-slate-900 dark:text-white">{invUser.fullName || invUser.username}</span>
+                              {invUser.investmentsCount > 0 ? (
+                                <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 text-[10px]">
+                                  Active Investor ({invUser.investmentsCount})
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-sky-500/10 text-sky-600 dark:text-sky-300 border border-sky-500/25 text-[10px]">
+                                  Eligible to Invest
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="text-xs text-slate-500">{invUser.email}</div>
+                          </td>
+                          <td className="px-5 py-4 text-xs font-mono">
+                            {invUser.bankOrWalletAccount ? (
+                              <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200">
+                                {invUser.bankOrWalletAccount}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400 italic">Not set (Admin can enter on transfer)</span>
+                            )}
+                          </td>
+                          <td className="px-5 py-4">
+                            <div className="font-extrabold text-slate-900 dark:text-white">{formatUSD(invUser.totalInvestedUsd)}</div>
+                            <div className="text-[11px] text-slate-500">
+                              {invUser.investments?.length > 0
+                                ? invUser.investments.map((i: any) => i.flat?.title || `Unit #${i.flatId}`).join(', ')
+                                : 'No units acquired yet'}
+                            </div>
+                          </td>
+                          <td className="px-5 py-4 font-extrabold text-emerald-600 dark:text-emerald-400">
+                            {formatUSD(invUser.expectedMonthlyUsd)} / mo
+                          </td>
+                          <td className="px-5 py-4">
+                            <div className="font-extrabold text-sky-600 dark:text-sky-400">{formatUSD(invUser.propertyBalanceUsd)} Balance</div>
+                            <div className="text-[11px] text-slate-500">Total Sent: {formatUSD(invUser.propertyTotalEarnedUsd)}</div>
+                          </td>
+                          <td className="px-5 py-4 text-right">
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                setSelectedInvestorForCredit(invUser);
+                                setCreditAmount(String(invUser.expectedMonthlyUsd > 0 ? invUser.expectedMonthlyUsd : 350));
+                                setCreditPropertyTitle(invUser.investments?.[0]?.flat?.title || 'Property Investment Portfolio');
+                                setCreditBankAccount(invUser.bankOrWalletAccount || '');
+                                setCreditDestination('Investor Bank Account & Property Wallet');
+                                const now = new Date();
+                                const mNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                                setCreditMonthYear(`${mNames[now.getMonth()]} ${now.getFullYear()}`);
+                                setCreditNote('Monthly return on property investment');
+                              }}
+                              className="bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-bold text-xs rounded-xl shadow-sm"
+                            >
+                              <DollarSign className="h-3.5 w-3.5 mr-1" />
+                              Add ROI to User Wallet / Bank
+                            </Button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* Properties Catalog & Management */}
@@ -1232,19 +1762,37 @@ function PropertyInvestmentPageContent() {
                         <td className="px-6 py-4 font-bold text-teal-600 dark:text-teal-400">{flat.annualYieldPercent || 19}%</td>
                         <td className="px-6 py-4 text-xs font-semibold text-slate-600 dark:text-slate-300">{flat.inventory?.length || 0} items</td>
                         <td className="px-6 py-4 text-right">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (confirm(`Are you sure you want to delete property "${flat.title}"?`)) {
-                                deletePropertyMutation.mutate(flat.id);
-                              }
-                            }}
-                            disabled={deletePropertyMutation.isPending}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800 transition-colors shadow-sm cursor-pointer"
-                          >
-                            <Trash2 className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
-                            <span className="text-rose-700 dark:text-rose-300 font-bold">Delete</span>
-                          </button>
+                          <div className="inline-flex items-center justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingPhotosFlat(flat);
+                                setEditingPhotosList(
+                                  Array.isArray(flat.images) && flat.images.length > 0
+                                    ? [...flat.images]
+                                    : [DEFAULT_PROPERTY_IMAGE]
+                                );
+                                setEditingPhotoUrlInput('');
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-300 dark:bg-sky-950/50 dark:text-sky-300 dark:border-sky-800 transition-colors shadow-sm cursor-pointer"
+                            >
+                              <ImageIcon className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                              <span>Photos ({flat.images?.length || 1})</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (confirm(`Are you sure you want to delete property "${flat.title}"?`)) {
+                                  deletePropertyMutation.mutate(flat.id);
+                                }
+                              }}
+                              disabled={deletePropertyMutation.isPending}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800 transition-colors shadow-sm cursor-pointer"
+                            >
+                              <Trash2 className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
+                              <span className="text-rose-700 dark:text-rose-300 font-bold">Delete</span>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1272,6 +1820,17 @@ function PropertyInvestmentPageContent() {
             {selectedFlat.description}
           </DialogDescription>
         </DialogHeader>
+
+        {/* Property Multi-Picture Gallery */}
+        <div className="mb-5 rounded-2xl overflow-hidden">
+          <PropertyImageCarousel
+            images={selectedFlat.images}
+            title={selectedFlat.title}
+            heightClass="h-60 sm:h-72 rounded-2xl"
+            autoPlayMs={3500}
+            showThumbnails={true}
+          />
+        </div>
 
         {/* Key Financial Summary */}
         <div className="grid grid-cols-3 gap-3 my-5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-sky-500/20 text-center">
@@ -1416,6 +1975,17 @@ function PropertyInvestmentPageContent() {
             Complete itemized physical furnishing catalog and utility inclusion package.
           </DialogDescription>
         </DialogHeader>
+
+        {/* Property Multi-Picture Gallery */}
+        <div className="mb-5 rounded-2xl overflow-hidden">
+          <PropertyImageCarousel
+            images={selectedFlat.images}
+            title={selectedFlat.title}
+            heightClass="h-52 sm:h-64 rounded-2xl"
+            autoPlayMs={3500}
+            showThumbnails={true}
+          />
+        </div>
 
         {/* Bills Package Box */}
         <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 mb-5">
@@ -1730,8 +2300,25 @@ function PropertyInvestmentPageContent() {
 
       <div>
         <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">
-          Disburse Amount ($ USD) *
+          Disburse ROI Amount to User Wallet ($ USD) *
         </label>
+        {Number(selectedInvestmentForPayout?.amountUsd || 0) > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            {[18, 19, 20, 21, 22].map((annualRoi) => {
+              const monthlyVal = Math.round((Number(selectedInvestmentForPayout?.amountUsd || 0) * (annualRoi / 100)) / 12);
+              return (
+                <button
+                  key={annualRoi}
+                  type="button"
+                  onClick={() => setPayoutAmount(String(monthlyVal))}
+                  className="px-2 py-0.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/25 font-bold text-[10px]"
+                >
+                  {annualRoi}% ROI (${monthlyVal}/mo)
+                </button>
+              );
+            })}
+          </div>
+        )}
         <input
           type="number"
           value={payoutAmount}
@@ -1742,12 +2329,41 @@ function PropertyInvestmentPageContent() {
       </div>
 
       <div>
+        <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">
+          Transfer Destination *
+        </label>
+        <select
+          value={payoutDestination}
+          onChange={(e) => setPayoutDestination(e.target.value)}
+          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-xs font-bold"
+        >
+          <option value="Bank Account & Property Wallet">Investor Bank Account & Property Wallet</option>
+          <option value="Direct Bank Account Deposit (IBAN / Wire)">Direct Bank Account Deposit (IBAN / Wire)</option>
+          <option value="Dedicated Property Wallet (USD)">Dedicated Property Wallet (USD)</option>
+          <option value="USDT (TRC-20) Crypto Wallet">USDT (TRC-20) Crypto Wallet</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">
+          Investor Bank Account / IBAN / Wallet Address
+        </label>
+        <input
+          type="text"
+          value={payoutBankAccount}
+          onChange={(e) => setPayoutBankAccount(e.target.value)}
+          placeholder="e.g. HBL / Meezan / IBAN / USDT Wallet Address"
+          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white font-mono text-xs"
+        />
+      </div>
+
+      <div>
         <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">Statement Note</label>
         <input
           type="text"
           value={payoutNote}
           onChange={(e) => setPayoutNote(e.target.value)}
-          placeholder="e.g. Guest booking dividend"
+          placeholder="e.g. Monthly property investment return"
           className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-xs"
         />
       </div>
@@ -1771,12 +2387,14 @@ function PropertyInvestmentPageContent() {
             note: payoutNote,
             payoutType,
             daysCount: payoutDaysCount,
+            bankAccount: payoutBankAccount,
+            destination: payoutDestination,
           });
         }}
         disabled={disburseMutation.isPending}
         className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold"
       >
-        {disburseMutation.isPending ? "Disbursing..." : "Confirm & Disburse Funds"}
+        {disburseMutation.isPending ? "Sending..." : "Send Money & Notify Investor"}
       </Button>
     </DialogFooter>
   </DialogContent>
@@ -1909,29 +2527,160 @@ function PropertyInvestmentPageContent() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">Annual Yield % *</label>
-          <input
-            type="number"
-            value={newPropYield}
-            onChange={(e) => setNewPropYield(e.target.value)}
-            placeholder="21"
-            className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-sm"
-          />
+      <div>
+        <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">Annual Yield % *</label>
+        <input
+          type="number"
+          value={newPropYield}
+          onChange={(e) => setNewPropYield(e.target.value)}
+          placeholder="21"
+          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-sm"
+        />
+      </div>
+
+      {/* Property Pictures Uploader & Multi-Image Sequential Builder */}
+      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-sky-500/25 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <label className="text-xs uppercase font-extrabold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+              <ImageIcon className="h-4 w-4 text-sky-500" />
+              Property Pictures ({newPropImageList.length} added — displays one after another)
+            </label>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+              Upload one or multiple pictures from your device or paste image URLs. Pictures automatically cycle one after another on the listing.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <label className="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white shadow-md shadow-sky-500/20 transition-all">
+              <Upload className="h-3.5 w-3.5" />
+              <span>{isUploadingImages ? 'Processing...' : '+ Upload Pictures'}</span>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                disabled={isUploadingImages}
+                onChange={(e) => {
+                  handleUploadPropertyFiles(e.target.files, setNewPropImageList);
+                  e.target.value = '';
+                }}
+                className="hidden"
+              />
+            </label>
+            {newPropImageList.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setNewPropImageList([])}
+                className="px-2.5 py-2 rounded-xl text-[11px] font-bold text-rose-500 hover:bg-rose-500/10 border border-rose-500/20 transition-colors"
+              >
+                Clear All
+              </button>
+            )}
+          </div>
         </div>
-        <div>
-          <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">
-            Image URLs (comma or newline separated)
-          </label>
+
+        {/* Optional Image URL Adder */}
+        <div className="flex flex-col sm:flex-row gap-2">
           <input
             type="text"
             value={newPropImages}
             onChange={(e) => setNewPropImages(e.target.value)}
-            placeholder="https://images.unsplash.com/..., https://..."
-            className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-xs font-mono"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleAddImageUrl(newPropImages, () => setNewPropImages(''), setNewPropImageList);
+              }
+            }}
+            placeholder="Or paste image URL(s) (comma-separated) and click + Add URL..."
+            className="flex-1 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-xs font-mono"
           />
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => handleAddImageUrl(newPropImages, () => setNewPropImages(''), setNewPropImageList)}
+            className="text-xs font-bold border-sky-500/30 text-sky-600 dark:text-sky-400 shrink-0 h-9 rounded-xl"
+          >
+            + Add URL
+          </Button>
         </div>
+
+        {/* Ordered Picture Preview Strip */}
+        {newPropImageList.length === 0 ? (
+          <div className="text-center py-6 rounded-xl border border-dashed border-slate-300 dark:border-slate-800 text-xs text-slate-400">
+            No pictures added yet. Click <strong>+ Upload Pictures</strong> above to select one or multiple photos.
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+            {newPropImageList.map((imgSrc, idx) => (
+              <div
+                key={idx}
+                className="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-900 aspect-video shadow-sm"
+              >
+                <img
+                  src={imgSrc}
+                  alt={`Property photo ${idx + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/40" />
+
+                <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-slate-950/80 text-white text-[10px] font-extrabold border border-white/15">
+                  {idx === 0 ? '★ #1 Cover' : `#${idx + 1}`}
+                </span>
+
+                <div className="absolute top-1.5 right-1.5 flex items-center gap-1">
+                  <label
+                    className="cursor-pointer px-2 py-0.5 rounded-md bg-sky-600/90 hover:bg-sky-500 text-white text-[10px] font-bold shadow flex items-center gap-1"
+                    title="Change this picture"
+                  >
+                    <span>Change</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={isUploadingImages}
+                      onChange={(e) => {
+                        handleReplaceSingleImage(e.target.files?.[0], idx, setNewPropImageList);
+                        e.target.value = '';
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setNewPropImageList((prev) => prev.filter((_, i) => i !== idx))}
+                    className="h-6 w-6 rounded-full bg-rose-600/90 hover:bg-rose-600 text-white flex items-center justify-center shadow"
+                    title="Remove picture"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                {newPropImageList.length > 1 && (
+                  <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between">
+                    <button
+                      type="button"
+                      disabled={idx === 0}
+                      onClick={() => moveImageInList(idx, -1, setNewPropImageList)}
+                      className="px-2 py-0.5 rounded bg-slate-950/80 hover:bg-slate-900 disabled:opacity-30 text-white text-[10px] font-bold border border-white/15"
+                      title="Move earlier"
+                    >
+                      &larr; Prev
+                    </button>
+                    <button
+                      type="button"
+                      disabled={idx === newPropImageList.length - 1}
+                      onClick={() => moveImageInList(idx, 1, setNewPropImageList)}
+                      className="px-2 py-0.5 rounded bg-slate-950/80 hover:bg-slate-900 disabled:opacity-30 text-white text-[10px] font-bold border border-white/15"
+                      title="Move later"
+                    >
+                      Next &rarr;
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div>
@@ -2074,7 +2823,8 @@ function PropertyInvestmentPageContent() {
           const daily = Number(newPropDailyRate) || 65;
           const yieldPct = Number(newPropYield) || 21;
           const inv = newPropInventory.length > 0 ? newPropInventory : getRecommendedInventory(price);
-          const parsedImages = newPropImages.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+          const extraUrls = newPropImages.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+          const combinedImages = [...newPropImageList, ...extraUrls].filter(Boolean);
 
           createPropertyMutation.mutate({
             title: newPropTitle,
@@ -2086,15 +2836,361 @@ function PropertyInvestmentPageContent() {
             annualYieldPercent: yieldPct,
             description: newPropDesc,
             features: newPropFeatures.split(',').map(s => s.trim()).filter(Boolean),
-            images: parsedImages.length > 0 ? parsedImages : [newPropImages],
+            images: combinedImages.length > 0 ? combinedImages : [DEFAULT_PROPERTY_IMAGE],
             inventory: inv,
             status: 'available',
           });
         }}
-        disabled={createPropertyMutation.isPending}
+        disabled={createPropertyMutation.isPending || isUploadingImages}
         className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold"
       >
         {createPropertyMutation.isPending ? "Creating Listing..." : "Publish Property Listing"}
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
+{/* ─── MODAL 7: ADMIN MANAGE EXISTING PROPERTY PHOTOS MODAL ───────── */}
+<Dialog open={!!editingPhotosFlat} onOpenChange={(open) => !open && setEditingPhotosFlat(null)}>
+  <DialogContent className="bg-white dark:bg-[#081729] border border-slate-200 dark:border-sky-500/30 text-slate-900 dark:text-white max-w-2xl rounded-3xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl">
+    <DialogHeader>
+      <DialogTitle className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+        <ImageIcon className="h-6 w-6 text-sky-500" />
+        Manage Property Pictures
+      </DialogTitle>
+      <DialogDescription className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm">
+        {editingPhotosFlat?.title} — Add multiple pictures that will display one after another on the property card and detail modals.
+      </DialogDescription>
+    </DialogHeader>
+
+    <div className="space-y-4 my-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-xs font-extrabold uppercase text-slate-600 dark:text-slate-300">
+          {editingPhotosList.length} Picture{editingPhotosList.length === 1 ? '' : 's'} in Sequence
+        </span>
+        <div className="flex items-center gap-2">
+          <label className="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white shadow-md shadow-sky-500/20 transition-all">
+            <Upload className="h-3.5 w-3.5" />
+            <span>{isUploadingImages ? 'Processing...' : '+ Upload Pictures'}</span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              disabled={isUploadingImages}
+              onChange={(e) => {
+                handleUploadPropertyFiles(e.target.files, setEditingPhotosList);
+                e.target.value = '';
+              }}
+              className="hidden"
+            />
+          </label>
+          {editingPhotosList.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setEditingPhotosList([])}
+              className="px-2.5 py-2 rounded-xl text-[11px] font-bold text-rose-500 hover:bg-rose-500/10 border border-rose-500/20 transition-colors"
+            >
+              Clear All
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Add by URL */}
+      <div className="flex flex-col sm:flex-row gap-2">
+        <input
+          type="text"
+          value={editingPhotoUrlInput}
+          onChange={(e) => setEditingPhotoUrlInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleAddImageUrl(editingPhotoUrlInput, () => setEditingPhotoUrlInput(''), setEditingPhotosList);
+            }
+          }}
+          placeholder="Or paste image URL(s) (comma-separated) and click + Add URL..."
+          className="flex-1 px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-xs font-mono"
+        />
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => handleAddImageUrl(editingPhotoUrlInput, () => setEditingPhotoUrlInput(''), setEditingPhotosList)}
+          className="text-xs font-bold border-sky-500/30 text-sky-600 dark:text-sky-400 shrink-0 h-9 rounded-xl"
+        >
+          + Add URL
+        </Button>
+      </div>
+
+      {/* Live Carousel Preview */}
+      {editingPhotosList.length > 0 && (
+        <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+          <PropertyImageCarousel
+            images={editingPhotosList}
+            title={editingPhotosFlat?.title || 'Property'}
+            heightClass="h-48 sm:h-56"
+            autoPlayMs={3000}
+          />
+        </div>
+      )}
+
+      {/* Sequence Order Grid */}
+      {editingPhotosList.length === 0 ? (
+        <div className="text-center py-8 rounded-xl border border-dashed border-slate-300 dark:border-slate-800 text-xs text-slate-400">
+          No pictures in list. Upload pictures or paste URLs above.
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {editingPhotosList.map((imgSrc, idx) => (
+            <div
+              key={idx}
+              className="relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-900 aspect-video shadow-sm"
+            >
+              <img src={imgSrc} alt={`Photo ${idx + 1}`} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/40" />
+              <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-slate-950/80 text-white text-[10px] font-extrabold border border-white/15">
+                {idx === 0 ? '★ #1 Cover' : `#${idx + 1}`}
+              </span>
+              <div className="absolute top-1.5 right-1.5 flex items-center gap-1">
+                <label
+                  className="cursor-pointer px-2 py-0.5 rounded-md bg-sky-600/90 hover:bg-sky-500 text-white text-[10px] font-bold shadow flex items-center gap-1"
+                  title="Change this picture"
+                >
+                  <span>Change</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={isUploadingImages}
+                    onChange={(e) => {
+                      handleReplaceSingleImage(e.target.files?.[0], idx, setEditingPhotosList);
+                      e.target.value = '';
+                    }}
+                    className="hidden"
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setEditingPhotosList((prev) => prev.filter((_, i) => i !== idx))}
+                  className="h-6 w-6 rounded-full bg-rose-600/90 hover:bg-rose-600 text-white flex items-center justify-center shadow"
+                  title="Remove picture"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              {editingPhotosList.length > 1 && (
+                <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between">
+                  <button
+                    type="button"
+                    disabled={idx === 0}
+                    onClick={() => moveImageInList(idx, -1, setEditingPhotosList)}
+                    className="px-2 py-0.5 rounded bg-slate-950/80 hover:bg-slate-900 disabled:opacity-30 text-white text-[10px] font-bold border border-white/15"
+                  >
+                    &larr; Prev
+                  </button>
+                  <button
+                    type="button"
+                    disabled={idx === editingPhotosList.length - 1}
+                    onClick={() => moveImageInList(idx, 1, setEditingPhotosList)}
+                    className="px-2 py-0.5 rounded bg-slate-950/80 hover:bg-slate-900 disabled:opacity-30 text-white text-[10px] font-bold border border-white/15"
+                  >
+                    Next &rarr;
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <DialogFooter className="flex gap-2">
+      <Button
+        variant="outline"
+        onClick={() => setEditingPhotosFlat(null)}
+        className="w-full sm:w-auto"
+      >
+        Cancel
+      </Button>
+      <Button
+        onClick={() => {
+          if (!editingPhotosFlat) return;
+          const extraUrls = editingPhotoUrlInput.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+          const finalImages = [...editingPhotosList, ...extraUrls].filter(Boolean);
+          updatePropertyImagesMutation.mutate({
+            id: editingPhotosFlat.id,
+            images: finalImages.length > 0 ? finalImages : [DEFAULT_PROPERTY_IMAGE],
+          });
+        }}
+        disabled={updatePropertyImagesMutation.isPending || isUploadingImages}
+        className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold"
+      >
+        {updatePropertyImagesMutation.isPending ? 'Saving Pictures...' : 'Save Pictures'}
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
+{/* ─── MODAL 8: ADMIN SEND MONEY TO INVESTOR BANK / ACCOUNT MODAL ─── */}
+<Dialog open={!!selectedInvestorForCredit} onOpenChange={(open) => !open && setSelectedInvestorForCredit(null)}>
+  <DialogContent className="bg-white dark:bg-[#081729] border border-slate-200 dark:border-sky-500/30 text-slate-900 dark:text-white max-w-md rounded-3xl p-6 shadow-2xl">
+    <DialogHeader>
+      <DialogTitle className="text-xl font-black flex items-center gap-2">
+        <Landmark className="h-5 w-5 text-emerald-500" />
+        Send Return / Add Money to Investor Account
+      </DialogTitle>
+      <DialogDescription className="text-slate-500 dark:text-slate-400 text-xs">
+        Investor: <strong className="text-slate-900 dark:text-white">{selectedInvestorForCredit?.fullName || selectedInvestorForCredit?.username}</strong> ({selectedInvestorForCredit?.email})
+      </DialogDescription>
+    </DialogHeader>
+
+    <div className="space-y-3.5 my-3">
+      {selectedInvestorForCredit?.totalInvestedUsd > 0 && (
+        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25">
+          <span className="text-[11px] font-bold uppercase text-emerald-700 dark:text-emerald-300 block mb-1.5">
+            ⚡ Quick Property ROI Calculator (Invested: {formatUSD(selectedInvestorForCredit.totalInvestedUsd)})
+          </span>
+          <div className="flex flex-wrap gap-1.5">
+            {selectedInvestorForCredit.expectedMonthlyUsd > 0 && (
+              <button
+                type="button"
+                onClick={() => setCreditAmount(String(selectedInvestorForCredit.expectedMonthlyUsd))}
+                className="px-2.5 py-1 rounded-lg bg-emerald-500 text-slate-950 font-extrabold text-[11px] shadow-sm"
+              >
+                Monthly Rent ({formatUSD(selectedInvestorForCredit.expectedMonthlyUsd)})
+              </button>
+            )}
+            {[18, 19, 20, 21, 22].map((annualRoi) => {
+              const monthlyVal = Math.round((selectedInvestorForCredit.totalInvestedUsd * (annualRoi / 100)) / 12);
+              return (
+                <button
+                  key={annualRoi}
+                  type="button"
+                  onClick={() => setCreditAmount(String(monthlyVal))}
+                  className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 font-bold text-[11px]"
+                >
+                  {annualRoi}% ROI / yr (${monthlyVal}/mo)
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <div>
+        <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">
+          ROI Amount to Add to User Wallet / Bank ($ USD) *
+        </label>
+        <input
+          type="number"
+          value={creditAmount}
+          onChange={(e) => setCreditAmount(e.target.value)}
+          placeholder="e.g. 520"
+          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-emerald-600 dark:text-emerald-400 font-extrabold text-lg"
+        />
+      </div>
+
+      <div>
+        <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">
+          Destination Account Type *
+        </label>
+        <select
+          value={creditDestination}
+          onChange={(e) => setCreditDestination(e.target.value)}
+          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-xs font-bold"
+        >
+          <option value="Investor Bank Account & Property Wallet">Investor Bank Account & Property Wallet</option>
+          <option value="Direct Bank Account Deposit (IBAN / Wire)">Direct Bank Account Deposit (IBAN / Wire)</option>
+          <option value="Dedicated Property Wallet (USD)">Dedicated Property Wallet (USD)</option>
+          <option value="USDT (TRC-20) Crypto Wallet">USDT (TRC-20) Crypto Wallet</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">
+          Investor Bank Account / IBAN / Wallet Details
+        </label>
+        <input
+          type="text"
+          value={creditBankAccount}
+          onChange={(e) => setCreditBankAccount(e.target.value)}
+          placeholder="e.g. HBL / Meezan Bank / IBAN / USDT Wallet"
+          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white font-mono text-xs"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-2.5">
+        <div>
+          <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">
+            Billing Month *
+          </label>
+          <input
+            type="text"
+            value={creditMonthYear}
+            onChange={(e) => setCreditMonthYear(e.target.value)}
+            placeholder="October 2026"
+            className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-xs font-bold"
+          />
+        </div>
+        <div>
+          <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">
+            Property Reference
+          </label>
+          <input
+            type="text"
+            value={creditPropertyTitle}
+            onChange={(e) => setCreditPropertyTitle(e.target.value)}
+            placeholder="Property Title"
+            className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-xs"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">
+          Notification Message / Statement Note
+        </label>
+        <input
+          type="text"
+          value={creditNote}
+          onChange={(e) => setCreditNote(e.target.value)}
+          placeholder="e.g. Monthly return on property you invested in"
+          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-xs"
+        />
+      </div>
+    </div>
+
+    <DialogFooter className="flex gap-2">
+      <Button
+        variant="outline"
+        onClick={() => setSelectedInvestorForCredit(null)}
+        className="w-full sm:w-auto"
+      >
+        Cancel
+      </Button>
+      <Button
+        onClick={() => {
+          if (!selectedInvestorForCredit) return;
+          const amt = Number(creditAmount);
+          if (isNaN(amt) || amt <= 0) {
+            toast.error('Please enter a valid USD amount');
+            return;
+          }
+          creditInvestorMutation.mutate({
+            userId: selectedInvestorForCredit.id,
+            data: {
+              amountUsd: amt,
+              monthYear: creditMonthYear,
+              propertyTitle: creditPropertyTitle,
+              bankAccount: creditBankAccount,
+              destination: creditDestination,
+              note: creditNote,
+            },
+          });
+        }}
+        disabled={creditInvestorMutation.isPending}
+        className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold"
+      >
+        {creditInvestorMutation.isPending ? 'Sending...' : 'Send Money & Notify Investor'}
       </Button>
     </DialogFooter>
   </DialogContent>
