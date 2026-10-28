@@ -32,11 +32,17 @@ export default function Dashboard() {
       router.push("/login");
     } else if (!isAdmin) {
       try {
-        const preferred = localStorage.getItem("investpro_preferred_mode");
+        const preferred = localStorage.getItem("investpro_active_mode") || localStorage.getItem("investpro_preferred_mode");
         if (preferred === "property") {
           router.push("/flats");
+        } else if (preferred === "regular") {
+          router.push("/dashboard");
+        } else {
+          router.push("/select-mode");
         }
-      } catch (e) {}
+      } catch (e) {
+        router.push("/select-mode");
+      }
     }
   }, [isAuthenticated, isAdmin, router]);
 

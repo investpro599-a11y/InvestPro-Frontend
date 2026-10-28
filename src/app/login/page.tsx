@@ -23,7 +23,18 @@ export default function Login() {
       if (user.role === "admin") {
         router.push("/admin");
       } else {
-        router.push("/dashboard?select=true");
+        try {
+          const preferred = localStorage.getItem("investpro_active_mode") || localStorage.getItem("investpro_preferred_mode");
+          if (preferred === "property") {
+            router.push("/flats");
+          } else if (preferred === "regular") {
+            router.push("/dashboard");
+          } else {
+            router.push("/select-mode");
+          }
+        } catch (e) {
+          router.push("/select-mode");
+        }
       }
     }
   }, [isAuthenticated, user, router]);

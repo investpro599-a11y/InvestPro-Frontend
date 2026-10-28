@@ -59,8 +59,12 @@ function PortfolioSelectionModalContent({
   const handleSelect = (mode: "regular" | "property") => {
     try {
       sessionStorage.removeItem("investpro_show_mode_modal");
+      localStorage.setItem("investpro_active_mode", mode);
       if (rememberChoice) {
         localStorage.setItem("investpro_preferred_mode", mode);
+      }
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("investpro:mode-change", { detail: { mode } }));
       }
     } catch (e) {}
 

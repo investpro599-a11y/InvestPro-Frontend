@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -95,12 +96,21 @@ const getRecommendedInventory = (totalPrice: number): InventoryItem[] => [
   { name: "Lease Security Deposit & Reserve Fund", category: "Operations", costUsd: Math.round(totalPrice * 0.38), description: "Initial building lease deposit, utility setup & operating reserve" },
 ];
 
-export default function PropertyInvestmentPage() {
+function PropertyInvestmentPageContent() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState<'marketplace' | 'wallet' | 'admin'>('marketplace');
+  const searchParams = useSearchParams();
+  const tabQuery = searchParams?.get('tab');
+
+  const [activeTab, setActiveTab] = useState<'marketplace' | 'wallet' | 'admin'>((tabQuery as any) || 'marketplace');
+
+  useEffect(() => {
+    if (tabQuery === 'marketplace' || tabQuery === 'wallet' || tabQuery === 'admin') {
+      setActiveTab(tabQuery as any);
+    }
+  }, [tabQuery]);
   const [selectedFlat, setSelectedFlat] = useState<Flat | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isInspectModalOpen, setIsInspectModalOpen] = useState(false);
@@ -2093,4 +2103,12 @@ export default function PropertyInvestmentPage() {
     </div>
   </Layout>
 );
+}
+
+export default function PropertyInvestmentPage() {
+  return (
+    <Suspense fallback={null}>
+      <PropertyInvestmentPageContent />
+    </Suspense>
+  );
 }
