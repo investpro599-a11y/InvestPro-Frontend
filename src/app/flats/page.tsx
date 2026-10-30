@@ -74,17 +74,37 @@ const formatUSD = (val?: number | string | null) => {
   return "$" + num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 };
 
-// Category icon helper for furnishing inventory
-const getCategoryIcon = (category: string) => {
-  const cat = (category || '').toLowerCase();
-  if (cat.includes('bed')) return <Bed className="h-4 w-4 text-sky-500 dark:text-sky-400" />;
-  if (cat.includes('living') || cat.includes('sofa')) return <Sofa className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />;
-  if (cat.includes('elect') || cat.includes('tv')) return <Tv className="h-4 w-4 text-purple-500 dark:text-purple-400" />;
-  if (cat.includes('smart') || cat.includes('tech') || cat.includes('lock')) return <KeyRound className="h-4 w-4 text-amber-500 dark:text-amber-400" />;
-  if (cat.includes('kitchen') || cat.includes('dining')) return <Utensils className="h-4 w-4 text-rose-500 dark:text-rose-400" />;
-  if (cat.includes('coffee')) return <Coffee className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />;
-  return <PackageCheck className="h-4 w-4 text-teal-500 dark:text-teal-400" />;
-};
+  // Category icon helper for furnishing inventory
+  const getCategoryIcon = (category: string) => {
+    const cat = (category || '').toLowerCase();
+    if (cat.includes('bed')) return <Bed className="h-4 w-4 text-sky-500 dark:text-sky-400" />;
+    if (cat.includes('living') || cat.includes('sofa')) return <Sofa className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />;
+    if (cat.includes('elect') || cat.includes('tv')) return <Tv className="h-4 w-4 text-purple-500 dark:text-purple-400" />;
+    if (cat.includes('smart') || cat.includes('tech') || cat.includes('lock')) return <KeyRound className="h-4 w-4 text-amber-500 dark:text-amber-400" />;
+    if (cat.includes('kitchen') || cat.includes('dining')) return <Utensils className="h-4 w-4 text-rose-500 dark:text-rose-400" />;
+    if (cat.includes('coffee')) return <Coffee className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />;
+    return <PackageCheck className="h-4 w-4 text-teal-500 dark:text-teal-400" />;
+  };
+
+  const DEFAULT_UTILITY_POLICY = "100% of the following operating bills are fully managed, paid, and absorbed by the on-ground Superhost team with zero additional investor liability:";
+  const DEFAULT_UTILITY_BILLS = [
+    "Electricity & Power",
+    "Water & Sewerage",
+    "1Gbps Fiber Wi-Fi",
+    "Central HVAC / AC",
+    "Netflix & Disney+",
+    "Turnover Cleaning",
+  ];
+
+  const getUtilityIcon = (bill: string) => {
+    const b = (bill || '').toLowerCase();
+    if (b.includes('elect') || b.includes('power') || b.includes('solar')) return <Zap className="h-4 w-4 text-amber-500 shrink-0" />;
+    if (b.includes('water') || b.includes('sewer')) return <Droplets className="h-4 w-4 text-sky-500 shrink-0" />;
+    if (b.includes('wifi') || b.includes('wi-fi') || b.includes('internet') || b.includes('fiber')) return <Wifi className="h-4 w-4 text-indigo-500 shrink-0" />;
+    if (b.includes('hvac') || b.includes('ac') || b.includes('air') || b.includes('cool') || b.includes('heat')) return <Snowflake className="h-4 w-4 text-cyan-500 shrink-0" />;
+    if (b.includes('tv') || b.includes('netflix') || b.includes('stream') || b.includes('disney')) return <Tv className="h-4 w-4 text-purple-500 shrink-0" />;
+    return <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />;
+  };
 
 // Preset furnishing package builder
 const getRecommendedInventory = (totalPrice: number): InventoryItem[] => [
@@ -351,6 +371,57 @@ function PropertyInvestmentPageContent() {
   const [editingPhotosList, setEditingPhotosList] = useState<string[]>([]);
   const [editingPhotoUrlInput, setEditingPhotoUrlInput] = useState('');
 
+  // Admin Full Edit Property (Pricing, Values, Inventory Components & Utility Bills) State
+  const [editingPropertyFlat, setEditingPropertyFlat] = useState<Flat | null>(null);
+  const [editPropTitle, setEditPropTitle] = useState('');
+  const [editPropUnitType, setEditPropUnitType] = useState('');
+  const [editPropLocation, setEditPropLocation] = useState('');
+  const [editPropPrice, setEditPropPrice] = useState('');
+  const [editPropRent, setEditPropRent] = useState('');
+  const [editPropDailyRate, setEditPropDailyRate] = useState('');
+  const [editPropYield, setEditPropYield] = useState('');
+  const [editPropDesc, setEditPropDesc] = useState('');
+  const [editPropFeatures, setEditPropFeatures] = useState('');
+  const [editPropStatus, setEditPropStatus] = useState<'available' | 'in_setup' | 'active' | 'fully_occupied'>('available');
+  const [editPropInventory, setEditPropInventory] = useState<InventoryItem[]>([]);
+  const [editPropUtilityPolicy, setEditPropUtilityPolicy] = useState(DEFAULT_UTILITY_POLICY);
+  const [editPropUtilityBills, setEditPropUtilityBills] = useState<string[]>([...DEFAULT_UTILITY_BILLS]);
+  const [newEditBillInput, setNewEditBillInput] = useState('');
+  const [editCustomItemName, setEditCustomItemName] = useState('');
+  const [editCustomItemCategory, setEditCustomItemCategory] = useState('Bedroom');
+  const [editCustomItemCost, setEditCustomItemCost] = useState('');
+  const [editCustomItemDesc, setEditCustomItemDesc] = useState('');
+  const [isInspectEditing, setIsInspectEditing] = useState(false);
+
+  const openEditPropertyModal = (flat: Flat) => {
+    setEditingPropertyFlat(flat);
+    setEditPropTitle(flat.title || '');
+    setEditPropUnitType(flat.unitType || '2-Bedroom Luxury Suite');
+    setEditPropLocation(flat.location || '');
+    setEditPropPrice(String(flat.totalPriceUsd || 3000));
+    setEditPropRent(String(flat.monthlyRentUsd || 550));
+    setEditPropDailyRate(String(flat.dailyRateUsd || 65));
+    setEditPropYield(String(flat.annualYieldPercent || 20));
+    setEditPropDesc(flat.description || '');
+    setEditPropFeatures(Array.isArray(flat.features) ? flat.features.join(', ') : '');
+    setEditPropStatus(flat.status || 'available');
+    setEditPropInventory(
+      Array.isArray(flat.inventory) && flat.inventory.length > 0
+        ? flat.inventory.map(item => ({ ...item }))
+        : getRecommendedInventory(Number(flat.totalPriceUsd) || 3000)
+    );
+    setEditPropUtilityPolicy(flat.utilityPolicyText || DEFAULT_UTILITY_POLICY);
+    setEditPropUtilityBills(
+      Array.isArray(flat.utilityBills) && flat.utilityBills.length > 0
+        ? [...flat.utilityBills]
+        : [...DEFAULT_UTILITY_BILLS]
+    );
+    setNewEditBillInput('');
+    setEditCustomItemName('');
+    setEditCustomItemCost('');
+    setEditCustomItemDesc('');
+  };
+
   // Admin Bank/Account Payout & Direct Credit State
   const [payoutBankAccount, setPayoutBankAccount] = useState<string>('');
   const [payoutDestination, setPayoutDestination] = useState<string>('Bank Account & Property Wallet');
@@ -482,6 +553,7 @@ function PropertyInvestmentPageContent() {
 
   const openInspectModal = (flat: Flat) => {
     setSelectedFlat(flat);
+    setIsInspectEditing(false);
     setIsInspectModalOpen(true);
   };
 
@@ -606,6 +678,25 @@ function PropertyInvestmentPageContent() {
       setEditingPhotoUrlInput('');
     },
     onError: (err: any) => toast.error(err.message || 'Failed to update property pictures'),
+  });
+
+  // Admin Full Update Property (Pricing, Values, Inventory & Utility Bills) Mutation
+  const updatePropertyDetailsMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Flat> }) => {
+      return await flatsApi.updateFlat(id, updates);
+    },
+    onSuccess: (updatedFlat) => {
+      toast.success('Property pricing, inventory values & specifications updated!');
+      queryClient.invalidateQueries({ queryKey: ['flats'] });
+      queryClient.invalidateQueries({ queryKey: ['airbnbWallet'] });
+      queryClient.invalidateQueries({ queryKey: ['adminFlatInvestments'] });
+      if (selectedFlat && updatedFlat && selectedFlat.id === updatedFlat.id) {
+        setSelectedFlat(updatedFlat);
+      }
+      setEditingPropertyFlat(null);
+      setIsInspectEditing(false);
+    },
+    onError: (err: any) => toast.error(err.message || 'Failed to update property values'),
   });
 
   // Admin Delete Property Mutation
@@ -1142,23 +1233,34 @@ function PropertyInvestmentPageContent() {
                             </Button>
                           </div>
                           {isAdmin && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => {
-                                setEditingPhotosFlat(flat);
-                                setEditingPhotosList(
-                                  Array.isArray(flat.images) && flat.images.length > 0
-                                    ? [...flat.images]
-                                    : [DEFAULT_PROPERTY_IMAGE]
-                                );
-                                setEditingPhotoUrlInput('');
-                              }}
-                              className="w-full py-2 rounded-xl font-bold text-xs bg-sky-500/10 border-sky-400/35 text-sky-300 [html.light_&]:text-sky-700 [html.light_&]:bg-sky-50 hover:bg-sky-500/20 flex items-center justify-center gap-1.5"
-                            >
-                              <ImageIcon className="h-3.5 w-3.5" />
-                              <span>Change / Manage Pictures ({flat.images?.length || 1})</span>
-                            </Button>
+                            <div className="grid grid-cols-2 gap-2">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                  setEditingPhotosFlat(flat);
+                                  setEditingPhotosList(
+                                    Array.isArray(flat.images) && flat.images.length > 0
+                                      ? [...flat.images]
+                                      : [DEFAULT_PROPERTY_IMAGE]
+                                  );
+                                  setEditingPhotoUrlInput('');
+                                }}
+                                className="w-full py-2 rounded-xl font-bold text-xs bg-sky-500/10 border-sky-400/35 text-sky-300 [html.light_&]:text-sky-700 [html.light_&]:bg-sky-50 hover:bg-sky-500/20 flex items-center justify-center gap-1.5"
+                              >
+                                <ImageIcon className="h-3.5 w-3.5 shrink-0" />
+                                <span>Photos ({flat.images?.length || 1})</span>
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => openEditPropertyModal(flat)}
+                                className="w-full py-2 rounded-xl font-bold text-xs bg-emerald-500/10 border-emerald-400/35 text-emerald-300 [html.light_&]:text-emerald-700 [html.light_&]:bg-emerald-50 hover:bg-emerald-500/20 flex items-center justify-center gap-1.5"
+                              >
+                                <Sliders className="h-3.5 w-3.5 shrink-0" />
+                                <span>Edit Pricing &amp; Values</span>
+                              </Button>
+                            </div>
                           )}
                         </div>
                       </CardContent>
@@ -1765,6 +1867,14 @@ function PropertyInvestmentPageContent() {
                           <div className="inline-flex items-center justify-end gap-2">
                             <button
                               type="button"
+                              onClick={() => openEditPropertyModal(flat)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800 transition-colors shadow-sm cursor-pointer"
+                            >
+                              <Sliders className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                              <span>Edit Pricing &amp; Values</span>
+                            </button>
+                            <button
+                              type="button"
                               onClick={() => {
                                 setEditingPhotosFlat(flat);
                                 setEditingPhotosList(
@@ -1989,38 +2099,54 @@ function PropertyInvestmentPageContent() {
 
         {/* Bills Package Box */}
         <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 mb-5">
-          <h4 className="text-xs font-extrabold uppercase text-emerald-800 dark:text-emerald-300 mb-2 flex items-center gap-1.5">
-            <Zap className="h-4 w-4 text-emerald-500" /> Utility & Bills Coverage Policy
-          </h4>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <h4 className="text-xs font-extrabold uppercase text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+              <Zap className="h-4 w-4 text-emerald-500" /> Utility &amp; Bills Coverage Policy
+            </h4>
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => openEditPropertyModal(selectedFlat)}
+                className="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-300 hover:underline flex items-center gap-1"
+              >
+                <Sliders className="h-3 w-3" /> Edit Policy &amp; Bills
+              </button>
+            )}
+          </div>
           <p className="text-xs text-slate-700 dark:text-slate-300 mb-3 leading-relaxed">
-            100% of the following operating bills are fully managed, paid, and absorbed by the on-ground Superhost team with zero additional investor liability:
+            {selectedFlat.utilityPolicyText || DEFAULT_UTILITY_POLICY}
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
-            <div className="p-2 rounded-lg bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 flex items-center gap-2">
-              <Zap className="h-4 w-4 text-amber-500" /> Electricity & Power
-            </div>
-            <div className="p-2 rounded-lg bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 flex items-center gap-2">
-              <Droplets className="h-4 w-4 text-sky-500" /> Water & Sewerage
-            </div>
-            <div className="p-2 rounded-lg bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 flex items-center gap-2">
-              <Wifi className="h-4 w-4 text-indigo-500" /> 1Gbps Fiber Wi-Fi
-            </div>
-            <div className="p-2 rounded-lg bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 flex items-center gap-2">
-              <Snowflake className="h-4 w-4 text-cyan-500" /> Central HVAC / AC
-            </div>
-            <div className="p-2 rounded-lg bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 flex items-center gap-2">
-              <Tv className="h-4 w-4 text-purple-500" /> Netflix & Disney+
-            </div>
-            <div className="p-2 rounded-lg bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500" /> Turnover Cleaning
-            </div>
+            {(Array.isArray(selectedFlat.utilityBills) && selectedFlat.utilityBills.length > 0
+              ? selectedFlat.utilityBills
+              : DEFAULT_UTILITY_BILLS
+            ).map((bill, bIdx) => (
+              <div
+                key={bIdx}
+                className="p-2 rounded-lg bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 flex items-center gap-2"
+              >
+                {getUtilityIcon(bill)}
+                <span className="truncate">{bill}</span>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Itemized Inventory List */}
         <h4 className="text-xs font-extrabold uppercase text-slate-500 dark:text-slate-400 mb-3 flex items-center justify-between">
           <span>Physical Furnishings Breakdown</span>
-          <span>{selectedFlat.inventory?.length || 0} Components</span>
+          <div className="flex items-center gap-3">
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => openEditPropertyModal(selectedFlat)}
+                className="text-[11px] font-extrabold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 normal-case"
+              >
+                <Sliders className="h-3 w-3" /> Edit Component Prices &amp; Items
+              </button>
+            )}
+            <span>{selectedFlat.inventory?.length || 0} Components</span>
+          </div>
         </h4>
 
         <div className="border border-slate-200 dark:border-sky-500/20 rounded-2xl bg-slate-50 dark:bg-slate-950/80 overflow-hidden divide-y divide-slate-200 dark:divide-slate-800/80 max-h-64 overflow-y-auto">
@@ -2051,7 +2177,7 @@ function PropertyInvestmentPageContent() {
           )}
         </div>
 
-        <DialogFooter className="mt-6 flex justify-between gap-3">
+        <DialogFooter className="mt-6 flex flex-wrap justify-between gap-2">
           <Button
             variant="outline"
             onClick={() => setIsInspectModalOpen(false)}
@@ -2059,15 +2185,28 @@ function PropertyInvestmentPageContent() {
           >
             Close Inspection
           </Button>
-          <Button
-            onClick={() => {
-              setIsInspectModalOpen(false);
-              openPropertyDetail(selectedFlat);
-            }}
-            className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold"
-          >
-            Proceed to Acquisition &rarr;
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            {isAdmin && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => openEditPropertyModal(selectedFlat)}
+                className="border-sky-500/40 bg-sky-500/10 text-sky-600 dark:text-sky-300 font-bold"
+              >
+                <Sliders className="h-4 w-4 mr-1.5" />
+                Edit Pricing &amp; Values
+              </Button>
+            )}
+            <Button
+              onClick={() => {
+                setIsInspectModalOpen(false);
+                openPropertyDetail(selectedFlat);
+              }}
+              className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold"
+            >
+              Proceed to Acquisition &rarr;
+            </Button>
+          </div>
         </DialogFooter>
       </div>
     )}
@@ -2770,24 +2909,51 @@ function PropertyInvestmentPageContent() {
           </Button>
         </div>
 
-        {/* Existing Inventory List */}
-        <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-3 bg-slate-50 dark:bg-slate-950/60 max-h-48 overflow-y-auto space-y-2">
+        {/* Existing Inventory List (Editable inline) */}
+        <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-3 bg-slate-50 dark:bg-slate-950/60 max-h-60 overflow-y-auto space-y-2">
           {newPropInventory.length === 0 ? (
             <div className="text-center py-4 text-xs text-slate-400">
               No items in package. Click "Auto-Fill Full Package" or add custom items above.
             </div>
           ) : (
             newPropInventory.map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between gap-3 text-xs p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                <div className="min-w-0 flex items-center gap-2">
+              <div key={idx} className="grid grid-cols-1 sm:grid-cols-12 items-center gap-2 text-xs p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                <div className="sm:col-span-5 flex items-center gap-2 min-w-0">
                   {getCategoryIcon(item.category)}
-                  <div className="truncate">
-                    <span className="font-bold text-slate-800 dark:text-slate-200">{item.name}</span>
-                    <span className="text-slate-400 ml-2">({item.category})</span>
-                  </div>
+                  <input
+                    type="text"
+                    value={item.name}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNewPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, name: val } : it));
+                    }}
+                    className="w-full px-2 py-1 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 font-bold text-slate-800 dark:text-slate-200 text-xs"
+                  />
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="font-extrabold text-emerald-600 dark:text-emerald-400">${item.costUsd}</span>
+                <div className="sm:col-span-3">
+                  <input
+                    type="text"
+                    value={item.category}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNewPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, category: val } : it));
+                    }}
+                    className="w-full px-2 py-1 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs"
+                  />
+                </div>
+                <div className="sm:col-span-3 flex items-center gap-1">
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">$</span>
+                  <input
+                    type="number"
+                    value={item.costUsd}
+                    onChange={(e) => {
+                      const val = Number(e.target.value) || 0;
+                      setNewPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, costUsd: val } : it));
+                    }}
+                    className="w-full px-2 py-1 rounded bg-slate-50 dark:bg-slate-950 border border-emerald-500/30 font-extrabold text-emerald-600 dark:text-emerald-400 text-xs"
+                  />
+                </div>
+                <div className="sm:col-span-1 flex justify-end">
                   <button
                     type="button"
                     onClick={() => setNewPropInventory(newPropInventory.filter((_, i) => i !== idx))}
@@ -3191,6 +3357,428 @@ function PropertyInvestmentPageContent() {
         className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold"
       >
         {creditInvestorMutation.isPending ? 'Sending...' : 'Send Money & Notify Investor'}
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
+{/* ─── MODAL 9: ADMIN FULL EDIT PROPERTY PRICING, VALUES, INVENTORY & BILLS MODAL ─── */}
+<Dialog open={!!editingPropertyFlat} onOpenChange={(open) => !open && setEditingPropertyFlat(null)}>
+  <DialogContent className="bg-white dark:bg-[#081729] border border-slate-200 dark:border-sky-500/30 text-slate-900 dark:text-white max-w-3xl rounded-3xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl">
+    <DialogHeader>
+      <DialogTitle className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+        <Sliders className="h-6 w-6 text-emerald-500" />
+        Edit Property Pricing, Values &amp; Breakdown
+      </DialogTitle>
+      <DialogDescription className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm">
+        Full Admin Access — Modify property prices, yields, utility bills coverage, and every itemized furnishing component value.
+      </DialogDescription>
+    </DialogHeader>
+
+    <div className="space-y-5 my-4">
+      {/* 1. Core Property Title, Type, Location & Status */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <div>
+          <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">Property Title *</label>
+          <input
+            type="text"
+            value={editPropTitle}
+            onChange={(e) => setEditPropTitle(e.target.value)}
+            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-sm font-bold"
+          />
+        </div>
+        <div>
+          <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">Unit Type *</label>
+          <input
+            type="text"
+            value={editPropUnitType}
+            onChange={(e) => setEditPropUnitType(e.target.value)}
+            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-sm"
+          />
+        </div>
+        <div>
+          <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">Location *</label>
+          <input
+            type="text"
+            value={editPropLocation}
+            onChange={(e) => setEditPropLocation(e.target.value)}
+            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-sm"
+          />
+        </div>
+        <div>
+          <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">Listing Status</label>
+          <select
+            value={editPropStatus}
+            onChange={(e) => setEditPropStatus(e.target.value as any)}
+            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-sm font-bold"
+          >
+            <option value="available">Available for Acquisition</option>
+            <option value="in_setup">In On-Ground Setup</option>
+            <option value="active">Active &amp; Live on Airbnb</option>
+            <option value="fully_occupied">Fully Occupied / Sold Out</option>
+          </select>
+        </div>
+      </div>
+
+      {/* 2. Core Financial Pricing & ROI Yield Values */}
+      <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs uppercase font-extrabold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+            <DollarSign className="h-4 w-4" /> Property Pricing &amp; ROI Values
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              const sum = editPropInventory.reduce((s, i) => s + (Number(i.costUsd) || 0), 0);
+              if (sum > 0) {
+                setEditPropPrice(String(sum));
+                toast.success(`Total Setup Price synced to $${sum.toLocaleString()} USD from components`);
+              }
+            }}
+            className="text-[11px] font-extrabold px-2.5 py-1 rounded-lg bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition-colors"
+          >
+            Sync Setup Cost from Components (${editPropInventory.reduce((s, i) => s + (Number(i.costUsd) || 0), 0).toLocaleString()})
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div>
+            <label className="text-[11px] uppercase font-bold text-slate-600 dark:text-slate-300 block mb-1">Total Setup Cost ($)</label>
+            <input
+              type="number"
+              value={editPropPrice}
+              onChange={(e) => setEditPropPrice(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white font-black text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-[11px] uppercase font-bold text-slate-600 dark:text-slate-300 block mb-1">Monthly Rent ($)</label>
+            <input
+              type="number"
+              value={editPropRent}
+              onChange={(e) => setEditPropRent(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-emerald-600 dark:text-emerald-400 font-black text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-[11px] uppercase font-bold text-slate-600 dark:text-slate-300 block mb-1">Nightly Rate ($)</label>
+            <input
+              type="number"
+              value={editPropDailyRate}
+              onChange={(e) => setEditPropDailyRate(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-sky-500 font-black text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-[11px] uppercase font-bold text-slate-600 dark:text-slate-300 block mb-1">Annual Yield (%)</label>
+            <input
+              type="number"
+              value={editPropYield}
+              onChange={(e) => setEditPropYield(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-teal-600 dark:text-teal-400 font-black text-sm"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Utility & Bills Coverage Policy Editor */}
+      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-sky-500/25 space-y-3">
+        <div className="flex items-center justify-between">
+          <label className="text-xs uppercase font-extrabold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+            <Zap className="h-4 w-4 text-amber-500" />
+            Utility &amp; Bills Coverage Policy ({editPropUtilityBills.length} bills included)
+          </label>
+          <button
+            type="button"
+            onClick={() => {
+              setEditPropUtilityPolicy(DEFAULT_UTILITY_POLICY);
+              setEditPropUtilityBills([...DEFAULT_UTILITY_BILLS]);
+            }}
+            className="text-[11px] font-bold text-sky-500 hover:underline"
+          >
+            Reset to Default Bills
+          </button>
+        </div>
+
+        <div>
+          <label className="text-[11px] uppercase font-bold text-slate-500 block mb-1">Coverage Policy Statement</label>
+          <textarea
+            rows={2}
+            value={editPropUtilityPolicy}
+            onChange={(e) => setEditPropUtilityPolicy(e.target.value)}
+            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {editPropUtilityBills.map((bill, idx) => (
+            <div key={idx} className="flex items-center gap-2 p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+              {getUtilityIcon(bill)}
+              <input
+                type="text"
+                value={bill}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setEditPropUtilityBills(prev => prev.map((b, i) => i === idx ? val : b));
+                }}
+                className="flex-1 bg-transparent text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setEditPropUtilityBills(prev => prev.filter((_, i) => i !== idx))}
+                className="text-rose-500 hover:text-rose-600 p-1"
+                title="Remove bill"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newEditBillInput}
+            onChange={(e) => setNewEditBillInput(e.target.value)}
+            placeholder="Add another covered utility / bill (e.g. 24/7 Concierge Security)"
+            className="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+          />
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => {
+              if (!newEditBillInput.trim()) return;
+              setEditPropUtilityBills(prev => [...prev, newEditBillInput.trim()]);
+              setNewEditBillInput('');
+            }}
+            className="bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl"
+          >
+            + Add Bill
+          </Button>
+        </div>
+      </div>
+
+      {/* 4. Physical Furnishings Breakdown (9 Components & Prices) Editor */}
+      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-sky-500/25 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <label className="text-xs uppercase font-extrabold text-slate-800 dark:text-slate-200 block">
+              Physical Furnishings Breakdown ({editPropInventory.length} Components)
+            </label>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">
+              Sum of Component Values: <strong className="text-emerald-600 dark:text-emerald-400">${editPropInventory.reduce((s, i) => s + (Number(i.costUsd) || 0), 0).toLocaleString()} USD</strong>
+            </span>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => setEditPropInventory(getRecommendedInventory(Number(editPropPrice) || 3000))}
+            className="text-xs font-bold text-emerald-600 dark:text-emerald-400 border-emerald-500/30 shrink-0"
+          >
+            ⚡ Auto-Scale Component Prices to ${Number(editPropPrice || 0).toLocaleString()}
+          </Button>
+        </div>
+
+        {/* Add New Component Row */}
+        <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+          <input
+            type="text"
+            value={editCustomItemName}
+            onChange={(e) => setEditCustomItemName(e.target.value)}
+            placeholder="Component title (e.g. Coffee Station: Nespresso Setup)"
+            className="sm:col-span-4 px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+          />
+          <input
+            type="text"
+            value={editCustomItemDesc}
+            onChange={(e) => setEditCustomItemDesc(e.target.value)}
+            placeholder="Subtitle / description"
+            className="sm:col-span-3 px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+          />
+          <select
+            value={editCustomItemCategory}
+            onChange={(e) => setEditCustomItemCategory(e.target.value)}
+            className="sm:col-span-2 px-2 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white font-medium"
+          >
+            <option value="Bedroom">Bedroom</option>
+            <option value="Living Room">Living Room</option>
+            <option value="Kitchen">Kitchen</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Smart Tech">Smart Tech</option>
+            <option value="Supplies">Supplies</option>
+            <option value="Decor">Decor</option>
+            <option value="Operations">Operations</option>
+            <option value="Setup">Setup</option>
+          </select>
+          <input
+            type="number"
+            value={editCustomItemCost}
+            onChange={(e) => setEditCustomItemCost(e.target.value)}
+            placeholder="Price ($)"
+            className="sm:col-span-2 px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-emerald-600 dark:text-emerald-400 font-bold"
+          />
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => {
+              if (!editCustomItemName.trim()) {
+                toast.error('Please enter a component name');
+                return;
+              }
+              setEditPropInventory(prev => [
+                ...prev,
+                {
+                  name: editCustomItemName.trim(),
+                  category: editCustomItemCategory,
+                  costUsd: Number(editCustomItemCost) || 0,
+                  description: editCustomItemDesc.trim() || `${editCustomItemCategory} furnishing & setup item`,
+                },
+              ]);
+              setEditCustomItemName('');
+              setEditCustomItemCost('');
+              setEditCustomItemDesc('');
+            }}
+            className="sm:col-span-1 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white h-8"
+          >
+            + Add
+          </Button>
+        </div>
+
+        {/* Editable Component Rows */}
+        <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+          {editPropInventory.map((item, idx) => (
+            <div
+              key={idx}
+              className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+                <div className="sm:col-span-6 flex items-center gap-2">
+                  {getCategoryIcon(item.category)}
+                  <input
+                    type="text"
+                    value={item.name}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setEditPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, name: val } : it));
+                    }}
+                    placeholder="Component Name"
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div className="sm:col-span-3">
+                  <input
+                    type="text"
+                    value={item.category}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setEditPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, category: val } : it));
+                    }}
+                    placeholder="Category (e.g. KITCHEN)"
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-xs uppercase font-bold text-slate-600 dark:text-slate-300"
+                  />
+                </div>
+                <div className="sm:col-span-2 flex items-center gap-1">
+                  <span className="text-emerald-500 font-black text-xs">$</span>
+                  <input
+                    type="number"
+                    value={item.costUsd}
+                    onChange={(e) => {
+                      const val = Number(e.target.value) || 0;
+                      setEditPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, costUsd: val } : it));
+                    }}
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-emerald-500/40 text-xs font-black text-emerald-600 dark:text-emerald-400"
+                  />
+                </div>
+                <div className="sm:col-span-1 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setEditPropInventory(prev => prev.filter((_, i) => i !== idx))}
+                    className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10"
+                    title="Delete component"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+              <input
+                type="text"
+                value={item.description || ''}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setEditPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, description: val } : it));
+                }}
+                placeholder="Component subtitle / description (e.g. Complimentary coffee bar setup designed for 5-star reviews)"
+                className="w-full px-2.5 py-1 rounded-lg bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200/70 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 5. Features & Description */}
+      <div className="grid grid-cols-1 gap-3">
+        <div>
+          <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">
+            Key Features &amp; Amenities (comma-separated)
+          </label>
+          <input
+            type="text"
+            value={editPropFeatures}
+            onChange={(e) => setEditPropFeatures(e.target.value)}
+            className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-xs"
+          />
+        </div>
+        <div>
+          <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">Description</label>
+          <textarea
+            rows={2}
+            value={editPropDesc}
+            onChange={(e) => setEditPropDesc(e.target.value)}
+            className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-sky-500/30 text-slate-900 dark:text-white text-xs"
+          />
+        </div>
+      </div>
+    </div>
+
+    <DialogFooter className="flex flex-col sm:flex-row gap-2">
+      <Button
+        variant="outline"
+        onClick={() => setEditingPropertyFlat(null)}
+        className="w-full sm:w-auto"
+      >
+        Cancel
+      </Button>
+      <Button
+        onClick={() => {
+          if (!editingPropertyFlat) return;
+          if (!editPropTitle.trim() || !editPropLocation.trim()) {
+            toast.error('Title and Location are required');
+            return;
+          }
+          updatePropertyDetailsMutation.mutate({
+            id: editingPropertyFlat.id,
+            updates: {
+              title: editPropTitle.trim(),
+              unitType: editPropUnitType.trim(),
+              location: editPropLocation.trim(),
+              totalPriceUsd: Number(editPropPrice) || 3000,
+              monthlyRentUsd: Number(editPropRent) || 550,
+              dailyRateUsd: Number(editPropDailyRate) || 65,
+              annualYieldPercent: Number(editPropYield) || 20,
+              description: editPropDesc,
+              features: editPropFeatures.split(',').map(s => s.trim()).filter(Boolean),
+              status: editPropStatus,
+              inventory: editPropInventory,
+              utilityPolicyText: editPropUtilityPolicy,
+              utilityBills: editPropUtilityBills.filter(Boolean),
+            },
+          });
+        }}
+        disabled={updatePropertyDetailsMutation.isPending}
+        className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-extrabold"
+      >
+        {updatePropertyDetailsMutation.isPending ? 'Saving Changes...' : 'Save All Pricing & Values'}
       </Button>
     </DialogFooter>
   </DialogContent>

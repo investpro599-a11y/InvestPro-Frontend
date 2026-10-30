@@ -365,6 +365,8 @@ export interface Flat {
   images: string[];
   features: string[];
   inventory: InventoryItem[];
+  utilityPolicyText?: string;
+  utilityBills?: string[];
   status: 'available' | 'in_setup' | 'active' | 'fully_occupied';
   createdAt?: string | Date;
   updatedAt?: string | Date;
