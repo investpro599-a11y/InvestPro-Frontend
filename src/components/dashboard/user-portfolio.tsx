@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { dashboardApi, commissionApi } from '@/lib';
+import { dashboardApi, commissionApi, investmentApi, flatsApi } from '@/lib';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { useAuth } from '@/hooks/use-auth';
@@ -12,6 +12,16 @@ export function UserPortfolio() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard/stats'],
     queryFn: dashboardApi.getStats,
+  });
+
+  const { data: investments = [] } = useQuery({
+    queryKey: ['investments'],
+    queryFn: investmentApi.getAll,
+  });
+
+  const { data: propertyWallet } = useQuery({
+    queryKey: ['airbnbWallet'],
+    queryFn: flatsApi.getWallet,
   });
 
   const { data: commissionStats } = useQuery({
@@ -32,6 +42,21 @@ export function UserPortfolio() {
     );
   }
 
+  const computedRegularInvested = Array.isArray(investments)
+    ? investments
+        .filter((inv: any) => inv.status !== 'cancelled' && inv.status !== 'rejected')
+        .reduce((sum: number, inv: any) => sum + (parseFloat(String(inv.amount ?? 0)) || 0), 0)
+    : 0;
+  const computedPropertyInvested = Array.isArray(propertyWallet?.investments)
+    ? propertyWallet.investments
+        .filter((inv: any) => inv.status !== 'rejected' && inv.status !== 'cancelled')
+        .reduce((sum: number, inv: any) => sum + (Number(inv.amountUsd ?? inv.amountInvested ?? 0) || 0), 0)
+    : 0;
+  const totalInvested = Math.max(
+    Number(stats.investmentAmount ?? 0),
+    computedRegularInvested + computedPropertyInvested
+  );
+
   return (
     <Card className="mb-8">
       <CardHeader>
@@ -40,8 +65,8 @@ export function UserPortfolio() {
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
-            <p className="font-medium">Total Invested (Active):</p>
-            <p className="text-2xl font-bold text-green-700">${(stats.investmentAmount ?? 0).toLocaleString()}</p>
+            <p className="font-medium">Total Invested:</p>
+            <p className="text-2xl font-bold text-green-700">${totalInvested.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
           <div>
             <p className="font-medium">Unpaid ROI:</p>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { dashboardApi, investmentApi, withdrawalApi } from "@/lib";
+import { dashboardApi, investmentApi, withdrawalApi, flatsApi } from "@/lib";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
@@ -42,19 +42,27 @@ export function StatsGrid() {
     staleTime: 10000,
   });
 
-  const { data: investments = [] } = useQuery({
+  const { data: investments = [], refetch: refetchInvestments } = useQuery({
     queryKey: ["investments"],
     queryFn: investmentApi.getAll,
+    refetchInterval: 30000,
   });
 
-  const { data: withdrawals = [] } = useQuery({
+  const { data: propertyWallet, refetch: refetchPropertyWallet } = useQuery({
+    queryKey: ["airbnbWallet"],
+    queryFn: flatsApi.getWallet,
+    refetchInterval: 30000,
+  });
+
+  const { data: withdrawals = [], refetch: refetchWithdrawals } = useQuery({
     queryKey: ["withdrawals"],
     queryFn: withdrawalApi.getAll,
   });
 
-  const { data: dailyProfitsData } = useQuery({
+  const { data: dailyProfitsData, refetch: refetchDailyProfits } = useQuery({
     queryKey: ["dashboard/daily-profits"],
     queryFn: dashboardApi.getDailyProfits,
+    refetchInterval: 30000,
   });
 
   if (isStatsLoading) {
@@ -73,19 +81,120 @@ export function StatsGrid() {
     );
   }
 
-  // Calculate dynamic stats
-  const totalBalance = (stats?.currentBalance ?? stats?.totalBalance ?? 0);
-  const totalInvested = (stats?.investmentAmount ?? stats?.totalInvested ?? 0);
-  const totalWithdrawn = (stats?.totalWithdrawn ?? 0);
-  const totalProfit = (stats?.totalROI ?? ((stats?.paidCommissions || 0) + (stats?.availableROI || 0)));
-  const affiliateIncome = (stats?.totalCommissions ?? stats?.directCommissions ?? 0);
-  const networkMembers = (stats?.totalReferrals ?? stats?.activeReferrals ?? 0);
-  const availableProfits = (stats?.availableROI ?? stats?.currentBalance ?? totalProfit);
+  // Calculate dynamic stats (combining regular portfolio + property investments and 7% monthly ROI daily profit logs)
+  const rawDailyLogs = dailyProfitsData?.dailyLogs || [];
+  const rawDailyAccounts = dailyProfitsData?.accounts || [];
+
+  const sortedInvestments = Array.isArray(investments)
+    ? [...investments].sort(
+        (a: any, b: any) =>
+          new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+      )
+    : [];
+
+  const accountMap = new Map<string, any>();
+  if (Array.isArray(rawDailyAccounts)) {
+    rawDailyAccounts.forEach((acc: any) => {
+      const amt = Number(acc.amount ?? 0) || 0;
+      const dailyRoi7 = (amt * 0.07) / 30;
+      const days = Math.max(1, Number(acc.daysActive ?? 1));
+      accountMap.set(String(acc.investmentId), {
+        ...acc,
+        roiRate: 7,
+        dailyRoi: dailyRoi7,
+        totalEarnedRoi: dailyRoi7 * days,
+      });
+    });
+  }
+
+  const dailyLogs = Array.isArray(rawDailyLogs)
+    ? rawDailyLogs.map((log: any) => {
+        const acc = accountMap.get(String(log.investmentId));
+        const normalizedAmount = acc
+          ? acc.dailyRoi
+          : Number(log.amount ?? 0);
+        return {
+          ...log,
+          amount: normalizedAmount,
+        };
+      })
+    : [];
+
+  const computedRegularInvested = sortedInvestments
+    .filter((inv: any) => inv.status !== "cancelled" && inv.status !== "rejected")
+    .reduce((sum: number, inv: any) => sum + (parseFloat(String(inv.amount ?? 0)) || 0), 0);
+
+  const propertyInvestmentsList = Array.isArray(propertyWallet?.investments) ? propertyWallet.investments : [];
+  const computedPropertyInvested = propertyInvestmentsList
+    .filter((inv: any) => inv.status !== "rejected" && inv.status !== "cancelled")
+    .reduce((sum: number, inv: any) => sum + (Number(inv.amountUsd ?? inv.amountInvested ?? 0) || 0), 0);
+
+  const totalInvested = Math.max(
+    Number(stats?.investmentAmount ?? stats?.totalInvested ?? 0),
+    computedRegularInvested + computedPropertyInvested
+  );
+
+  // Also compute 7% monthly ROI directly from active investments as a fallback
+  const computedRoiFromActiveInvestments = sortedInvestments
+    .filter((inv: any) => inv.status === "active" || inv.status === "maturing" || inv.status === "completed")
+    .reduce((sum: number, inv: any) => {
+      const amt = parseFloat(String(inv.amount ?? 0)) || 0;
+      const start = new Date(inv.approvedAt || inv.createdAt || Date.now());
+      start.setHours(0, 0, 0, 0);
+      const end = new Date();
+      end.setHours(23, 59, 59, 999);
+      const days = Math.max(0, Math.floor((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000))) + 1;
+      const daily7 = (amt * 0.07) / 30;
+      return sum + daily7 * days;
+    }, 0);
+
+  const earnedFromAccounts = Array.from(accountMap.values()).reduce(
+    (sum: number, acc: any) => sum + (Number(acc.totalEarnedRoi ?? 0) || 0),
+    0
+  );
+  const earnedFromLogs = dailyLogs.reduce(
+    (sum: number, log: any) => sum + (Number(log.amount ?? 0) || 0),
+    0
+  );
+  const earnedDailyRoiTotal =
+    earnedFromAccounts > 0
+      ? earnedFromAccounts
+      : earnedFromLogs > 0
+      ? earnedFromLogs
+      : Math.max(computedRoiFromActiveInvestments, Number(stats?.unpaidROI ?? 0));
+
+  const roiWithdrawn = Number(stats?.roiWithdrawn ?? 0);
+  const unpaidRoiAvailable = Math.max(0, earnedDailyRoiTotal - roiWithdrawn);
+  const propertyBalanceUsd = Number(propertyWallet?.balanceUsd ?? (stats as any)?.propertyBalanceUsd ?? 0);
+  const propertyEarnedUsd = Number(propertyWallet?.totalEarnedUsd ?? (stats as any)?.propertyEarnedUsd ?? 0);
+
+  const totalWithdrawn = Number(stats?.totalWithdrawn ?? 0);
+  const affiliateIncome = Number(stats?.totalCommissions ?? stats?.directCommissions ?? 0);
+  const networkMembers = Number(stats?.totalReferrals ?? stats?.activeReferrals ?? 0);
+
+  const totalProfit = earnedDailyRoiTotal + propertyEarnedUsd;
+  const availableProfits = unpaidRoiAvailable + propertyBalanceUsd;
+
+  const availableCommission = Number(stats?.availableCommission ?? 0);
+  const availablePrincipal = Number(stats?.availablePrincipal ?? 0);
+
+  const totalBalance = availableProfits + availableCommission + availablePrincipal;
 
   // Combine recent transactions for the "Recent Transactions" section
-  const dailyLogs = dailyProfitsData?.dailyLogs || [];
+  const propertyPayoutsList = Array.isArray(propertyWallet?.payouts) ? propertyWallet.payouts : [];
   const recentTransactions = [
-    ...dailyLogs.slice(0, 4).map((log: any) => ({
+    ...sortedInvestments.slice(0, 3).map((inv: any) => ({
+      id: `inv-${inv.id || inv._id}`,
+      type: "investment",
+      title: "Investment",
+      subtitle: `${inv.plan || 'Standard'} Plan (7% Monthly ROI)`,
+      amount: inv.amount,
+      isPositive: true,
+      date: formatDistanceToNow(new Date(inv.createdAt), { addSuffix: true }),
+      timestamp: new Date(inv.createdAt || 0).getTime(),
+      status: inv.status
+    })),
+    ...dailyLogs.slice(0, 3).map((log: any) => ({
       id: `profit-${log.id || log.timestamp || Math.random()}`,
       type: "profit",
       title: "Profit",
@@ -93,17 +202,30 @@ export function StatsGrid() {
       amount: log.amount,
       isPositive: true,
       date: log.formattedDate || (log.date ? new Date(log.date).toLocaleDateString() : "Today"),
+      timestamp: Number(log.timestamp) || new Date(log.date || 0).getTime(),
       status: log.status || "completed"
     })),
-    ...investments.slice(0, 2).map((inv: any) => ({
-      id: `inv-${inv.id || inv._id}`,
-      type: "investment",
-      title: "Investment",
-      subtitle: `${inv.plan || 'Standard'} Plan`,
-      amount: inv.amount,
+    ...propertyPayoutsList.slice(0, 2).map((p: any) => ({
+      id: `prop-profit-${p.id || p._id || Math.random()}`,
+      type: "profit",
+      title: "Property ROI",
+      subtitle: `${p.flatTitle || "Property"} • ${p.monthYear || "Dividend"}`,
+      amount: p.amountUsd ?? p.amount ?? 0,
       isPositive: true,
-      date: formatDistanceToNow(new Date(inv.createdAt), { addSuffix: true }),
-      status: inv.status
+      date: p.paidAt ? formatDistanceToNow(new Date(p.paidAt), { addSuffix: true }) : "Recent",
+      timestamp: new Date(p.paidAt || 0).getTime(),
+      status: p.status || "credited"
+    })),
+    ...propertyInvestmentsList.slice(0, 2).map((inv: any) => ({
+      id: `prop-inv-${inv.id || inv._id}`,
+      type: "investment",
+      title: "Property Investment",
+      subtitle: inv.flat?.title || `Property #${inv.flatId}`,
+      amount: inv.amountUsd ?? inv.amountInvested ?? 0,
+      isPositive: true,
+      date: inv.investedAt || inv.createdAt ? formatDistanceToNow(new Date(inv.investedAt || inv.createdAt), { addSuffix: true }) : "Recent",
+      timestamp: new Date(inv.investedAt || inv.createdAt || 0).getTime(),
+      status: inv.status || "pending"
     })),
     ...withdrawals.slice(0, 2).map((w: any) => ({
       id: `w-${w.id || w._id}`,
@@ -113,9 +235,10 @@ export function StatsGrid() {
       amount: w.amount,
       isPositive: false,
       date: formatDistanceToNow(new Date(w.createdAt), { addSuffix: true }),
+      timestamp: new Date(w.createdAt || 0).getTime(),
       status: w.status
     }))
-  ].slice(0, 5);
+  ].slice(0, 6);
 
   return (
     <div className="space-y-6">
@@ -140,7 +263,13 @@ export function StatsGrid() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => refetch()}
+              onClick={() => {
+                refetch();
+                refetchInvestments();
+                refetchPropertyWallet();
+                refetchWithdrawals();
+                refetchDailyProfits();
+              }}
               disabled={isRefetching}
               className="text-amber-400 [html.light_&]:text-amber-700 hover:bg-amber-500/20 rounded-full h-9 w-9 shrink-0"
               title="Refresh Stats"

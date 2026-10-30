@@ -64,6 +64,11 @@ export function InvestmentForm() {
       setSelectedFile(null);
       queryClient.invalidateQueries({ queryKey: ["investments"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard/daily-profits"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard/investment-chart"] });
+      queryClient.invalidateQueries({ queryKey: ["admin/investments"] });
+      queryClient.invalidateQueries({ queryKey: ["admin/investments/pending"] });
+      queryClient.invalidateQueries({ queryKey: ["admin/stats"] });
     },
     onError: (error: any) => {
       const message = extractMessage(error);
@@ -140,8 +145,8 @@ export function InvestmentForm() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="6months">6 Months (7% Monthly ROI)</SelectItem>
-                        <SelectItem value="12months">12 Months (8% Monthly ROI)</SelectItem>
-                        <SelectItem value="18months">18 Months (9% Monthly ROI)</SelectItem>
+                        <SelectItem value="12months">12 Months (7% Monthly ROI)</SelectItem>
+                        <SelectItem value="18months">18 Months (7% Monthly ROI)</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage className="text-red-400" />

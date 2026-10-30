@@ -65,24 +65,10 @@ export const investmentApi = {
   },
 
   create: async (data: InsertInvestment | FormData): Promise<any> => {
-    if (typeof window !== "undefined" && data instanceof FormData) {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-      const token = localStorage.getItem("authToken");
-      const response = await fetch(`${baseUrl}/investments`, {
-        method: "POST",
-        body: data,
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || "Failed to create investment");
-      return unwrap(result);
-    } else {
-      const response = await apiRequest("POST", "/investments", data);
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || "Failed to create investment");
-      return unwrap(result);
-    }
+    const response = await apiRequest("POST", "/investments", data);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to create investment");
+    return unwrap(result);
   },
 
   update: async (id: string, data: Partial<InsertInvestment>): Promise<Investment> => {
@@ -386,14 +372,7 @@ export const fileUploadApi = {
   upload: async (file: File): Promise<{ filename: string; url: string; size: number }> => {
     const formData = new FormData();
     formData.append("file", file);
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
-    const response = await fetch(`${baseUrl}/upload`, {
-      method: "POST",
-      body: formData,
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      credentials: "include",
-    });
+    const response = await apiRequest("POST", "/upload", formData);
     const result = await response.json();
     if (!response.ok) throw new Error(result.message || "Failed to upload file");
     return unwrap<{ filename: string; url: string; size: number }>(result);

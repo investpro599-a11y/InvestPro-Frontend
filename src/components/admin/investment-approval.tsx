@@ -79,7 +79,11 @@ export function InvestmentApproval() {
       toast(toastConfig);
       
       queryClient.invalidateQueries({ queryKey: ["admin/investments/pending"] });
+      queryClient.invalidateQueries({ queryKey: ["admin/investments"] });
       queryClient.invalidateQueries({ queryKey: ["admin/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["investments"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard/daily-profits"] });
     },
     onError: (error: any) => {
       const message = extractMessage(error);
@@ -99,7 +103,11 @@ export function InvestmentApproval() {
       toast(toastConfig);
       
       queryClient.invalidateQueries({ queryKey: ["admin/investments/pending"] });
+      queryClient.invalidateQueries({ queryKey: ["admin/investments"] });
       queryClient.invalidateQueries({ queryKey: ["admin/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["investments"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard/daily-profits"] });
       setShowRejectDialog(false);
       setRejectReason("");
       setInvestmentToReject(null);

@@ -397,14 +397,14 @@ html.light .text-red-400, .light .text-red-400 {
 }
 
 /* Ensure vibrant solid action buttons preserve white text in light mode */
-html.light button[class*="bg-primary"], .light button[class*="bg-primary"],
-html.light button[class*="bg-blue-600"], .light button[class*="bg-blue-600"],
+html.light button[class~="bg-primary"], .light button[class~="bg-primary"],
+html.light button[class~="bg-blue-600"], .light button[class~="bg-blue-600"],
 html.light button[class*="from-blue"], .light button[class*="from-blue"],
-html.light button[class*="bg-emerald-600"], .light button[class*="bg-emerald-600"],
-html.light button[class*="bg-emerald-500"], .light button[class*="bg-emerald-500"],
-html.light button[class*="bg-rose-600"], .light button[class*="bg-rose-600"],
-html.light button[class*="bg-rose-700"], .light button[class*="bg-rose-700"],
-html.light button[class*="bg-red-600"], .light button[class*="bg-red-600"],
+html.light button[class~="bg-emerald-600"], .light button[class~="bg-emerald-600"],
+html.light button[class~="bg-emerald-500"], .light button[class~="bg-emerald-500"],
+html.light button[class~="bg-rose-600"], .light button[class~="bg-rose-600"],
+html.light button[class~="bg-rose-700"], .light button[class~="bg-rose-700"],
+html.light button[class~="bg-red-600"], .light button[class~="bg-red-600"],
 html.light button[class*="bg-gradient"], .light button[class*="bg-gradient"],
 html.light .btn-primary, .light .btn-primary,
 html.light [data-force-white="true"], .light [data-force-white="true"] {

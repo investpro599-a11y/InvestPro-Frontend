@@ -111,7 +111,7 @@ export function AdminDashboard() {
             </p>
             <p className="text-sm text-purple-700">Total Commissions</p>
             <p className="text-xs text-purple-600 mt-1">
-              $${(adminStats?.revenue?.total || 0).toLocaleString()} revenue
+              ${(adminStats?.revenue?.total || 0).toLocaleString()} revenue
             </p>
           </div>
         </div>
@@ -153,7 +153,7 @@ export function AdminDashboard() {
               <div className="flex justify-between">
                 <span className="text-sm text-emerald-600">System Revenue:</span>
                 <span className="text-sm font-medium text-emerald-700">
-                  $${(adminStats?.revenue?.total || 0).toLocaleString()}
+                  ${(adminStats?.revenue?.total || 0).toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between">

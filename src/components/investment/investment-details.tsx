@@ -54,8 +54,8 @@ export function InvestmentDetails({ investment, trigger }: InvestmentDetailsProp
   const [isOpen, setIsOpen] = useState(false);
 
   const calculateROI = () => {
-    const amount = investment.amount;
-    const roiRate = investment.roiRate;
+    const amount = Number(investment.amount) || 0;
+    const roiRate = 7;
     return (amount * roiRate) / 100;
   };
 
@@ -125,7 +125,7 @@ export function InvestmentDetails({ investment, trigger }: InvestmentDetailsProp
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-gray-600">ROI Rate</p>
                   <p className="text-2xl font-bold text-blue-600">
-                    {investment.roiRate}%
+                    7% (Monthly)
                   </p>
                 </div>
                 <div className="space-y-2">

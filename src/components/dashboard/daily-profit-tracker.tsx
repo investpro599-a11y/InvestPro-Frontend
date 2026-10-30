@@ -64,8 +64,33 @@ export function DailyProfitTracker() {
     );
   }
 
-  const accounts = data?.accounts || [];
-  const dailyLogs = data?.dailyLogs || [];
+  const rawAccounts = data?.accounts || [];
+  const rawDailyLogs = data?.dailyLogs || [];
+
+  const accountMap = new Map<string, AccountProfitSummary>();
+  const accounts: AccountProfitSummary[] = rawAccounts.map((acc) => {
+    const amt = Number(acc.amount || 0);
+    const dailyRoi = (amt * 0.07) / 30;
+    const daysActive = Math.max(1, Number(acc.daysActive || 1));
+    const normalized: AccountProfitSummary = {
+      ...acc,
+      roiRate: 7,
+      dailyRoi,
+      totalEarnedRoi: dailyRoi * daysActive,
+    };
+    accountMap.set(String(acc.investmentId), normalized);
+    return normalized;
+  });
+
+  const totalDailyProfit = accounts.reduce((sum, acc) => sum + acc.dailyRoi, 0);
+
+  const dailyLogs: DailyProfitLog[] = rawDailyLogs.map((log) => {
+    const acc = accountMap.get(String(log.investmentId));
+    return {
+      ...log,
+      amount: acc ? acc.dailyRoi : Number(log.amount || 0),
+    };
+  });
 
   // Filter logs by selected account
   const filteredLogs = selectedAccount === "all"
@@ -85,7 +110,7 @@ export function DailyProfitTracker() {
               <div>
                 <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Total Everyday Profit</p>
                 <p className="text-2xl font-extrabold font-display text-emerald-300 mt-1">
-                  +${(data?.totalDailyProfit || 0).toFixed(2)} <span className="text-xs font-medium text-emerald-400/70">/ day</span>
+                  +${totalDailyProfit.toFixed(2)} <span className="text-xs font-medium text-emerald-400/70">/ day (7% Monthly)</span>
                 </p>
               </div>
               <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">

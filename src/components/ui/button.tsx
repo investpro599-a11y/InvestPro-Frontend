@@ -14,7 +14,7 @@ const buttonVariants = cva(
         destructive:
           "bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-lg shadow-rose-600/25 hover:shadow-xl hover:shadow-rose-600/40 hover:scale-[1.02] border border-rose-400/30",
         outline:
-          "border border-slate-700/60 bg-slate-900/40 backdrop-blur-md text-slate-200 hover:bg-slate-800/60 hover:text-white hover:border-slate-500/60 shadow-sm hover:scale-[1.01]",
+          "border border-slate-700/60 bg-slate-900/40 backdrop-blur-md text-slate-200 hover:bg-slate-800/60 hover:text-white hover:border-slate-500/60 [html.light_&]:bg-white [html.light_&]:text-slate-800 [html.light_&]:border-slate-300 [html.light_&]:hover:bg-slate-100 shadow-sm hover:scale-[1.01]",
         secondary:
           "bg-slate-800/80 backdrop-blur-md text-slate-200 hover:bg-slate-700/80 hover:text-white border border-slate-700/50 hover:scale-[1.01]",
         ghost:

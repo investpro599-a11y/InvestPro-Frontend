@@ -74,6 +74,29 @@ const formatUSD = (val?: number | string | null) => {
   return "$" + num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 };
 
+// Smart feature list parser/normalizer that heals split currency numbers like ["1-Bedroom Package ($2", "000)"] -> ["1-Bedroom Package ($2,000)"]
+const normalizeFeaturesList = (features?: string[] | string | null): string[] => {
+  if (!features) return [];
+  const raw = Array.isArray(features)
+    ? features
+    : String(features).split(/,(?![0-9]{3}\b)/);
+  const healed: string[] = [];
+  for (const item of raw) {
+    const trimmed = String(item || '').trim();
+    if (!trimmed) continue;
+    if (
+      healed.length > 0 &&
+      /^\d{3}\)?$/.test(trimmed) &&
+      /\$?\d+$/.test(healed[healed.length - 1])
+    ) {
+      healed[healed.length - 1] = `${healed[healed.length - 1]},${trimmed}`;
+    } else {
+      healed.push(trimmed);
+    }
+  }
+  return healed;
+};
+
   // Category icon helper for furnishing inventory
   const getCategoryIcon = (category: string) => {
     const cat = (category || '').toLowerCase();
@@ -403,7 +426,7 @@ function PropertyInvestmentPageContent() {
     setEditPropDailyRate(String(flat.dailyRateUsd || 65));
     setEditPropYield(String(flat.annualYieldPercent || 20));
     setEditPropDesc(flat.description || '');
-    setEditPropFeatures(Array.isArray(flat.features) ? flat.features.join(', ') : '');
+    setEditPropFeatures(normalizeFeaturesList(flat.features).join(', '));
     setEditPropStatus(flat.status || 'available');
     setEditPropInventory(
       Array.isArray(flat.inventory) && flat.inventory.length > 0
@@ -593,6 +616,7 @@ function PropertyInvestmentPageContent() {
       queryClient.invalidateQueries({ queryKey: ['flats'] });
       queryClient.invalidateQueries({ queryKey: ['airbnbWallet'] });
       queryClient.invalidateQueries({ queryKey: ['adminFlatInvestments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard/stats'] });
       setIsDetailModalOpen(false);
       setSelectedFlat(null);
       setPaymentProof('');
@@ -673,6 +697,7 @@ function PropertyInvestmentPageContent() {
       queryClient.invalidateQueries({ queryKey: ['flats'] });
       queryClient.invalidateQueries({ queryKey: ['airbnbWallet'] });
       queryClient.invalidateQueries({ queryKey: ['adminFlatInvestments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard/stats'] });
       setEditingPhotosFlat(null);
       setEditingPhotosList([]);
       setEditingPhotoUrlInput('');
@@ -690,6 +715,7 @@ function PropertyInvestmentPageContent() {
       queryClient.invalidateQueries({ queryKey: ['flats'] });
       queryClient.invalidateQueries({ queryKey: ['airbnbWallet'] });
       queryClient.invalidateQueries({ queryKey: ['adminFlatInvestments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard/stats'] });
       if (selectedFlat && updatedFlat && selectedFlat.id === updatedFlat.id) {
         setSelectedFlat(updatedFlat);
       }
@@ -827,6 +853,7 @@ function PropertyInvestmentPageContent() {
       queryClient.invalidateQueries({ queryKey: ['flats'] });
       queryClient.invalidateQueries({ queryKey: ['airbnbWallet'] });
       queryClient.invalidateQueries({ queryKey: ['adminFlatInvestments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard/stats'] });
     },
     onError: (err: any) => toast.error(err.message || 'Failed to seed demo data'),
   });
@@ -858,7 +885,13 @@ function PropertyInvestmentPageContent() {
   const propertyBalance = walletData?.balanceUsd || 0;
   const propertyTotalEarned = walletData?.totalEarnedUsd || 0;
   const activeUnitsCount = walletData?.activeUnitsCount || 0;
-  const totalPropertyInvested = myInvestments.reduce((sum, inv) => sum + (inv.amountUsd || 0), 0);
+  const userPropertyInvested = myInvestments
+    .filter((inv: any) => inv.status !== 'rejected' && inv.status !== 'cancelled')
+    .reduce((sum, inv) => sum + Number(inv.amountUsd ?? (inv as any).amountInvested ?? 0), 0);
+  const platformPropertyInvested = allAdminInvestments
+    .filter((inv: any) => inv.status !== 'rejected' && inv.status !== 'cancelled')
+    .reduce((sum, inv) => sum + Number(inv.amountUsd ?? (inv as any).amountInvested ?? 0), 0);
+  const totalPropertyInvested = isAdmin && userPropertyInvested === 0 ? platformPropertyInvested : userPropertyInvested;
 
   // Selected flat investment calculation
   const currentPrice = selectedFlat?.totalPriceUsd || 0;
@@ -1201,12 +1234,12 @@ function PropertyInvestmentPageContent() {
                           </div>
 
                           {/* Features List */}
-                          {flat.features && flat.features.length > 0 && (
+                          {normalizeFeaturesList(flat.features).length > 0 && (
                             <div className="flex flex-wrap gap-1.5 mb-5">
-                              {flat.features.slice(0, 3).map((feat, idx) => (
+                              {normalizeFeaturesList(flat.features).slice(0, 3).map((feat, idx) => (
                                 <span
                                   key={idx}
-                                  className="text-[11px] px-2.5 py-1 rounded-lg bg-sky-500/10 [html.light_&]:bg-slate-100 text-slate-300 [html.light_&]:text-slate-700 border border-sky-500/20 [html.light_&]:border-slate-200"
+                                  className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-sky-500/10 [html.light_&]:bg-slate-100 text-slate-200 [html.light_&]:text-slate-700 border border-sky-500/20 [html.light_&]:border-slate-200"
                                 >
                                   {feat}
                                 </span>
@@ -1221,22 +1254,21 @@ function PropertyInvestmentPageContent() {
                             <Button
                               variant="outline"
                               onClick={() => openInspectModal(flat)}
-                              className="w-full py-2.5 rounded-xl font-bold text-xs border-sky-400/30 text-sky-200 [html.light_&]:text-slate-700 [html.light_&]:border-slate-300 hover:bg-sky-500/10 [html.light_&]:hover:bg-slate-100"
+                              className="w-full py-2.5 rounded-xl font-extrabold text-xs bg-slate-900/70 [html.light_&]:!bg-slate-100 border-sky-400/35 [html.light_&]:!border-slate-300 text-sky-100 [html.light_&]:!text-slate-800 hover:bg-slate-800 [html.light_&]:hover:!bg-slate-200 shadow-sm"
                             >
                               Inspect Items
                             </Button>
                             <Button
                               onClick={() => openPropertyDetail(flat)}
-                              className="w-full py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white shadow-md shadow-sky-500/25"
+                              className="w-full py-2.5 rounded-xl font-extrabold text-xs bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 !text-white shadow-md shadow-sky-500/25"
                             >
                               Acquire Unit &rarr;
                             </Button>
                           </div>
                           {isAdmin && (
                             <div className="grid grid-cols-2 gap-2">
-                              <Button
+                              <button
                                 type="button"
-                                variant="outline"
                                 onClick={() => {
                                   setEditingPhotosFlat(flat);
                                   setEditingPhotosList(
@@ -1246,20 +1278,19 @@ function PropertyInvestmentPageContent() {
                                   );
                                   setEditingPhotoUrlInput('');
                                 }}
-                                className="w-full py-2 rounded-xl font-bold text-xs bg-sky-500/10 border-sky-400/35 text-sky-300 [html.light_&]:text-sky-700 [html.light_&]:bg-sky-50 hover:bg-sky-500/20 flex items-center justify-center gap-1.5"
+                                className="w-full py-2 px-3 rounded-xl font-extrabold text-xs bg-sky-950/70 [html.light_&]:!bg-sky-50 border border-sky-400/40 [html.light_&]:!border-sky-300 text-sky-300 [html.light_&]:!text-sky-800 hover:bg-sky-900/80 [html.light_&]:hover:!bg-sky-100 flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer"
                               >
-                                <ImageIcon className="h-3.5 w-3.5 shrink-0" />
+                                <ImageIcon className="h-3.5 w-3.5 text-sky-400 [html.light_&]:!text-sky-700 shrink-0" />
                                 <span>Photos ({flat.images?.length || 1})</span>
-                              </Button>
-                              <Button
+                              </button>
+                              <button
                                 type="button"
-                                variant="outline"
                                 onClick={() => openEditPropertyModal(flat)}
-                                className="w-full py-2 rounded-xl font-bold text-xs bg-emerald-500/10 border-emerald-400/35 text-emerald-300 [html.light_&]:text-emerald-700 [html.light_&]:bg-emerald-50 hover:bg-emerald-500/20 flex items-center justify-center gap-1.5"
+                                className="w-full py-2 px-3 rounded-xl font-extrabold text-xs bg-emerald-950/70 [html.light_&]:!bg-emerald-50 border border-emerald-400/45 [html.light_&]:!border-emerald-400 text-emerald-300 [html.light_&]:!text-emerald-800 hover:bg-emerald-900/80 [html.light_&]:hover:!bg-emerald-100 flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer"
                               >
-                                <Sliders className="h-3.5 w-3.5 shrink-0" />
+                                <Sliders className="h-3.5 w-3.5 text-emerald-400 [html.light_&]:!text-emerald-700 shrink-0" />
                                 <span>Edit Pricing &amp; Values</span>
-                              </Button>
+                              </button>
                             </div>
                           )}
                         </div>
@@ -2847,14 +2878,14 @@ function PropertyInvestmentPageContent() {
       </div>
 
       {/* Itemized Furnishing & Setup Package Builder ("The Whole Pack") */}
-      <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-sky-500/25 space-y-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
           <div>
-            <label className="text-xs uppercase font-extrabold text-slate-700 dark:text-slate-300 block">
-              Itemized Furnishings & Setup Package ({newPropInventory.length} items)
+            <label className="text-xs sm:text-sm uppercase tracking-wide font-extrabold text-slate-800 dark:text-slate-100 block">
+              Itemized Furnishings &amp; Setup Package ({newPropInventory.length} Items)
             </label>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400">
-              Total Package Breakdown: <strong className="text-emerald-600 dark:text-emerald-400">${newPropInventory.reduce((s, i) => s + (Number(i.costUsd) || 0), 0).toLocaleString()} USD</strong>
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Total Package Breakdown: <strong className="text-emerald-600 dark:text-emerald-400 font-extrabold">${newPropInventory.reduce((s, i) => s + (Number(i.costUsd) || 0), 0).toLocaleString()} USD</strong>
             </span>
           </div>
           <Button
@@ -2862,64 +2893,74 @@ function PropertyInvestmentPageContent() {
             size="sm"
             variant="outline"
             onClick={() => setNewPropInventory(getRecommendedInventory(Number(newPropPrice) || 3000))}
-            className="text-xs font-bold text-emerald-600 dark:text-emerald-400 border-emerald-500/30 shrink-0"
+            className="text-xs font-extrabold bg-emerald-950/70 [html.light_&]:!bg-emerald-50 border-emerald-400/45 [html.light_&]:!border-emerald-400 text-emerald-300 [html.light_&]:!text-emerald-800 hover:bg-emerald-900/80 [html.light_&]:hover:!bg-emerald-100 rounded-xl shrink-0"
           >
             ⚡ Auto-Fill Full Package
           </Button>
         </div>
 
-        {/* Custom Item Adder Row */}
-        <div className="p-3 mb-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-          <input
-            type="text"
-            value={customItemName}
-            onChange={(e) => setCustomItemName(e.target.value)}
-            placeholder="Add custom item (e.g. Balcony Patio Furniture)"
-            className="sm:col-span-5 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
-          />
-          <select
-            value={customItemCategory}
-            onChange={(e) => setCustomItemCategory(e.target.value)}
-            className="sm:col-span-3 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white font-medium"
-          >
-            <option value="Bedroom">Bedroom</option>
-            <option value="Living Room">Living Room</option>
-            <option value="Kitchen">Kitchen</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Smart Tech">Smart Tech</option>
-            <option value="Supplies">Supplies</option>
-            <option value="Decor">Decor</option>
-            <option value="Operations">Operations</option>
-            <option value="Setup">Setup</option>
-          </select>
-          <input
-            type="number"
-            value={customItemCost}
-            onChange={(e) => setCustomItemCost(e.target.value)}
-            placeholder="Cost ($)"
-            className="sm:col-span-2 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white font-bold"
-          />
-          <Button
-            type="button"
-            size="sm"
-            onClick={handleAddCustomInventoryItem}
-            className="sm:col-span-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white h-8"
-          >
-            + Add
-          </Button>
+        {/* Custom Item Adder Card */}
+        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 space-y-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
+            <input
+              type="text"
+              value={customItemName}
+              onChange={(e) => setCustomItemName(e.target.value)}
+              placeholder="Add custom component (e.g. Balcony Patio Furniture)"
+              className="sm:col-span-5 px-3.5 py-2 rounded-[10px] bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white font-semibold"
+            />
+            <select
+              value={customItemCategory}
+              onChange={(e) => setCustomItemCategory(e.target.value)}
+              className="sm:col-span-3 px-3 py-2 rounded-[10px] bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white font-bold"
+            >
+              <option value="Bedroom">Bedroom</option>
+              <option value="Living Room">Living Room</option>
+              <option value="Kitchen">Kitchen</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Smart Tech">Smart Tech</option>
+              <option value="Supplies">Supplies</option>
+              <option value="Decor">Decor</option>
+              <option value="Operations">Operations</option>
+              <option value="Setup">Setup</option>
+            </select>
+            <div className="sm:col-span-2 flex items-center gap-1.5 px-3 py-2 rounded-[10px] bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700">
+              <span className="text-emerald-600 dark:text-emerald-400 font-black text-xs">$</span>
+              <input
+                type="number"
+                value={customItemCost}
+                onChange={(e) => setCustomItemCost(e.target.value)}
+                placeholder="Cost"
+                className="w-full bg-transparent text-xs text-slate-900 dark:text-white font-black focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleAddCustomInventoryItem}
+              className="sm:col-span-2 w-full text-xs font-extrabold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 h-9 rounded-[10px] shadow-sm"
+            >
+              + Add Item
+            </Button>
+          </div>
         </div>
 
         {/* Existing Inventory List (Editable inline) */}
-        <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-3 bg-slate-50 dark:bg-slate-950/60 max-h-60 overflow-y-auto space-y-2">
+        <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
           {newPropInventory.length === 0 ? (
-            <div className="text-center py-4 text-xs text-slate-400">
-              No items in package. Click "Auto-Fill Full Package" or add custom items above.
+            <div className="text-center py-6 rounded-xl border border-dashed border-slate-300 dark:border-slate-800 text-xs text-slate-400">
+              No items in package. Click <strong>Auto-Fill Full Package</strong> or add custom items above.
             </div>
           ) : (
             newPropInventory.map((item, idx) => (
-              <div key={idx} className="grid grid-cols-1 sm:grid-cols-12 items-center gap-2 text-xs p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                <div className="sm:col-span-5 flex items-center gap-2 min-w-0">
-                  {getCategoryIcon(item.category)}
+              <div
+                key={idx}
+                className="p-3 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-sky-500/30 transition-colors flex flex-col sm:flex-row sm:items-center gap-2.5"
+              >
+                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                  <div className="h-8 w-8 rounded-[10px] bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0">
+                    {getCategoryIcon(item.category)}
+                  </div>
                   <input
                     type="text"
                     value={item.name}
@@ -2927,10 +2968,10 @@ function PropertyInvestmentPageContent() {
                       const val = e.target.value;
                       setNewPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, name: val } : it));
                     }}
-                    className="w-full px-2 py-1 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 font-bold text-slate-800 dark:text-slate-200 text-xs"
+                    className="flex-1 min-w-0 px-3 py-1.5 rounded-[10px] bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700/80 font-bold text-slate-800 dark:text-slate-100 text-xs"
                   />
                 </div>
-                <div className="sm:col-span-3">
+                <div className="flex items-center gap-2 shrink-0">
                   <input
                     type="text"
                     value={item.category}
@@ -2938,29 +2979,27 @@ function PropertyInvestmentPageContent() {
                       const val = e.target.value;
                       setNewPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, category: val } : it));
                     }}
-                    className="w-full px-2 py-1 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs"
+                    className="w-28 sm:w-32 px-2.5 py-1.5 rounded-[10px] bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700/80 text-sky-600 dark:text-sky-400 uppercase font-extrabold text-[11px] text-center"
                   />
-                </div>
-                <div className="sm:col-span-3 flex items-center gap-1">
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">$</span>
-                  <input
-                    type="number"
-                    value={item.costUsd}
-                    onChange={(e) => {
-                      const val = Number(e.target.value) || 0;
-                      setNewPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, costUsd: val } : it));
-                    }}
-                    className="w-full px-2 py-1 rounded bg-slate-50 dark:bg-slate-950 border border-emerald-500/30 font-extrabold text-emerald-600 dark:text-emerald-400 text-xs"
-                  />
-                </div>
-                <div className="sm:col-span-1 flex justify-end">
+                  <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-[10px] bg-emerald-500/10 border border-emerald-500/40 w-24 sm:w-28 shrink-0">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-black text-xs">$</span>
+                    <input
+                      type="number"
+                      value={item.costUsd}
+                      onChange={(e) => {
+                        const val = Number(e.target.value) || 0;
+                        setNewPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, costUsd: val } : it));
+                      }}
+                      className="w-full bg-transparent text-right font-black text-emerald-600 dark:text-emerald-400 text-xs focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
                   <button
                     type="button"
                     onClick={() => setNewPropInventory(newPropInventory.filter((_, i) => i !== idx))}
-                    className="text-rose-500 hover:text-rose-700 p-1"
+                    className="h-8 w-8 rounded-[10px] border border-rose-500/20 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 flex items-center justify-center shrink-0 transition-colors"
                     title="Remove item"
                   >
-                    <X className="h-3.5 w-3.5" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
@@ -3001,7 +3040,7 @@ function PropertyInvestmentPageContent() {
             dailyRateUsd: daily,
             annualYieldPercent: yieldPct,
             description: newPropDesc,
-            features: newPropFeatures.split(',').map(s => s.trim()).filter(Boolean),
+            features: normalizeFeaturesList(newPropFeatures),
             images: combinedImages.length > 0 ? combinedImages : [DEFAULT_PROPERTY_IMAGE],
             inventory: inv,
             status: 'available',
@@ -3559,14 +3598,14 @@ function PropertyInvestmentPageContent() {
       </div>
 
       {/* 4. Physical Furnishings Breakdown (9 Components & Prices) Editor */}
-      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-sky-500/25 space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-sky-500/25 space-y-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
           <div>
-            <label className="text-xs uppercase font-extrabold text-slate-800 dark:text-slate-200 block">
+            <label className="text-xs sm:text-sm uppercase tracking-wide font-extrabold text-slate-800 dark:text-slate-100 block">
               Physical Furnishings Breakdown ({editPropInventory.length} Components)
             </label>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400">
-              Sum of Component Values: <strong className="text-emerald-600 dark:text-emerald-400">${editPropInventory.reduce((s, i) => s + (Number(i.costUsd) || 0), 0).toLocaleString()} USD</strong>
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Sum of Component Values: <strong className="text-emerald-600 dark:text-emerald-400 font-extrabold">${editPropInventory.reduce((s, i) => s + (Number(i.costUsd) || 0), 0).toLocaleString()} USD</strong>
             </span>
           </div>
           <Button
@@ -3574,87 +3613,97 @@ function PropertyInvestmentPageContent() {
             size="sm"
             variant="outline"
             onClick={() => setEditPropInventory(getRecommendedInventory(Number(editPropPrice) || 3000))}
-            className="text-xs font-bold text-emerald-600 dark:text-emerald-400 border-emerald-500/30 shrink-0"
+            className="text-xs font-extrabold bg-emerald-950/70 [html.light_&]:!bg-emerald-50 border-emerald-400/45 [html.light_&]:!border-emerald-400 text-emerald-300 [html.light_&]:!text-emerald-800 hover:bg-emerald-900/80 [html.light_&]:hover:!bg-emerald-100 rounded-xl shrink-0"
           >
             ⚡ Auto-Scale Component Prices to ${Number(editPropPrice || 0).toLocaleString()}
           </Button>
         </div>
 
-        {/* Add New Component Row */}
-        <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-          <input
-            type="text"
-            value={editCustomItemName}
-            onChange={(e) => setEditCustomItemName(e.target.value)}
-            placeholder="Component title (e.g. Coffee Station: Nespresso Setup)"
-            className="sm:col-span-4 px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
-          />
-          <input
-            type="text"
-            value={editCustomItemDesc}
-            onChange={(e) => setEditCustomItemDesc(e.target.value)}
-            placeholder="Subtitle / description"
-            className="sm:col-span-3 px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
-          />
-          <select
-            value={editCustomItemCategory}
-            onChange={(e) => setEditCustomItemCategory(e.target.value)}
-            className="sm:col-span-2 px-2 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white font-medium"
-          >
-            <option value="Bedroom">Bedroom</option>
-            <option value="Living Room">Living Room</option>
-            <option value="Kitchen">Kitchen</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Smart Tech">Smart Tech</option>
-            <option value="Supplies">Supplies</option>
-            <option value="Decor">Decor</option>
-            <option value="Operations">Operations</option>
-            <option value="Setup">Setup</option>
-          </select>
-          <input
-            type="number"
-            value={editCustomItemCost}
-            onChange={(e) => setEditCustomItemCost(e.target.value)}
-            placeholder="Price ($)"
-            className="sm:col-span-2 px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-emerald-600 dark:text-emerald-400 font-bold"
-          />
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => {
-              if (!editCustomItemName.trim()) {
-                toast.error('Please enter a component name');
-                return;
-              }
-              setEditPropInventory(prev => [
-                ...prev,
-                {
-                  name: editCustomItemName.trim(),
-                  category: editCustomItemCategory,
-                  costUsd: Number(editCustomItemCost) || 0,
-                  description: editCustomItemDesc.trim() || `${editCustomItemCategory} furnishing & setup item`,
-                },
-              ]);
-              setEditCustomItemName('');
-              setEditCustomItemCost('');
-              setEditCustomItemDesc('');
-            }}
-            className="sm:col-span-1 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white h-8"
-          >
-            + Add
-          </Button>
+        {/* Add New Component Card (Clean 2-Row Layout) */}
+        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 space-y-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+            <input
+              type="text"
+              value={editCustomItemName}
+              onChange={(e) => setEditCustomItemName(e.target.value)}
+              placeholder="Component title (e.g. Coffee Station: Nespresso Setup)"
+              className="sm:col-span-8 px-3.5 py-2 rounded-[10px] bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white font-semibold"
+            />
+            <select
+              value={editCustomItemCategory}
+              onChange={(e) => setEditCustomItemCategory(e.target.value)}
+              className="sm:col-span-4 px-3 py-2 rounded-[10px] bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white font-bold"
+            >
+              <option value="Bedroom">Bedroom</option>
+              <option value="Living Room">Living Room</option>
+              <option value="Kitchen">Kitchen</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Smart Tech">Smart Tech</option>
+              <option value="Supplies">Supplies</option>
+              <option value="Decor">Decor</option>
+              <option value="Operations">Operations</option>
+              <option value="Setup">Setup</option>
+            </select>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
+            <input
+              type="text"
+              value={editCustomItemDesc}
+              onChange={(e) => setEditCustomItemDesc(e.target.value)}
+              placeholder="Subtitle / description (e.g. Complimentary coffee bar setup)"
+              className="sm:col-span-6 px-3.5 py-2 rounded-[10px] bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+            />
+            <div className="sm:col-span-3 flex items-center gap-1.5 px-3 py-2 rounded-[10px] bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700">
+              <span className="text-emerald-600 dark:text-emerald-400 font-black text-xs">$</span>
+              <input
+                type="number"
+                value={editCustomItemCost}
+                onChange={(e) => setEditCustomItemCost(e.target.value)}
+                placeholder="Price (USD)"
+                className="w-full bg-transparent text-xs text-emerald-600 dark:text-emerald-400 font-black focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => {
+                if (!editCustomItemName.trim()) {
+                  toast.error('Please enter a component name');
+                  return;
+                }
+                setEditPropInventory(prev => [
+                  ...prev,
+                  {
+                    name: editCustomItemName.trim(),
+                    category: editCustomItemCategory,
+                    costUsd: Number(editCustomItemCost) || 0,
+                    description: editCustomItemDesc.trim() || `${editCustomItemCategory} furnishing & setup item`,
+                  },
+                ]);
+                setEditCustomItemName('');
+                setEditCustomItemCost('');
+                setEditCustomItemDesc('');
+              }}
+              className="sm:col-span-3 w-full text-xs font-extrabold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 h-9 rounded-[10px] shadow-sm"
+            >
+              + Add Component
+            </Button>
+          </div>
         </div>
 
         {/* Editable Component Rows */}
-        <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+        <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
           {editPropInventory.map((item, idx) => (
             <div
               key={idx}
-              className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2"
+              className="p-3.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-sky-500/30 transition-colors space-y-2"
             >
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-                <div className="sm:col-span-6 flex items-center gap-2">
-                  {getCategoryIcon(item.category)}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2.5">
+                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                  <div className="h-9 w-9 rounded-[10px] bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0">
+                    {getCategoryIcon(item.category)}
+                  </div>
                   <input
                     type="text"
                     value={item.name}
@@ -3663,10 +3712,11 @@ function PropertyInvestmentPageContent() {
                       setEditPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, name: val } : it));
                     }}
                     placeholder="Component Name"
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white"
+                    className="flex-1 min-w-0 px-3 py-2 rounded-[10px] bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700/80 text-xs font-bold text-slate-900 dark:text-white"
                   />
                 </div>
-                <div className="sm:col-span-3">
+
+                <div className="flex items-center gap-2 shrink-0">
                   <input
                     type="text"
                     value={item.category}
@@ -3674,33 +3724,32 @@ function PropertyInvestmentPageContent() {
                       const val = e.target.value;
                       setEditPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, category: val } : it));
                     }}
-                    placeholder="Category (e.g. KITCHEN)"
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-xs uppercase font-bold text-slate-600 dark:text-slate-300"
+                    placeholder="Category"
+                    className="w-28 sm:w-32 px-2.5 py-2 rounded-[10px] bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700/80 text-[11px] uppercase tracking-wider font-extrabold text-sky-600 dark:text-sky-400 text-center"
                   />
-                </div>
-                <div className="sm:col-span-2 flex items-center gap-1">
-                  <span className="text-emerald-500 font-black text-xs">$</span>
-                  <input
-                    type="number"
-                    value={item.costUsd}
-                    onChange={(e) => {
-                      const val = Number(e.target.value) || 0;
-                      setEditPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, costUsd: val } : it));
-                    }}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-emerald-500/40 text-xs font-black text-emerald-600 dark:text-emerald-400"
-                  />
-                </div>
-                <div className="sm:col-span-1 flex justify-end">
+                  <div className="flex items-center gap-1 px-3 py-2 rounded-[10px] bg-emerald-500/10 border border-emerald-500/40 w-24 sm:w-28 shrink-0">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-black text-xs">$</span>
+                    <input
+                      type="number"
+                      value={item.costUsd}
+                      onChange={(e) => {
+                        const val = Number(e.target.value) || 0;
+                        setEditPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, costUsd: val } : it));
+                      }}
+                      className="w-full bg-transparent text-right text-xs font-black text-emerald-600 dark:text-emerald-400 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
                   <button
                     type="button"
                     onClick={() => setEditPropInventory(prev => prev.filter((_, i) => i !== idx))}
-                    className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10"
+                    className="h-9 w-9 rounded-[10px] border border-rose-500/20 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 flex items-center justify-center shrink-0 transition-colors"
                     title="Delete component"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
+
               <input
                 type="text"
                 value={item.description || ''}
@@ -3709,7 +3758,7 @@ function PropertyInvestmentPageContent() {
                   setEditPropInventory(prev => prev.map((it, i) => i === idx ? { ...it, description: val } : it));
                 }}
                 placeholder="Component subtitle / description (e.g. Complimentary coffee bar setup designed for 5-star reviews)"
-                className="w-full px-2.5 py-1 rounded-lg bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200/70 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400"
+                className="w-full px-3.5 py-1.5 rounded-[10px] bg-slate-50/80 dark:bg-slate-950/60 border border-slate-200/70 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-300"
               />
             </div>
           ))}
@@ -3767,7 +3816,7 @@ function PropertyInvestmentPageContent() {
               dailyRateUsd: Number(editPropDailyRate) || 65,
               annualYieldPercent: Number(editPropYield) || 20,
               description: editPropDesc,
-              features: editPropFeatures.split(',').map(s => s.trim()).filter(Boolean),
+              features: normalizeFeaturesList(editPropFeatures),
               status: editPropStatus,
               inventory: editPropInventory,
               utilityPolicyText: editPropUtilityPolicy,

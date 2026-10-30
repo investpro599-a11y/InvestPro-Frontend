@@ -61,7 +61,7 @@ function TreeNodeComponent({ node }: { node: GenealogyNode }) {
 
         { (node.investmentAmount ?? 0) > 0 && (
           <div className="mt-1.5 p-1.5 rounded-lg bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-[10px] font-bold">
-            Monthly ROI: ${((node.investmentAmount ?? 0) * 0.15).toLocaleString()} USD
+            Monthly ROI (7%): ${((node.investmentAmount ?? 0) * 0.07).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
           </div>
         )}
 

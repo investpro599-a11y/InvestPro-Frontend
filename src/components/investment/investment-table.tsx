@@ -63,8 +63,10 @@ export function InvestmentTable() {
         title: "Investment Cancelled",
         description: "Your investment has been cancelled successfully.",
       });
-      // Invalidate and refetch investments
+      // Invalidate and refetch investments and dashboard stats
       queryClient.invalidateQueries({ queryKey: ["investments"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard/daily-profits"] });
       setCancellingId(null);
     },
     onError: (error: any) => {
@@ -270,7 +272,7 @@ export function InvestmentTable() {
                       {investment.plan === "6months" ? "6 Months" : investment.plan === "12months" ? "12 Months" : "18 Months"}
                     </TableCell>
                     <TableCell className="text-slate-300">{format(new Date(investment.createdAt), "MMM dd, yyyy")}</TableCell>
-                    <TableCell className="text-emerald-400 font-semibold">{investment.roiRate}%</TableCell>
+                    <TableCell className="text-emerald-400 font-semibold">7%</TableCell>
                     <TableCell>
                       <Badge className={getStatusColor(investment.status)}>
                         {investment.status}
